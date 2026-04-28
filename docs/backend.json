@@ -30,6 +30,9 @@
         "ipAddress": {
           "type": "string",
           "description": "The user's registered IP address"
+        },
+        "country": {
+          "type": "string"
         }
       },
       "required": ["displayName", "email"]
@@ -78,6 +81,9 @@
           "type": "string",
           "description": "The IP address from which the submission was made"
         },
+        "country": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time"
@@ -89,77 +95,40 @@
       },
       "required": ["userId", "model", "price", "imei", "status", "createdAt"]
     },
-    "banned_ip": {
-      "title": "Banned IP",
-      "description": "An IP address that is blocked from making new submissions",
-      "type": "object",
-      "properties": {
-        "ip": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "required": ["ip", "createdAt"]
-    },
-    "payment_claim": {
-      "title": "Payment Claim",
-      "description": "A claim made by a user that they have paid for an unlock",
-      "type": "object",
-      "properties": {
-        "orderId": { "type": "string" },
-        "userId": { "type": "string" },
-        "submissionId": { "type": "string" },
-        "imei": { "type": "string" },
-        "model": { "type": "string" },
-        "price": { "type": "number" },
-        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["orderId", "userId", "submissionId", "imei", "model", "price", "status", "createdAt"]
-    },
-    "order": {
-      "title": "Order",
-      "description": "A confirmed and paid unlock order",
-      "type": "object",
-      "properties": {
-        "orderId": { "type": "string" },
-        "userId": { "type": "string" },
-        "submissionId": { "type": "string" },
-        "imei": { "type": "string" },
-        "model": { "type": "string" },
-        "price": { "type": "number" },
-        "status": { "type": "string", "enum": ["confirming_payment", "processing", "approved", "declined", "unlocked", "ready_for_activation_bulk", "ready_for_activation"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "updatedAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["orderId", "userId", "submissionId", "imei", "model", "price", "status", "createdAt"]
-    },
-    "ticket": {
-      "title": "Support Ticket",
+    "activity": {
+      "title": "User Activity",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
         "userEmail": { "type": "string" },
-        "userName": { "type": "string" },
-        "category": { "type": "string" },
-        "subject": { "type": "string" },
-        "message": { "type": "string" },
-        "status": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["userId", "category", "subject", "message", "status", "createdAt"]
+        "ipAddress": { "type": "string" },
+        "country": { "type": "string" },
+        "action": { "type": "string" },
+        "path": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
     },
-    "counters": {
-      "title": "Counters",
+    "notification": {
+      "title": "Notification",
       "type": "object",
       "properties": {
-        "registeredUsers": { "type": "number" },
-        "unlockedDevices": { "type": "number" }
-      },
-      "required": ["registeredUsers", "unlockedDevices"]
+        "userId": { "type": "string", "description": "Specific user ID or 'all'" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "readBy": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "withdrawal": {
+      "title": "Withdrawal Request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "method": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "processed", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -174,29 +143,17 @@
       "schema": { "$ref": "#/backend/entities/submission" },
       "description": "Device check submissions"
     },
-    "/banned_users/{userId}": {
-      "schema": { "type": "object", "properties": { "userId": { "type": "string" }, "createdAt": { "type": "string" } } },
-      "description": "Banned user IDs"
+    "/activities/{activityId}": {
+      "schema": { "$ref": "#/backend/entities/activity" },
+      "description": "User audit log"
     },
-    "/banned_ips/{ipId}": {
-      "schema": { "$ref": "#/backend/entities/banned_ip" },
-      "description": "Banned IP addresses"
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/backend/entities/notification" },
+      "description": "System notifications"
     },
-    "/orders/{orderId}": {
-      "schema": { "$ref": "#/backend/entities/order" },
-      "description": "Unlock orders"
-    },
-    "/tickets/{ticketId}": {
-      "schema": { "$ref": "#/backend/entities/ticket" },
-      "description": "Support tickets"
-    },
-    "/counters/metrics": {
-      "schema": { "$ref": "#/backend/entities/counters" },
-      "description": "Site metrics"
-    },
-    "/payment_claims/{claimId}": {
-      "schema": { "$ref": "#/backend/entities/payment_claim" },
-      "description": "Payment claims"
+    "/withdrawals/{requestId}": {
+      "schema": { "$ref": "#/backend/entities/withdrawal" },
+      "description": "User withdrawal requests"
     }
   }
 }

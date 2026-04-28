@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useUser, useCollection, useDoc } from '@/firebase';
+import { useUser, useCollection, useDoc, useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import { LoginButton } from '@/components/login-button';
-import { where } from 'firebase/firestore';
+import { where, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,11 +22,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -54,6 +57,7 @@ interface Order {
 interface UserProfile {
     id: string;
     balance?: number;
+    email: string;
 }
 
 interface SupportTicket {
@@ -84,6 +88,7 @@ const CopyToClipboard = ({ text, children }: { text: string; children: React.Rea
 
 function MyAccountContent() {
   const { data: user, loading: userLoading } = useUser();
+  const { firestore } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
   
@@ -113,6 +118,18 @@ function MyAccountContent() {
   const [isSubmittingBulk, setIsSubmittingBulk] = useState(false);
   const [bulkPaid, setBulkPaid] = useState(false);
   const [timeLeft, setTimeLeft] = useState(20 * 60);
+
+  // Withdrawal State
+  const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
+  const [isWithdrawing, setIsWithdrawalProcessing] = useState(false);
+  const [withdrawalSuccess, setWithdrawalSuccess] = useState(false);
+  const [withdrawAmount, setWithdrawalAmount] = useState('');
+  const [withdrawMethod, setWithdrawalMethod] = useState('');
+  const [withdrawReason, setWithdrawalReason] = useState('');
+
+  // Deletion State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -152,7 +169,6 @@ function MyAccountContent() {
   const currentBalance = userProfile?.balance || 0;
   const bulkAmountToPay = Math.max(0, bulkFinalTotal - currentBalance);
 
-
   const handleBulkPaid = () => {
     if (isSubmittingBulk) return;
     setIsSubmittingBulk(true);
@@ -166,6 +182,74 @@ function MyAccountContent() {
         });
     }, 1500);
   };
+
+  const handleWithdrawalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (currentBalance < 50) return;
+    const amt = parseFloat(withdrawAmount);
+    if (amt > currentBalance || amt < 50) {
+        return toast({ title: "Invalid Amount", description: "Min withdrawal is $50 and cannot exceed balance.", variant: "destructive" });
+    }
+
+    setIsWithdrawalProcessing(true);
+    
+    // Simulate 2 minute processing as requested
+    setTimeout(async () => {
+      try {
+        await addDoc(collection(firestore, 'withdrawals'), {
+            userId: user?.uid,
+            userEmail: user?.email,
+            amount: amt,
+            method: withdrawMethod,
+            reason: withdrawReason,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+        });
+        setIsWithdrawalProcessing(false);
+        setWithdrawalSuccess(true);
+      } catch (e) {
+        setIsWithdrawalProcessing(false);
+        toast({ title: "Error", description: "Failed to submit request.", variant: "destructive" });
+      }
+    }, 120000); // 2 minutes
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    // In a real app, this might create a deletion request ticket
+    await addDoc(collection(firestore, 'tickets'), {
+        userId: user?.uid,
+        userName: user?.displayName || 'Client',
+        userEmail: user?.email,
+        category: 'Account Deletion',
+        subject: 'Account Deletion Request',
+        message: 'I would like to request the permanent deletion of my account and all associated data.',
+        status: 'open',
+        replies: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    });
+    
+    // Notify admin
+    const tgMessage = `⚠️ <b>ACCOUNT DELETION REQUEST!</b> ⚠️\n\n<b>User:</b> ${user?.email}\n<b>ID:</b> ${user?.uid}`;
+    fetch('/api/telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: tgMessage }),
+    });
+
+    setIsDeleting(false);
+    setIsDeleteModalOpen(false);
+    toast({ title: "Request Submitted", description: "Our team will process your deletion request within 48 hours." });
+  };
+
+  const stats = useMemo(() => {
+    if (!orders) return { unlocked: 0, declined: 0 };
+    return {
+        unlocked: orders.filter(o => o.status === 'unlocked').length,
+        declined: orders.filter(o => o.status === 'declined').length,
+    };
+  }, [orders]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -224,6 +308,11 @@ function MyAccountContent() {
               {isAdmin && (
                 <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
               )}
+              {user && (
+                <Link href="/my-account/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <Bell className="h-5 w-5 text-gray-600" />
+                </Link>
+              )}
               <LoginButton />
             </div>
             <div className="md:hidden">
@@ -241,11 +330,12 @@ function MyAccountContent() {
                     <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                     <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
-                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
                     {isAdmin && (
-                      <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                      <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                     )}
+                    <Link href="/my-account/notifications" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Notifications</Link>
                     <div className='pt-4'>
                       <LoginButton />
                     </div>
@@ -257,147 +347,206 @@ function MyAccountContent() {
         </div>
       </nav>
 
-      <main className="flex-grow max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full">
+      <main className="flex-grow max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full space-y-8">
         <h1 className="text-4xl font-bold text-center mb-10">Your Account</h1>
         
-        <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <Card className="lg:col-span-2">
-                <CardHeader>
-                    <CardTitle className="text-2xl text-blue-600">Account Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <p><strong>Current Balance:</strong> ${userProfile?.balance?.toFixed(2) || '0.00'}</p>
-                            <p><strong>Total Orders:</strong> {orders ? orders.length : 0}</p>
-                        </div>
-                        <div>
-                            <p><strong>Deposit via Crypto:</strong></p>
-                            <div className="flex items-center gap-3 mt-2">
-                               {usdtImage && (
-                                 <Image 
-                                    src={usdtImage.imageUrl} 
-                                    alt="USDT" 
-                                    width={42} 
-                                    height={42} 
-                                    className="rounded-full"
-                                    data-ai-hint="usdt logo"
-                                 />
-                               )}
-                               <div className="flex-1">
-                                 <p className="text-sm">USDT BEP20 Address:</p>
-                                 <div className="font-mono text-xs bg-gray-100 p-2 rounded-md break-all flex items-center justify-between border shadow-inner">
-                                    <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                    <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
-                                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                                            <Copy className="w-3 h-3 text-gray-500 hover:text-gray-800"/>
-                                        </Button>
-                                    </CopyToClipboard>
-                                 </div>
-                               </div>
-                            </div>
-                        </div>
-                    </div>
+        {/* Account Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-white border-l-4 border-l-blue-500 shadow-sm">
+                <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Wallet className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-gray-400 uppercase">Balance</p><p className="text-2xl font-black">${userProfile?.balance?.toFixed(2) || '0.00'}</p></div>
                 </CardContent>
             </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                        <MessageSquare className="text-blue-600" />
-                        Need Help?
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">If you have any issues with your order, payment, or activation, please submit a support ticket.</p>
-                    <Link href="/my-account/tickets/new" className="w-full">
-                        <Button className="w-full btn-primary text-white">
-                            <Ticket className="mr-2 h-4 w-4" />
-                            Submit Support Ticket
-                        </Button>
-                    </Link>
+            <Card className="bg-white border-l-4 border-l-green-500 shadow-sm">
+                <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 bg-green-50 rounded-2xl text-green-600"><CheckCircle2 className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-gray-400 uppercase">Unlocked</p><p className="text-2xl font-black">{stats.unlocked}</p></div>
+                </CardContent>
+            </Card>
+            <Card className="bg-white border-l-4 border-l-red-500 shadow-sm">
+                <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 bg-red-50 rounded-2xl text-red-600"><XCircle className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-gray-400 uppercase">Declined</p><p className="text-2xl font-black">{stats.declined}</p></div>
+                </CardContent>
+            </Card>
+            <Card className="bg-white border-l-4 border-l-primary shadow-sm">
+                <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 bg-primary/10 rounded-2xl text-primary"><BarChart3 className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-gray-400 uppercase">Total Orders</p><p className="text-2xl font-black">{orders?.length || 0}</p></div>
                 </CardContent>
             </Card>
         </div>
 
-        <Alert className="mb-12">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Important Notice</AlertTitle>
-            <AlertDescription>
-                After depositing, please refresh the page to confirm that your current balance has been updated and your unlock order has been approved for processing. If you experience any issues, please contact Support.
+        <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            <Card className="lg:col-span-2">
+                <CardHeader>
+                    <CardTitle className="text-2xl text-blue-600 flex items-center gap-2"><Wallet className="h-6 w-6" /> Financial Management</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="p-6 rounded-2xl bg-gray-50 border border-dashed border-gray-200">
+                        <p className="font-bold mb-4">Deposit via Crypto:</p>
+                        <div className="flex items-center gap-3">
+                           {usdtImage && (
+                             <Image 
+                                src={usdtImage.imageUrl} 
+                                alt="USDT" 
+                                width={48} 
+                                height={42} 
+                                className="rounded-full shadow-sm"
+                             />
+                           )}
+                           <div className="flex-1">
+                             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">USDT BEP20 Address:</p>
+                             <div className="font-mono text-[11px] sm:text-xs bg-white p-3 rounded-xl break-all flex items-center justify-between border shadow-sm group">
+                                <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
+                                <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100">
+                                        <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
+                                    </Button>
+                                </CopyToClipboard>
+                             </div>
+                           </div>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t">
+                        <h4 className="font-bold mb-2">Withdraw Funds</h4>
+                        <p className="text-sm text-gray-500 mb-4">You can request a withdrawal of your available balance. Min: $50.</p>
+                        <Button 
+                            onClick={() => setIsWithdrawalModalOpen(true)} 
+                            variant="outline" 
+                            className="w-full sm:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 h-11 px-6 rounded-xl font-bold"
+                            disabled={currentBalance < 50}
+                        >
+                            Request Withdrawal
+                        </Button>
+                        {currentBalance < 50 && (
+                            <p className="text-[10px] text-red-500 mt-2 font-medium flex items-center gap-1">
+                                <Info className="h-3 w-3" /> You do not have sufficient balance to withdraw.
+                            </p>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                            <MessageSquare className="text-blue-600 h-5 w-5" />
+                            Support Center
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-xs text-gray-600 mb-4 leading-relaxed">Having issues? Our technician is available 24/7. Response time: 1-24 hours.</p>
+                        <Link href="/my-account/tickets/new" className="w-full">
+                            <Button className="w-full btn-primary text-white h-11 rounded-xl shadow-lg">
+                                <Ticket className="mr-2 h-4 w-4" />
+                                New Support Ticket
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-red-100 bg-red-50/30">
+                    <CardHeader>
+                        <CardTitle className="text-sm font-bold text-red-600 flex items-center gap-2">
+                            <Trash2 className="h-4 w-4" />
+                            Account Deletion
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-[10px] text-gray-500 mb-3">Permanently remove your account and all history.</p>
+                        <Button 
+                            variant="link" 
+                            className="text-red-500 p-0 h-auto text-xs font-bold hover:text-red-700"
+                            onClick={() => setIsDeleteModalOpen(true)}
+                        >
+                            Request Deletion
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+
+        <Alert className="mb-12 border-blue-200 bg-blue-50/50">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertTitle className="text-blue-800 font-bold">Refresh Account</AlertTitle>
+            <AlertDescription className="text-blue-700 text-sm">
+                If you just deposited, click the refresh button below to update your balance and order status.
             </AlertDescription>
         </Alert>
 
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold">Order History</h2>
+            <h2 className="text-3xl font-bold flex items-center gap-3">
+                <Clock className="h-8 w-8 text-primary" />
+                Order History
+            </h2>
             <div className="flex items-center gap-4">
                  {canPayBulk && (
                     <Button onClick={handleOpenBulkModal} className="btn-primary text-white shadow-lg animate-pulse">
-                        Pay Bulk ({ordersForBulkPay.length} items)
+                        Pay Bulk ({ordersForBulkPay.length})
                     </Button>
                 )}
-                 <div className="flex items-center gap-2">
-                    <p className="text-sm text-gray-500 hidden md:block">Click the refresh button to update your order status.</p>
-                    <Button variant="outline" onClick={() => router.refresh()}>
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Refresh
-                    </Button>
-                </div>
+                <Button variant="outline" onClick={() => router.refresh()} className="h-10 rounded-xl">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Refresh
+                </Button>
             </div>
           </div>
           {ordersLoading ? (
-            <div className="text-center py-16 px-6 bg-white rounded-2xl shadow-lg">
-                <p className="text-center text-gray-600">Loading orders...</p>
-            </div>
+            <div className="text-center py-16 px-6 bg-white rounded-2xl shadow-lg"><Loader className="animate-spin h-8 w-8 mx-auto text-primary" /></div>
           ) : orders && orders.length > 0 ? (
-            <Card>
+            <Card className="overflow-hidden border-none shadow-xl">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-gray-50">
                   <TableRow>
                     <TableHead>Order Date</TableHead>
                     <TableHead>Order ID</TableHead>
-                    <TableHead>Service</TableHead>
                     <TableHead>Device</TableHead>
-                    <TableHead>IMEI</TableHead>
+                    <TableHead>IMEI/Serial</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Amount</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {orders.map(order => (
-                    <TableRow key={order.id}>
-                      <TableCell>{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
-                      <TableCell className="font-mono text-sm">{order.orderId}</TableCell>
-                      <TableCell>iCloud Unlock</TableCell>
-                      <TableCell>{order.model}</TableCell>
-                      <TableCell className="font-mono text-xs">{order.imei}</TableCell>
+                    <TableRow key={order.id} className="hover:bg-gray-50/50">
+                      <TableCell className="text-xs text-gray-500">{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                      <TableCell className="font-mono text-xs font-bold text-blue-600">{order.orderId}</TableCell>
+                      <TableCell className="text-sm font-semibold">{order.model}</TableCell>
+                      <TableCell className="font-mono text-[10px] text-gray-400">{order.imei}</TableCell>
                       <TableCell>
                         <Badge variant={
                             order.status === 'approved' || order.status === 'unlocked' ? 'secondary' : 
                             order.status === 'declined' ? 'destructive' : 'default'
-                        } className={order.status === 'confirming_payment' || order.status === 'processing' ? 'animate-pulse' : ''}>
+                        } className={cn("text-[10px] uppercase font-bold", (order.status === 'confirming_payment' || order.status === 'processing') && "animate-pulse")}>
                           {formatStatus(order.status)}
                         </Badge>
                       </TableCell>
-                      <TableCell>${order.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-black text-sm">${order.price.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </Card>
           ) : (
-            <div className="text-center py-16 px-6 bg-white rounded-2xl shadow-lg">
-                <p className="text-gray-600">No orders found. Once you make a payment for a service, your orders will appear here.</p>
+            <div className="text-center py-20 px-6 bg-white rounded-3xl shadow-inner border border-dashed">
+                <p className="text-gray-400 font-medium">Your order history will appear here once you place an order.</p>
             </div>
           )}
         </section>
 
         <section>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">My Support Tickets</h2>
+                <h2 className="text-3xl font-bold flex items-center gap-3">
+                    <MessageSquare className="h-8 w-8 text-primary" />
+                    Support Tickets
+                </h2>
                 <Link href="/my-account/tickets/new">
-                    <Button variant="outline" size="sm" className="bg-white border-blue-200 text-blue-600 hover:bg-blue-50">
+                    <Button variant="outline" size="sm" className="bg-white border-blue-200 text-blue-600 hover:bg-blue-50 h-10 px-4 rounded-xl font-bold">
                         <Ticket className="mr-2 h-4 w-4" />
                         New Ticket
                     </Button>
@@ -406,12 +555,11 @@ function MyAccountContent() {
             {ticketsLoading ? (
                 <p>Loading tickets...</p>
             ) : tickets && tickets.length > 0 ? (
-                <Card>
+                <Card className="overflow-hidden border-none shadow-xl">
                     <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-gray-50">
                             <TableRow>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Ticket ID</TableHead>
                                 <TableHead>Category</TableHead>
                                 <TableHead>Subject</TableHead>
                                 <TableHead>Status</TableHead>
@@ -425,20 +573,19 @@ function MyAccountContent() {
                                 return timeB - timeA;
                             }).map(ticket => (
                                 <TableRow key={ticket.id}>
-                                    <TableCell>{ticket.createdAt?.toDate ? ticket.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
-                                    <TableCell className="font-mono text-xs uppercase">{ticket.id.slice(0, 8)}</TableCell>
-                                    <TableCell>{ticket.category}</TableCell>
-                                    <TableCell className="font-medium">{ticket.subject}</TableCell>
+                                    <TableCell className="text-xs text-gray-500">{ticket.createdAt?.toDate ? ticket.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                                    <TableCell className="text-xs font-bold text-gray-400 uppercase">{ticket.category}</TableCell>
+                                    <TableCell className="font-semibold text-sm">{ticket.subject}</TableCell>
                                     <TableCell>
-                                        <Badge variant={getStatusVariant(ticket.status)}>
+                                        <Badge variant={getStatusVariant(ticket.status)} className="text-[10px] uppercase font-bold">
                                             {ticket.status.replace('_', ' ')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <Link href={`/my-account/tickets/${ticket.id}`}>
-                                            <Button size="sm" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold">
-                                                View Details
-                                                <ChevronRight className="ml-1 h-4 w-4" />
+                                            <Button size="sm" variant="ghost" className="text-blue-600 hover:text-blue-700 font-bold text-xs gap-1">
+                                                View
+                                                <ChevronRight className="h-3 w-3" />
                                             </Button>
                                         </Link>
                                     </TableCell>
@@ -448,14 +595,15 @@ function MyAccountContent() {
                     </Table>
                 </Card>
             ) : (
-                <div className="text-center py-12 px-6 bg-white rounded-2xl shadow-lg border border-dashed">
-                    <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">You haven't submitted any support tickets yet.</p>
+                <div className="text-center py-16 px-6 bg-white rounded-3xl shadow-inner border border-dashed">
+                    <MessageSquare className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-400">You haven't submitted any support tickets yet.</p>
                 </div>
             )}
         </section>
       </main>
       
+      {/* Bulk Pay Modal */}
       <Dialog open={isBulkPayModalOpen} onOpenChange={setIsBulkPayModalOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
             <DialogHeader className="px-5 py-2.5 border-b bg-white">
@@ -524,7 +672,7 @@ function MyAccountContent() {
                         <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
                             <span className="font-medium">0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
                             <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-200">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-100">
                                     <Copy className="w-4 h-4 text-gray-500"/>
                                 </Button>
                             </CopyToClipboard>
@@ -556,6 +704,84 @@ function MyAccountContent() {
                   ) : (
                     bulkAmountToPay > 0 ? 'Paid' : 'Confirm'
                   )}
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdrawal Modal */}
+      <Dialog open={isWithdrawalModalOpen} onOpenChange={(v) => !isWithdrawing && !withdrawalSuccess && setIsWithdrawalModalOpen(v)}>
+        <DialogContent className="sm:max-w-[450px]">
+          {isWithdrawing ? (
+            <div className="py-12 flex flex-col items-center justify-center space-y-6 text-center">
+              <Loader className="h-16 w-16 animate-spin text-primary" />
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold">Processing Withdrawal</h3>
+                <p className="text-sm text-gray-500 px-6">We are verifying your account and processing the request. This may take a few moments...</p>
+              </div>
+              <p className="text-[10px] text-gray-400 font-mono animate-pulse">ESTIMATED TIME: 120s</p>
+            </div>
+          ) : withdrawalSuccess ? (
+            <div className="py-10 text-center space-y-6 animate-fade-in">
+              <CheckCircle2 className="h-20 w-24 mx-auto text-green-500" />
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black">Request Submitted!</h3>
+                <div className="p-4 bg-green-50 border border-green-100 rounded-xl text-green-800 text-sm leading-relaxed mx-2">
+                    Support will review and process your withdrawal. If it takes more than 2 days, please submit a support ticket.
+                </div>
+              </div>
+              <Button onClick={() => { setIsWithdrawalModalOpen(false); setWithdrawalSuccess(false); }} className="w-full btn-primary text-white">Great, Thanks</Button>
+            </div>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Withdraw Funds</DialogTitle>
+                <DialogDescription>Minimum withdrawal amount is $50. Processing time: 1-48 hours.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleWithdrawalSubmit} className="space-y-5 py-4">
+                <div className="space-y-2">
+                    <Label htmlFor="w-amount">Amount to Withdraw ($)</Label>
+                    <Input id="w-amount" type="number" placeholder="Min $50" value={withdrawAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="w-method">Payment Method</Label>
+                    <Select value={withdrawMethod} onValueChange={setWithdrawalMethod} required>
+                        <SelectTrigger id="w-method"><SelectValue placeholder="Choose method..." /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="usdt-bep20">USDT (BEP20)</SelectItem>
+                            <SelectItem value="usdt-trc20">USDT (TRC20)</SelectItem>
+                            <SelectItem value="bitcoin">Bitcoin (BTC)</SelectItem>
+                            <SelectItem value="paypal">PayPal</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="w-reason">Reason for Withdrawal</Label>
+                    <Textarea id="w-reason" placeholder="e.g., Change of plans, surplus balance..." value={withdrawReason} onChange={(e) => setWithdrawalReason(e.target.value)} required />
+                </div>
+                <DialogFooter>
+                    <Button type="submit" className="w-full btn-primary text-white h-12 font-bold shadow-lg">Proceed with Withdrawal</Button>
+                </DialogFooter>
+              </form>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+                <DialogTitle className="text-red-600 flex items-center gap-2">Confirm Account Deletion</DialogTitle>
+                <DialogDescription>This action is irreversible. All your orders, balance, and history will be lost.</DialogDescription>
+            </DialogHeader>
+            <div className="py-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-800 text-xs font-medium">
+                ⚠️ Your request will be reviewed by an administrator within 48 hours. If you have an active balance, it will be forfeited unless withdrawn first.
+            </div>
+            <DialogFooter className="gap-3">
+                <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="flex-1">Cancel</Button>
+                <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting} className="flex-1 font-bold">
+                    {isDeleting ? <Loader className="animate-spin h-4 w-4" /> : 'Confirm Deletion'}
                 </Button>
             </DialogFooter>
         </DialogContent>

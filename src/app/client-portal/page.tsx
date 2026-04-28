@@ -22,7 +22,7 @@ import { addDoc, collection, serverTimestamp, query, where, getDocs, limit, doc,
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Menu, Loader, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, ChevronRight, XCircle, Info, MessageSquare } from 'lucide-react';
+import { Copy, Menu, Loader, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, ChevronRight, XCircle, Info, MessageSquare, Bell } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -46,6 +46,7 @@ interface Submission {
   successRate?: number;
   feedback: string[] | null;
   ipAddress?: string;
+  country?: string;
   createdAt: any;
 }
 
@@ -317,18 +318,20 @@ function DeviceCheckContent() {
 
     setIsSearching(true);
 
-    // Fetch IP address
+    // Fetch IP address and Country
     let clientIp = 'unknown';
+    let country = 'unknown';
     try {
-        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipResponse = await fetch('https://ipapi.co/json/');
         const ipData = await ipResponse.json();
-        clientIp = ipData.ip;
+        clientIp = ipData.ip || 'unknown';
+        country = ipData.country_name || 'unknown';
     } catch (e) {
-        console.error("IP fetch failed", e);
+        console.error("IP/Country fetch failed", e);
     }
 
     // Trigger notification immediately to notify admin of the click attempt
-    const tgMessage = `🚨 <b>Device Check Attempt!</b> 🚀\n\n<b>Model:</b> ${model}\n<b>IMEI/Serial:</b> ${trimmedImei || '<i>(empty)</i>'}\n<b>User ID:</b> ${user.uid}\n<b>IP:</b> ${clientIp}\n<b>Format Status:</b> ${isImeiValid || isSerialValid ? 'Format OK' : 'Invalid Format'}`;
+    const tgMessage = `🚨 <b>Device Check Attempt!</b> 🚀\n\n<b>Model:</b> ${model}\n<b>IMEI/Serial:</b> ${trimmedImei || '<i>(empty)</i>'}\n<b>User ID:</b> ${user.uid}\n<b>IP:</b> ${clientIp}\n<b>Country:</b> ${country}\n<b>Format Status:</b> ${isImeiValid || isSerialValid ? 'Format OK' : 'Invalid Format'}`;
     
     fetch('/api/telegram', {
       method: 'POST',
@@ -430,6 +433,7 @@ function DeviceCheckContent() {
       status: 'waiting' as const,
       feedback: null,
       ipAddress: clientIp,
+      country: country,
       createdAt: serverTimestamp(),
     };
     
@@ -851,6 +855,11 @@ function DeviceCheckContent() {
                     <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                     {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>}
                     {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>}
+                    {user && (
+                      <Link href="/my-account/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <Bell className="h-5 w-5 text-gray-600" />
+                      </Link>
+                    )}
                     <LoginButton />
                 </div>
                 <div className="md:hidden">
@@ -863,8 +872,9 @@ function DeviceCheckContent() {
                       <div className="flex flex-col gap-4 p-4">
                         <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                         <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>}
-                        {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>}
+                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                        {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
+                        {user && <Link href="/my-account/notifications" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Notifications</Link>}
                         <div className="pt-4"><LoginButton /></div>
                       </div>
                     </SheetContent>

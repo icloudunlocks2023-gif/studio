@@ -33,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -50,6 +50,7 @@ interface Submission {
   successRate?: number;
   feedback: string[] | null;
   ipAddress?: string;
+  country?: string;
 }
 
 interface Order {
@@ -525,23 +526,36 @@ function AdminDashboard() {
                                   </div>
                               </>)}
                       </CardContent>
-                      <CardFooter className="flex justify-between flex-wrap gap-2">
-                          <Button onClick={handleUpdateMetrics} className="btn-primary text-white">Save All Settings</Button>
-                          <div className="flex gap-2">
-                              <Link href="/admin/tickets">
-                                <Button variant="outline" className="relative border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100">
-                                  <MessageSquare className="mr-2 h-4 w-4" />
-                                  Tickets
+                      <CardFooter className="flex flex-col items-stretch gap-4">
+                          <Button onClick={handleUpdateMetrics} className="btn-primary text-white w-full">Save All Settings</Button>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                              <Link href="/admin/activities" className="w-full">
+                                <Button variant="outline" className="w-full text-xs gap-1 border-blue-200">
+                                  <Activity className="h-3 w-3" /> Activities
+                                </Button>
+                              </Link>
+                              <Link href="/admin/notifications" className="w-full">
+                                <Button variant="outline" className="w-full text-xs gap-1 border-primary/30">
+                                  <Bell className="h-3 w-3" /> Notifications
+                                </Button>
+                              </Link>
+                              <Link href="/admin/tickets" className="w-full">
+                                <Button variant="outline" className="relative w-full text-xs gap-1 border-blue-200 bg-blue-50 text-blue-700">
+                                  <MessageSquare className="h-3 w-3" /> Tickets
                                   {hasOpenTickets && (
-                                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
                                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                     </span>
                                   )}
                                 </Button>
                               </Link>
-                              <Link href="/admin/users"><Button variant="outline"><Users className="mr-2 h-4 w-4" />Users</Button></Link>
-                              <Link href="/admin/banned"><Button variant="destructive"><Ban className="mr-2 h-4 w-4" />Banned</Button></Link>
+                              <Link href="/admin/users" className="w-full">
+                                <Button variant="outline" className="w-full text-xs gap-1"><Users className="h-3 w-3" />Users</Button>
+                              </Link>
+                              <Link href="/admin/banned" className="w-full col-span-2 sm:col-span-1">
+                                <Button variant="destructive" className="w-full text-xs gap-1"><Ban className="h-3 w-3" />Banned</Button>
+                              </Link>
                           </div>
                       </CardFooter>
                   </Card>
@@ -561,7 +575,13 @@ function AdminDashboard() {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-gray-400 uppercase font-bold tracking-tighter">Network Info</p>
-                                <p className="break-all">IP: <span className="font-mono text-blue-700">{sub.ipAddress || 'unknown'}</span></p>
+                                <p className="break-all flex items-center gap-1">
+                                  IP: <span className="font-mono text-blue-700">{sub.ipAddress || 'unknown'}</span>
+                                </p>
+                                <p className="flex items-center gap-1 font-semibold text-gray-700">
+                                  <MapPin className="h-3 w-3 text-red-500" />
+                                  Country: <span className="text-primary">{sub.country || 'Auto-detecting...'}</span>
+                                </p>
                                 <p className="font-bold text-red-600">IP Frequency: {sub.ipAddress ? ipCounts[sub.ipAddress] : 0}</p>
                             </div>
                         </div>
