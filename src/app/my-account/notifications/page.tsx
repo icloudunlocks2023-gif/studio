@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -12,6 +11,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { orderBy } from 'firebase/firestore';
+import { cn } from '@/lib/utils';
 
 interface Notification {
   id: string;
