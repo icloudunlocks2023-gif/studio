@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { LoginButton } from '@/components/login-button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Clock, ChevronRight } from 'lucide-react';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -198,6 +198,7 @@ export default function ServicesPage() {
                     {isAdmin && (
                         <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
                     )}
+                    {user && <NotificationDropdown />}
                     <LoginButton />
                 </div>
                 <div className="md:hidden">
@@ -213,12 +214,18 @@ export default function ServicesPage() {
                       </SheetHeader>
                       <div className="flex flex-col gap-4 p-4">
                         <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                        <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
+                        <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                         {user && (
-                            <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                            <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                         )}
                         {isAdmin && (
-                            <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                            <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                        )}
+                        {user && (
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="text-gray-700 text-base font-medium">Notifications</span>
+                            <NotificationDropdown />
+                          </div>
                         )}
                         <div className='pt-4'>
                           <LoginButton />

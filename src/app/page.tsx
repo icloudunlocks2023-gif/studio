@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -11,6 +10,7 @@ import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 
 
 const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
@@ -252,6 +252,7 @@ export default function IcloudUnlocksPage() {
               {isAdmin && (
                 <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
               )}
+              {user && <NotificationDropdown />}
               <LoginButton />
             </div>
             <div className="md:hidden">
@@ -269,10 +270,16 @@ export default function IcloudUnlocksPage() {
                     <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                     <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
-                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
                     {isAdmin && (
                       <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                    )}
+                    {user && (
+                      <div className="flex items-center gap-2 py-2">
+                        <span className="text-gray-700 text-base font-medium">Notifications</span>
+                        <NotificationDropdown />
+                      </div>
                     )}
                     <div className='pt-4'>
                       <LoginButton />

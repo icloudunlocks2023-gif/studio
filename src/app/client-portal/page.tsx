@@ -33,6 +33,7 @@ import { Progress } from '@/components/ui/progress';
 import { PaymentVerificationAnimation } from '@/components/ui/payment-verification-animation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 
 interface Submission {
   id: string;
@@ -860,11 +861,7 @@ function DeviceCheckContent() {
                     <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                     {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>}
                     {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>}
-                    {user && (
-                      <Link href="/my-account/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
-                        <Bell className="h-5 w-5 text-gray-600" />
-                      </Link>
-                    )}
+                    {user && <NotificationDropdown />}
                     <LoginButton />
                 </div>
                 <div className="md:hidden">
@@ -877,9 +874,14 @@ function DeviceCheckContent() {
                       <div className="flex flex-col gap-4 p-4">
                         <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                         <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
-                        {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
-                        {user && <Link href="/my-account/notifications" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Notifications</Link>}
+                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                        {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
+                        {user && (
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="text-gray-700 text-base font-medium">Notifications</span>
+                            <NotificationDropdown />
+                          </div>
+                        )}
                         <div className="pt-4"><LoginButton /></div>
                       </div>
                     </SheetContent>

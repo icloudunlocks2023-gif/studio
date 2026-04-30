@@ -30,6 +30,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -308,11 +309,7 @@ function MyAccountContent() {
               {isAdmin && (
                 <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
               )}
-              {user && (
-                <Link href="/my-account/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
-                  <Bell className="h-5 w-5 text-gray-600" />
-                </Link>
-              )}
+              {user && <NotificationDropdown />}
               <LoginButton />
             </div>
             <div className="md:hidden">
@@ -335,7 +332,12 @@ function MyAccountContent() {
                     {isAdmin && (
                       <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                     )}
-                    <Link href="/my-account/notifications" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Notifications</Link>
+                    {user && (
+                      <div className="flex items-center gap-2 py-2">
+                        <span className="text-gray-700 text-base font-medium">Notifications</span>
+                        <NotificationDropdown />
+                      </div>
+                    )}
                     <div className='pt-4'>
                       <LoginButton />
                     </div>
@@ -522,7 +524,7 @@ function MyAccountContent() {
                         <Badge variant={
                             order.status === 'approved' || order.status === 'unlocked' ? 'secondary' : 
                             order.status === 'declined' ? 'destructive' : 'default'
-                        } className={cn("text-[10px] uppercase font-bold", (order.status === 'confirming_payment' || order.status === 'processing') && "animate-pulse")}>
+                        } className={cn("text-[10px] uppercase font-bold", (order.status === 'confirming_payment' || order.status === 'processing' ) && "animate-pulse")}>
                           {formatStatus(order.status)}
                         </Badge>
                       </TableCell>
