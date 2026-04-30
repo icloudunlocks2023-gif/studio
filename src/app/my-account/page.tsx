@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -22,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3 } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -30,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -673,7 +673,7 @@ function MyAccountContent() {
                             <span className="font-medium">0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
                             <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-100">
-                                    <Copy className="w-4 h-4 text-gray-500"/>
+                                    <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
                                 </Button>
                             </CopyToClipboard>
                         </div>
