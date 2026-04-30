@@ -2,94 +2,72 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useUser, useFirebase, useCollection } from '@/firebase';
-import { where, doc, updateDoc, arrayUnion } from 'firebase/firestore';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { Bell, Info } from 'lucide-react';
+import { useUser, useCollection } from '@/firebase';
+import { Bell } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function NotificationListener() {
   const { data: user } = useUser();
-  const { firestore } = useFirebase();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [currentNotification, setCurrentNotification] = useState<any>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [lastNotificationId, setLastNotificationId] = useState<string | null>(null);
 
-  // Constraints for global or user-specific notifications
-  const constraints = useMemo(() => {
-    if (!user) return [where('userId', '==', 'none')];
-    // This is a simplification. For complex "all" vs "user" logic, multiple queries or client filter needed
-    return []; 
-  }, [user]);
+  // Memoize constraints to prevent infinite loops
+  const constraints = useMemo(() => [], []);
 
   const { data: notifications } = useCollection<any>('notifications', { constraints });
 
   useEffect(() => {
     if (notifications && user) {
-      // Find notifications the user hasn't "read" (or seen popup for)
+      // Find the most recent unread notification
       const unread = notifications.filter(n => {
         const isTarget = n.userId === 'all' || n.userId === user.uid;
         const isUnread = !n.readBy?.includes(user.uid);
         return isTarget && isUnread;
+      }).sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return timeB - timeA;
       });
 
       if (unread.length > 0) {
-        setCurrentNotification(unread[0]);
-        setOpen(true);
+        const latest = unread[0];
+        
+        // Only trigger if this is a truly new notification we haven't seen in this component session
+        if (latest.id !== lastNotificationId) {
+          setLastNotificationId(latest.id);
+          setShowPopup(true);
+
+          // 1. Show popup for 2 seconds
+          const popupTimer = setTimeout(() => {
+            setShowPopup(false);
+            
+            // 2. After popup disappears, trigger the dropdown to open
+            const event = new CustomEvent('open-notification-tray', { 
+                detail: { newId: latest.id } 
+            });
+            window.dispatchEvent(event);
+          }, 2000);
+
+          return () => clearTimeout(popupTimer);
+        }
       }
     }
-  }, [notifications, user]);
+  }, [notifications, user, lastNotificationId]);
 
-  const handleClose = async () => {
-    if (user && currentNotification) {
-      const notifRef = doc(firestore, 'notifications', currentNotification.id);
-      await updateDoc(notifRef, {
-        readBy: arrayUnion(user.uid)
-      });
-    }
-    setOpen(false);
-  };
-
-  const handleView = () => {
-    handleClose();
-    router.push('/my-account/notifications');
-  };
-
-  if (!user) return null;
+  if (!user || !showPopup) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-primary">
-            <Bell className="h-5 w-5" />
-            System Notification
-          </DialogTitle>
-          <DialogDescription>
-            You have received an important update.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-6">
-          <div className="p-4 bg-gray-50 border rounded-xl flex gap-3 items-start shadow-inner">
-            <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-gray-800 leading-relaxed font-medium">
-              {currentNotification?.message}
-            </p>
-          </div>
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+      <div className="bg-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-md">
+        <div className="relative">
+            <Bell className="h-4 w-4 fill-white/20" />
+            <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
         </div>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button onClick={handleView} className="btn-primary text-white w-full sm:w-auto">View All Notifications</Button>
-          <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">Dismiss</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <span className="text-sm font-bold tracking-tight uppercase">New Notification</span>
+      </div>
+    </div>
   );
 }

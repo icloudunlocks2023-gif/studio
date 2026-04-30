@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useUser, useFirebase, useCollection } from '@/firebase';
 import { doc, updateDoc, arrayUnion, orderBy } from 'firebase/firestore';
 import { Bell, X, Clock, Info } from 'lucide-react';
@@ -22,6 +23,8 @@ interface Notification {
 export function NotificationDropdown() {
   const { data: user } = useUser();
   const { firestore } = useFirebase();
+  const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIds, setHighlightedIds] = useState<string[]>([]);
 
   // Memoize constraints to prevent infinite loops
   const constraints = useMemo(() => [orderBy('createdAt', 'desc')], []);
@@ -39,6 +42,27 @@ export function NotificationDropdown() {
     if (!user) return 0;
     return filteredNotifications.filter(n => !n.readBy?.includes(user.uid)).length;
   }, [user, filteredNotifications]);
+
+  // Handle external triggers to open the tray
+  useEffect(() => {
+    const handleOpenTrigger = (e: any) => {
+      setIsOpen(true);
+      if (e.detail?.newId) {
+        setHighlightedIds(prev => Array.from(new Set([...prev, e.detail.newId])));
+      }
+    };
+
+    window.addEventListener('open-notification-tray', handleOpenTrigger);
+    return () => window.removeEventListener('open-notification-tray', handleOpenTrigger);
+  }, []);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    // When the tray is closed, clear the session highlights
+    if (!open) {
+      setHighlightedIds([]);
+    }
+  };
 
   const markAllAsRead = async () => {
     if (!user || !filteredNotifications) return;
@@ -63,7 +87,7 @@ export function NotificationDropdown() {
   if (!user) return null;
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group">
           <Bell className={cn(
@@ -114,12 +138,15 @@ export function NotificationDropdown() {
             <div className="divide-y divide-gray-100">
               {filteredNotifications.map((notif) => {
                 const isRead = notif.readBy?.includes(user.uid);
+                const isHighlighted = highlightedIds.includes(notif.id);
+
                 return (
                   <div 
                     key={notif.id} 
                     className={cn(
                         "p-4 transition-colors cursor-pointer relative",
-                        !isRead ? "bg-blue-50/20 hover:bg-blue-50/40" : "hover:bg-gray-50"
+                        !isRead ? "bg-blue-50/20 hover:bg-blue-50/40" : "hover:bg-gray-50",
+                        isHighlighted && "ring-2 ring-inset ring-primary/20 bg-blue-100/30"
                     )}
                     onClick={() => markAsRead(notif.id)}
                   >
@@ -131,13 +158,18 @@ export function NotificationDropdown() {
                       )}>
                         <Info className="h-4 w-4" />
                       </div>
-                      <div className="space-y-1 overflow-hidden">
-                        <p className={cn(
-                            "text-xs leading-relaxed",
-                            !isRead ? "text-gray-900 font-bold" : "text-gray-500"
-                        )}>
-                          {notif.message}
-                        </p>
+                      <div className="space-y-1 overflow-hidden flex-1">
+                        <div className="flex justify-between items-start gap-2">
+                            <p className={cn(
+                                "text-xs leading-relaxed flex-1",
+                                !isRead ? "text-gray-900 font-bold" : "text-gray-500"
+                            )}>
+                            {notif.message}
+                            </p>
+                            {isHighlighted && (
+                                <Badge className="bg-primary text-white text-[9px] animate-pulse">NEW</Badge>
+                            )}
+                        </div>
                         <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
                           <Clock className="h-3 w-3" />
                           {notif.createdAt?.toDate ? format(notif.createdAt.toDate(), 'MMM dd, p') : 'Just now'}
