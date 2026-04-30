@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirebase, useCollection } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Bell, Send, Users, User, Loader } from 'lucide-react';
+import { ArrowLeft, Bell, Send, Users, User, Loader, Search } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
@@ -29,8 +29,21 @@ export default function AdminNotificationsPage() {
 
   const [targetType, setTargetType] = useState<'all' | 'specific'>('all');
   const [selectedUser, setSelectedUser] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Filter users based on search term (ID, Email, or Name)
+  const filteredUsers = useMemo(() => {
+    if (!allUsers) return [];
+    if (!searchTerm.trim()) return allUsers;
+    const term = searchTerm.toLowerCase();
+    return allUsers.filter((u: any) => 
+      u.id.toLowerCase().includes(term) || 
+      u.email?.toLowerCase().includes(term) || 
+      u.displayName?.toLowerCase().includes(term)
+    );
+  }, [allUsers, searchTerm]);
 
   useEffect(() => {
     if (userLoading) return;
@@ -55,6 +68,8 @@ export default function AdminNotificationsPage() {
       await addDoc(collection(firestore, 'notifications'), notifData);
       toast({ title: "Notification Sent Successfully!" });
       setMessage('');
+      setSelectedUser('');
+      setSearchTerm('');
     } catch (e) {
       console.error(e);
       toast({ title: "Error", description: "Failed to send notification.", variant: "destructive" });
@@ -111,18 +126,44 @@ export default function AdminNotificationsPage() {
             </div>
 
             {targetType === 'specific' && (
-              <div className="space-y-2 animate-fade-in">
-                <Label>Select Recipient</Label>
-                <Select value={selectedUser} onValueChange={setSelectedUser}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Search user..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allUsers?.map((u: any) => (
-                      <SelectItem key={u.id} value={u.id}>{u.email} ({u.displayName})</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3 animate-fade-in border-l-4 border-primary/20 pl-4 py-2">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-xs font-bold uppercase text-gray-500">
+                    <Search className="h-3 w-3" />
+                    Search Recipient (ID, Email or Name)
+                  </Label>
+                  <Input 
+                    placeholder="Type user details..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-9 shadow-sm"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Select from Results</Label>
+                  <Select value={selectedUser} onValueChange={setSelectedUser}>
+                    <SelectTrigger className="h-11">
+                      <SelectValue placeholder={searchTerm ? `Found ${filteredUsers.length} matches...` : "Select a user"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredUsers.length > 0 ? (
+                        filteredUsers.map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            <div className="flex flex-col py-1">
+                              <span className="font-medium">{u.email} ({u.displayName})</span>
+                              <span className="text-[10px] text-gray-400 font-mono">ID: {u.id}</span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-4 text-sm text-center text-gray-500 italic">
+                          No users matching "{searchTerm}"
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
