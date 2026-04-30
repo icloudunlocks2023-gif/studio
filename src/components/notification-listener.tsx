@@ -16,6 +16,7 @@ export function NotificationListener() {
 
   const { data: notifications } = useCollection<any>('notifications', { constraints });
 
+  // 1. Detection logic: Identifies when a truly new notification has arrived
   useEffect(() => {
     if (notifications && user) {
       // Find the most recent unread notification
@@ -32,27 +33,32 @@ export function NotificationListener() {
       if (unread.length > 0) {
         const latest = unread[0];
         
-        // Only trigger if this is a truly new notification we haven't seen in this component session
+        // Only trigger if this is a truly new notification ID we haven't seen in this session
         if (latest.id !== lastNotificationId) {
           setLastNotificationId(latest.id);
           setShowPopup(true);
-
-          // 1. Show popup for 2 seconds
-          const popupTimer = setTimeout(() => {
-            setShowPopup(false);
-            
-            // 2. After popup disappears, trigger the dropdown to open
-            const event = new CustomEvent('open-notification-tray', { 
-                detail: { newId: latest.id } 
-            });
-            window.dispatchEvent(event);
-          }, 2000);
-
-          return () => clearTimeout(popupTimer);
         }
       }
     }
   }, [notifications, user, lastNotificationId]);
+
+  // 2. Timer logic: Manages the visibility duration independently of data refreshes
+  useEffect(() => {
+    if (showPopup && lastNotificationId) {
+      // Show popup for exactly 4 seconds
+      const popupTimer = setTimeout(() => {
+        setShowPopup(false);
+        
+        // Trigger the dropdown tray to open automatically after the popup disappears
+        const event = new CustomEvent('open-notification-tray', { 
+            detail: { newId: lastNotificationId } 
+        });
+        window.dispatchEvent(event);
+      }, 4000);
+
+      return () => clearTimeout(popupTimer);
+    }
+  }, [showPopup, lastNotificationId]);
 
   if (!user || !showPopup) return null;
 
