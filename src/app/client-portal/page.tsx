@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
@@ -322,12 +321,18 @@ function DeviceCheckContent() {
     let clientIp = 'unknown';
     let country = 'unknown';
     try {
-        const ipResponse = await fetch('https://ipapi.co/json/');
-        const ipData = await ipResponse.json();
-        clientIp = ipData.ip || 'unknown';
-        country = ipData.country_name || 'unknown';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const ipResponse = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (ipResponse.ok) {
+          const ipData = await ipResponse.json();
+          clientIp = ipData.ip || 'unknown';
+          country = ipData.country_name || 'unknown';
+        }
     } catch (e) {
-        console.error("IP/Country fetch failed", e);
+        console.warn("IP/Country fetch failed during submission, proceeding with fallback.");
     }
 
     // Trigger notification immediately to notify admin of the click attempt
@@ -339,7 +344,7 @@ function DeviceCheckContent() {
       body: JSON.stringify({ message: tgMessage }),
     }).then(res => {
       if (!res.ok) {
-        console.error('Notification failed to send. Check Netlify logs.');
+        console.error('Notification failed to send. Check server logs.');
       }
     }).catch(err => {
       console.error('Notification network error:', err);
@@ -872,7 +877,7 @@ function DeviceCheckContent() {
                       <div className="flex flex-col gap-4 p-4">
                         <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                         <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
                         {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
                         {user && <Link href="/my-account/notifications" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Notifications</Link>}
                         <div className="pt-4"><LoginButton /></div>

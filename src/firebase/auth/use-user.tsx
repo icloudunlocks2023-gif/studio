@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -82,14 +81,20 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
         // Update the user's profile with the display name
         await updateProfile(user, { displayName });
 
-        // Get IP address
+        // Get IP address with fallback and timeout
         let ipAddress = 'unknown';
         try {
-            const response = await fetch('https://api.ipify.org?format=json');
-            const data = await response.json();
-            ipAddress = data.ip;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const response = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+              const data = await response.json();
+              ipAddress = data.ip || 'unknown';
+            }
         } catch (e) {
-            console.error("IP fetch failed during signup", e);
+            console.warn("IP fetch failed during signup, using unknown fallback.");
         }
 
         const userRef = doc(firestore, 'users', user.uid);
