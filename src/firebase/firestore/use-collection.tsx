@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -10,7 +9,6 @@ import {
   QueryConstraint,
 } from 'firebase/firestore';
 import { useFirestore } from '../provider';
-import { useMemo } from 'react';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
@@ -27,21 +25,15 @@ export function useCollection<T>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Note: Users should memoize constraints in their components using useMemo 
+  // to prevent infinite listener restarts.
   const memoizedConstraints = options?.constraints;
 
   useEffect(() => {
-    // If constraints are defined but some dependency is not ready (e.g. user is not loaded),
-    // don't fetch the collection.
-    if (options?.constraints && !memoizedConstraints) {
-      setLoading(false);
-      setData([]); // Set to empty array to avoid null issues
-      return;
-    }
-
     let q: Query<DocumentData>;
     const collectionRef = collection(firestore, collectionName);
 
-    if (memoizedConstraints) {
+    if (memoizedConstraints && memoizedConstraints.length > 0) {
       q = query(collectionRef, ...memoizedConstraints);
     } else {
       q = query(collectionRef);

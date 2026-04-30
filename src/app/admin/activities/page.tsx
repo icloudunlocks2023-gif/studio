@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -33,8 +32,14 @@ export default function AdminActivitiesPage() {
 
   const isAdmin = user?.email === ADMIN_EMAIL;
 
+  // Stabilize constraints to prevent infinite listener restarts
+  const activityConstraints = useMemo(() => [
+    orderBy('timestamp', 'desc'), 
+    limit(500) // Increased from 100 for better online accuracy
+  ], []);
+
   const { data: activities, loading: activitiesLoading } = useCollection<UserActivity>('activities', {
-    constraints: [orderBy('timestamp', 'desc'), limit(100)]
+    constraints: activityConstraints
   });
 
   // Derived "Online" status: Users with activity in the last 5 minutes
@@ -45,6 +50,7 @@ export default function AdminActivitiesPage() {
     
     const uniqueUsers = new Map();
     
+    // Activities are sorted desc, so first occurrence is most recent
     activities.forEach(act => {
       const timestamp = act.timestamp?.toDate ? act.timestamp.toDate().getTime() : now;
       if (now - timestamp < activeWindow) {
@@ -157,7 +163,7 @@ export default function AdminActivitiesPage() {
           <CardHeader className="bg-gray-50/50 border-b">
             <CardTitle className="text-lg flex items-center gap-2">
               <Activity className="h-5 w-5 text-blue-600" />
-              Real-time Activity Feed (Last 100)
+              Real-time Activity Feed (Last 500)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
