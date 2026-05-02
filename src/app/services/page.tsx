@@ -47,132 +47,132 @@ export default function ServicesPage() {
   };
 
   const iphoneModels = [
-    { name: 'iPhone X', price: 35 },
-    { name: 'iPhone XR', price: 45 },
-    { name: 'iPhone XS', price: 40 },
-    { name: 'iPhone XS Max', price: 45 },
-    { name: 'iPhone 11', price: 50 },
-    { name: 'iPhone 11 Pro', price: 55 },
-    { name: 'iPhone 11 Pro Max', price: 55 },
-    { name: 'iPhone SE (2020)', price: 50 },
-    { name: 'iPhone SE (2022)', price: 60 },
-    { name: 'iPhone 12 Mini', price: 55 },
-    { name: 'iPhone 12', price: 60 },
-    { name: 'iPhone 12 Pro', price: 65 },
-    { name: 'iPhone 12 Pro Max', price: 70 },
-    { name: 'iPhone 13 Mini', price: 75 },
-    { name: 'iPhone 13', price: 80 },
-    { name: 'iPhone 13 Pro', price: 85 },
-    { name: 'iPhone 13 Pro Max', price: 90 },
-    { name: 'iPhone 14', price: 90 },
-    { name: 'iPhone 14 Plus', price: 95 },
-    { name: 'iPhone 14 Pro', price: 100 },
-    { name: 'iPhone 14 Pro Max', price: 110 },
-    { name: 'iPhone 15', price: 100 },
-    { name: 'iPhone 15 Plus', price: 100 },
-    { name: 'iPhone 15 Pro', price: 110 },
-    { name: 'iPhone 15 Pro Max', price: 120 },
-    { name: 'iPhone 16', price: 120 },
-    { name: 'iPhone 16e', price: 120 },
-    { name: 'iPhone 16 Plus', price: 120 },
-    { name: 'iPhone 16 Pro', price: 125 },
-    { name: 'iPhone 16 Pro Max', price: 130 },
-    { name: 'iPhone 17', price: 130 },
-    { name: 'iPhone 17 Air', price: 130 },
-    { name: 'iPhone 17 Pro', price: 135 },
-    { name: 'iPhone 17 Pro Max', price: 135 },
+    { name: 'iPhone X', price: 35, lostPrice: 25 },
+    { name: 'iPhone XR', price: 45, lostPrice: 35 },
+    { name: 'iPhone XS', price: 40, lostPrice: 30 },
+    { name: 'iPhone XS Max', price: 45, lostPrice: 35 },
+    { name: 'iPhone 11', price: 50, lostPrice: 40 },
+    { name: 'iPhone 11 Pro', price: 55, lostPrice: 45 },
+    { name: 'iPhone 11 Pro Max', price: 55, lostPrice: 45 },
+    { name: 'iPhone SE (2020)', price: 50, lostPrice: 40 },
+    { name: 'iPhone SE (2022)', price: 60, lostPrice: 50 },
+    { name: 'iPhone 12 Mini', price: 55, lostPrice: 45 },
+    { name: 'iPhone 12', price: 60, lostPrice: 50 },
+    { name: 'iPhone 12 Pro', price: 65, lostPrice: 55 },
+    { name: 'iPhone 12 Pro Max', price: 70, lostPrice: 60 },
+    { name: 'iPhone 13 Mini', price: 75, lostPrice: 65 },
+    { name: 'iPhone 13', price: 80, lostPrice: 70 },
+    { name: 'iPhone 13 Pro', price: 85, lostPrice: 75 },
+    { name: 'iPhone 13 Pro Max', price: 90, lostPrice: 80 },
+    { name: 'iPhone 14', price: 90, lostPrice: 80 },
+    { name: 'iPhone 14 Plus', price: 95, lostPrice: 85 },
+    { name: 'iPhone 14 Pro', price: 100, lostPrice: 90 },
+    { name: 'iPhone 14 Pro Max', price: 110, lostPrice: 100 },
+    { name: 'iPhone 15', price: 100, lostPrice: 90 },
+    { name: 'iPhone 15 Plus', price: 100, lostPrice: 90 },
+    { name: 'iPhone 15 Pro', price: 110, lostPrice: 100 },
+    { name: 'iPhone 15 Pro Max', price: 120, lostPrice: 110 },
+    { name: 'iPhone 16', price: 120, lostPrice: 110 },
+    { name: 'iPhone 16e', price: 120, lostPrice: 110 },
+    { name: 'iPhone 16 Plus', price: 120, lostPrice: 110 },
+    { name: 'iPhone 16 Pro', price: 125, lostPrice: 115 },
+    { name: 'iPhone 16 Pro Max', price: 130, lostPrice: 120 },
+    { name: 'iPhone 17', price: 130, lostPrice: 120 },
+    { name: 'iPhone 17 Air', price: 130, lostPrice: 120 },
+    { name: 'iPhone 17 Pro', price: 135, lostPrice: 125 },
+    { name: 'iPhone 17 Pro Max', price: 135, lostPrice: 125 },
   ];
 
   const macbookModels = [
-    { name: 'MacBook 2016', price: 60 },
-    { name: 'MacBook 2017', price: 65 },
-    { name: 'MacBook Air 2017', price: 80 },
-    { name: 'MacBook Air 2018', price: 85 },
-    { name: 'MacBook Air 2019', price: 90 },
-    { name: 'MacBook Air (Intel) 2020', price: 95 },
-    { name: 'MacBook Air M1 2020', price: 150 },
-    { name: 'MacBook Air M2 13" 2022', price: 155 },
-    { name: 'MacBook Air M2 15" 2023', price: 140 },
-    { name: 'MacBook Air M3 13" 2024', price: 145 },
-    { name: 'MacBook Air M3 15" 2024', price: 150 },
-    { name: 'MacBook Air M4 13" 2025', price: 165 },
-    { name: 'MacBook Air M4 15" 2025', price: 170 },
-    { name: 'MacBook Pro 13" 2016', price: 90 },
-    { name: 'MacBook Pro 15" 2016', price: 95 },
-    { name: 'MacBook Pro 13" 2017', price: 95 },
-    { name: 'MacBook Pro 15" 2017', price: 100 },
-    { name: 'MacBook Pro 13" 2018', price: 100 },
-    { name: 'MacBook Pro 15" 2018', price: 105 },
-    { name: 'MacBook Pro 13" 2019', price: 110 },
-    { name: 'MacBook Pro 15" 2019', price: 115 },
-    { name: 'MacBook Pro 16" (Intel) 2019', price: 125 },
-    { name: 'MacBook Pro 13" (Intel) 2020', price: 130 },
-    { name: 'MacBook Pro M1 13" 2020', price: 160 },
-    { name: 'MacBook Pro M1 Pro/Max 14" 2021', price: 180 },
-    { name: 'MacBook Pro M1 Pro/Max 16" 2021', price: 190 },
-    { name: 'MacBook Pro M2 13" 2022', price: 185 },
-    { name: 'MacBook Pro M2 Pro/Max 14" 2023', price: 200 },
-    { name: 'MacBook Pro M2 Pro/Max 16" 2023', price: 210 },
-    { name: 'MacBook Pro M3 14" 2023', price: 190 },
-    { name: 'MacBook Pro M3 Pro/Max 14" 2023', price: 215 },
-    { name: 'MacBook Pro M3 Pro/Max 16" 2023', price: 225 },
-    { name: 'MacBook Pro M4 14" 2024', price: 230 },
-    { name: 'MacBook Pro M4 Pro/Max 14" 2024', price: 245 },
-    { name: 'MacBook Pro M4 Pro/Max 16" 2024', price: 255 },
-    { name: 'MacBook Pro M5 14" 2025', price: 270 },
+    { name: 'MacBook 2016', price: 60, lostPrice: 50 },
+    { name: 'MacBook 2017', price: 65, lostPrice: 55 },
+    { name: 'MacBook Air 2017', price: 80, lostPrice: 70 },
+    { name: 'MacBook Air 2018', price: 85, lostPrice: 75 },
+    { name: 'MacBook Air 2019', price: 90, lostPrice: 80 },
+    { name: 'MacBook Air (Intel) 2020', price: 95, lostPrice: 85 },
+    { name: 'MacBook Air M1 2020', price: 150, lostPrice: 130 },
+    { name: 'MacBook Air M2 13" 2022', price: 155, lostPrice: 135 },
+    { name: 'MacBook Air M2 15" 2023', price: 140, lostPrice: 120 },
+    { name: 'MacBook Air M3 13" 2024', price: 145, lostPrice: 125 },
+    { name: 'MacBook Air M3 15" 2024', price: 150, lostPrice: 130 },
+    { name: 'MacBook Air M4 13" 2025', price: 165, lostPrice: 145 },
+    { name: 'MacBook Air M4 15" 2025', price: 170, lostPrice: 150 },
+    { name: 'MacBook Pro 13" 2016', price: 90, lostPrice: 80 },
+    { name: 'MacBook Pro 15" 2016', price: 95, lostPrice: 85 },
+    { name: 'MacBook Pro 13" 2017', price: 95, lostPrice: 85 },
+    { name: 'MacBook Pro 15" 2017', price: 100, lostPrice: 90 },
+    { name: 'MacBook Pro 13" 2018', price: 100, lostPrice: 90 },
+    { name: 'MacBook Pro 15" 2018', price: 105, lostPrice: 95 },
+    { name: 'MacBook Pro 13" 2019', price: 110, lostPrice: 100 },
+    { name: 'MacBook Pro 15" 2019', price: 115, lostPrice: 105 },
+    { name: 'MacBook Pro 16" (Intel) 2019', price: 125, lostPrice: 115 },
+    { name: 'MacBook Pro 13" (Intel) 2020', price: 130, lostPrice: 120 },
+    { name: 'MacBook Pro M1 13" 2020', price: 160, lostPrice: 140 },
+    { name: 'MacBook Pro M1 Pro/Max 14" 2021', price: 180, lostPrice: 160 },
+    { name: 'MacBook Pro M1 Pro/Max 16" 2021', price: 190, lostPrice: 170 },
+    { name: 'MacBook Pro M2 13" 2022', price: 185, lostPrice: 165 },
+    { name: 'MacBook Pro M2 Pro/Max 14" 2023', price: 200, lostPrice: 180 },
+    { name: 'MacBook Pro M2 Pro/Max 16" 2023', price: 210, lostPrice: 190 },
+    { name: 'MacBook Pro M3 14" 2023', price: 190, lostPrice: 170 },
+    { name: 'MacBook Pro M3 Pro/Max 14" 2023', price: 215, lostPrice: 195 },
+    { name: 'MacBook Pro M3 Pro/Max 16" 2023', price: 225, lostPrice: 205 },
+    { name: 'MacBook Pro M4 14" 2024', price: 230, lostPrice: 210 },
+    { name: 'MacBook Pro M4 Pro/Max 14" 2024', price: 245, lostPrice: 225 },
+    { name: 'MacBook Pro M4 Pro/Max 16" 2024', price: 255, lostPrice: 235 },
+    { name: 'MacBook Pro M5 14" 2025', price: 270, lostPrice: 250 },
   ];
 
   const watchModels = [
-    { name: 'Apple Watch Series 2', price: 30 },
-    { name: 'Apple Watch Series 3', price: 35 },
-    { name: 'Apple Watch Series 4', price: 40 },
-    { name: 'Apple Watch Series 5', price: 45 },
-    { name: 'Apple Watch Series 6', price: 50 },
-    { name: 'Apple Watch Series 7 (2021)', price: 60 },
-    { name: 'Apple Watch Series 8 (2022)', price: 70 },
-    { name: 'Apple Watch Series 9 (2023)', price: 80 },
-    { name: 'Apple Watch Series 10 (2024)', price: 85 },
-    { name: 'Apple Watch Series 11 (2025)', price: 95 },
-    { name: 'Apple Watch SE 1st Gen (2020)', price: 55 },
-    { name: 'Apple Watch SE 2nd Gen (2022)', price: 75 },
-    { name: 'Apple Watch SE 3rd Gen (2025)', price: 80 },
-    { name: 'Apple Watch Ultra 1 (2022)', price: 90 },
-    { name: 'Apple Watch Ultra 2 (2023)', price: 95 },
-    { name: 'Apple Watch Ultra 3 (2025)', price: 115 },
+    { name: 'Apple Watch Series 2', price: 30, lostPrice: 20 },
+    { name: 'Apple Watch Series 3', price: 35, lostPrice: 25 },
+    { name: 'Apple Watch Series 4', price: 40, lostPrice: 30 },
+    { name: 'Apple Watch Series 5', price: 45, lostPrice: 35 },
+    { name: 'Apple Watch Series 6', price: 50, lostPrice: 40 },
+    { name: 'Apple Watch Series 7 (2021)', price: 60, lostPrice: 50 },
+    { name: 'Apple Watch Series 8 (2022)', price: 70, lostPrice: 60 },
+    { name: 'Apple Watch Series 9 (2023)', price: 80, lostPrice: 70 },
+    { name: 'Apple Watch Series 10 (2024)', price: 85, lostPrice: 75 },
+    { name: 'Apple Watch Series 11 (2025)', price: 95, lostPrice: 85 },
+    { name: 'Apple Watch SE 1st Gen (2020)', price: 55, lostPrice: 45 },
+    { name: 'Apple Watch SE 2nd Gen (2022)', price: 75, lostPrice: 65 },
+    { name: 'Apple Watch SE 3rd Gen (2025)', price: 80, lostPrice: 70 },
+    { name: 'Apple Watch Ultra 1 (2022)', price: 90, lostPrice: 80 },
+    { name: 'Apple Watch Ultra 2 (2023)', price: 95, lostPrice: 85 },
+    { name: 'Apple Watch Ultra 3 (2025)', price: 115, lostPrice: 105 },
   ];
 
   const ipadModels = [
-    { name: 'iPad 5th Gen (2017)', price: 60 },
-    { name: 'iPad 6th Gen (2018)', price: 65 },
-    { name: 'iPad 7th Gen (2019)', price: 70 },
-    { name: 'iPad 8th Gen (2020)', price: 75 },
-    { name: 'iPad 9th Gen (2021)', price: 80 },
-    { name: 'iPad 10th Gen (2022)', price: 85 },
-    { name: 'iPad 11th Gen (2025)', price: 90 },
-    { name: 'iPad Air 3rd Gen (2019)', price: 70 },
-    { name: 'iPad Air 4th Gen (2020)', price: 80 },
-    { name: 'iPad Air 5th Gen (2022)', price: 85 },
-    { name: 'iPad Air 6th Gen 11" (M2)', price: 95 },
-    { name: 'iPad Air 6th Gen 13" (M2)', price: 100 },
-    { name: 'iPad Air 7th Gen 11" (M3)', price: 105 },
-    { name: 'iPad Air 7th Gen 13" (M3)', price: 110 },
-    { name: 'iPad Pro 10.5" (2017)', price: 80 },
-    { name: 'iPad Pro 12.9" 2nd Gen (2017)', price: 85 },
-    { name: 'iPad Pro 11" 1st Gen (2018)', price: 90 },
-    { name: 'iPad Pro 12.9" 3rd Gen (2018)', price: 95 },
-    { name: 'iPad Pro 11" 2nd Gen (2020)', price: 100 },
-    { name: 'iPad Pro 12.9" 4th Gen (2020)', price: 105 },
-    { name: 'iPad Pro 11" 3rd Gen (M1, 2021)', price: 110 },
-    { name: 'iPad Pro 12.9" 5th Gen (M1, 2021)', price: 115 },
-    { name: 'iPad Pro 11" 4th Gen (M2, 2022)', price: 110 },
-    { name: 'iPad Pro 12.9" 6th Gen (M2, 2022)', price: 120 },
-    { name: 'iPad Pro 11" (M4, 2024)', price: 120 },
-    { name: 'iPad Pro 13" (M4, 2024)', price: 125 },
-    { name: 'iPad Pro 11" (M5, 2025)', price: 130 },
-    { name: 'iPad Pro 13" (M5, 2025)', price: 135 },
-    { name: 'iPad Mini 5th Gen (2019)', price: 65 },
-    { name: 'iPad Mini 6th Gen (2021)', price: 80 },
-    { name: 'iPad Mini 7th Gen (A17 Pro, 2024)', price: 95 },
+    { name: 'iPad 5th Gen (2017)', price: 60, lostPrice: 50 },
+    { name: 'iPad 6th Gen (2018)', price: 65, lostPrice: 55 },
+    { name: 'iPad 7th Gen (2019)', price: 70, lostPrice: 60 },
+    { name: 'iPad 8th Gen (2020)', price: 75, lostPrice: 65 },
+    { name: 'iPad 9th Gen (2021)', price: 80, lostPrice: 70 },
+    { name: 'iPad 10th Gen (2022)', price: 85, lostPrice: 75 },
+    { name: 'iPad 11th Gen (2025)', price: 90, lostPrice: 80 },
+    { name: 'iPad Air 3rd Gen (2019)', price: 70, lostPrice: 60 },
+    { name: 'iPad Air 4th Gen (2020)', price: 80, lostPrice: 70 },
+    { name: 'iPad Air 5th Gen (2022)', price: 85, lostPrice: 75 },
+    { name: 'iPad Air 6th Gen 11" (M2)', price: 95, lostPrice: 85 },
+    { name: 'iPad Air 6th Gen 13" (M2)', price: 100, lostPrice: 90 },
+    { name: 'iPad Air 7th Gen 11" (M3)', price: 105, lostPrice: 95 },
+    { name: 'iPad Air 7th Gen 13" (M3)', price: 110, lostPrice: 100 },
+    { name: 'iPad Pro 10.5" (2017)', price: 80, lostPrice: 70 },
+    { name: 'iPad Pro 12.9" 2nd Gen (2017)', price: 85, lostPrice: 75 },
+    { name: 'iPad Pro 11" 1st Gen (2018)', price: 90, lostPrice: 80 },
+    { name: 'iPad Pro 12.9" 3rd Gen (2018)', price: 95, lostPrice: 85 },
+    { name: 'iPad Pro 11" 2nd Gen (2020)', price: 100, lostPrice: 90 },
+    { name: 'iPad Pro 12.9" 4th Gen (2020)', price: 105, lostPrice: 95 },
+    { name: 'iPad Pro 11" 3rd Gen (M1, 2021)', price: 110, lostPrice: 100 },
+    { name: 'iPad Pro 12.9" 5th Gen (M1, 2021)', price: 115, lostPrice: 105 },
+    { name: 'iPad Pro 11" 4th Gen (M2, 2022)', price: 110, lostPrice: 100 },
+    { name: 'iPad Pro 12.9" 6th Gen (M2, 2022)', price: 120, lostPrice: 110 },
+    { name: 'iPad Pro 11" (M4, 2024)', price: 120, lostPrice: 110 },
+    { name: 'iPad Pro 13" (M4, 2024)', price: 125, lostPrice: 115 },
+    { name: 'iPad Pro 11" (M5, 2025)', price: 130, lostPrice: 120 },
+    { name: 'iPad Pro 13" (M5, 2025)', price: 135, lostPrice: 125 },
+    { name: 'iPad Mini 5th Gen (2019)', price: 65, lostPrice: 55 },
+    { name: 'iPad Mini 6th Gen (2021)', price: 80, lostPrice: 70 },
+    { name: 'iPad Mini 7th Gen (A17 Pro, 2024)', price: 95, lostPrice: 85 },
   ];
 
   const telegramIcon = getImage('telegram-icon');
@@ -253,7 +253,8 @@ export default function ServicesPage() {
                             <thead>
                             <tr className="border-b">
                                 <th className="p-2">Model</th>
-                                <th className="p-2">Price (USD)</th>
+                                <th className="p-2">Price (Clean iCloud Status)</th>
+                                <th className="p-2">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
@@ -262,6 +263,7 @@ export default function ServicesPage() {
                                 <tr key={device.name} className="border-b">
                                 <td className="p-2">{device.name}</td>
                                 <td className="p-2">${device.price}</td>
+                                <td className="p-2">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -287,7 +289,8 @@ export default function ServicesPage() {
                             <thead>
                             <tr className="border-b">
                                 <th className="p-2">Model</th>
-                                <th className="p-2">Price (USD)</th>
+                                <th className="p-2">Price (Clean iCloud Status)</th>
+                                <th className="p-2">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
@@ -296,6 +299,7 @@ export default function ServicesPage() {
                                 <tr key={device.name} className="border-b">
                                 <td className="p-2">{device.name}</td>
                                 <td className="p-2">${device.price}</td>
+                                <td className="p-2">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -321,7 +325,8 @@ export default function ServicesPage() {
                             <thead>
                             <tr className="border-b">
                                 <th className="p-2">Model</th>
-                                <th className="p-2">Price (USD)</th>
+                                <th className="p-2">Price (Clean iCloud Status)</th>
+                                <th className="p-2">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
@@ -330,6 +335,7 @@ export default function ServicesPage() {
                                 <tr key={device.name} className="border-b">
                                 <td className="p-2">{device.name}</td>
                                 <td className="p-2">${device.price}</td>
+                                <td className="p-2">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -355,7 +361,8 @@ export default function ServicesPage() {
                             <thead>
                             <tr className="border-b">
                                 <th className="p-2">Model</th>
-                                <th className="p-2">Price (USD)</th>
+                                <th className="p-2">Price (Clean iCloud Status)</th>
+                                <th className="p-2">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
@@ -364,6 +371,7 @@ export default function ServicesPage() {
                                 <tr key={device.name} className="border-b">
                                 <td className="p-2">{device.name}</td>
                                 <td className="p-2">${device.price}</td>
+                                <td className="p-2">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 

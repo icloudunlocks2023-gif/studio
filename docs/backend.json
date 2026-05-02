@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "user": {
@@ -66,6 +65,11 @@
           "type": "string",
           "enum": ["waiting", "feedback", "paid", "eligible", "not_supported", "find_my_off", "device_found", "chimaera", "banned"],
           "description": "The current status of the submission"
+        },
+        "icloudStatus": {
+          "type": "string",
+          "enum": ["clean", "lost"],
+          "description": "The iCloud status determined by admin"
         },
         "successRate": {
           "type": "number",

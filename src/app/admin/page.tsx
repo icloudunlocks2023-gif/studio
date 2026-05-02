@@ -32,7 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -46,6 +46,7 @@ interface Submission {
   price: number;
   imei: string;
   status: 'waiting' | 'feedback' | 'paid' | 'eligible' | 'not_supported' | 'find_my_off' | 'device_found' | 'chimaera' | 'banned';
+  icloudStatus?: 'clean' | 'lost';
   successRate?: number;
   feedback: string[] | null;
   ipAddress?: string;
@@ -93,6 +94,7 @@ interface Counters {
     unlockedDevices: number;
     orderCounter?: number;
     isServerOnline?: boolean;
+    usdtAddress?: string;
 }
 
 const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
@@ -129,11 +131,13 @@ function AdminDashboard() {
 
   const [feedbackValues, setFeedbackValues] = useState<{ [key: string]: string }>({});
   const [feedbackStatus, setFeedbackStatus] = useState<{ [key: string]: Submission['status'] }>({});
+  const [feedbackIcloudStatus, setFeedbackIcloudStatus] = useState<{ [key: string]: 'clean' | 'lost' }>({});
   const [selectedRates, setSelectedRates] = useState<{ [key: string]: number }>({});
   
   const [registeredUsers, setRegisteredUsers] = useState<number>(0);
   const [unlockedDevices, setUnlockedDevices] = useState<number>(0);
   const [isServerOnline, setIsServerOnline] = useState<boolean>(true);
+  const [usdtAddress, setUsdtAddress] = useState<string>('0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f');
 
   const hasOpenTickets = (openTickets?.length || 0) > 0;
 
@@ -171,6 +175,7 @@ function AdminDashboard() {
       setRegisteredUsers(counters.registeredUsers || 0);
       setUnlockedDevices(counters.unlockedDevices || 0);
       setIsServerOnline(counters.isServerOnline !== false);
+      if (counters.usdtAddress) setUsdtAddress(counters.usdtAddress);
     }
   }, [counters]);
 
@@ -195,6 +200,10 @@ function AdminDashboard() {
   const handleStatusChange = (id: string, value: Submission['status']) => {
     setFeedbackStatus(prev => ({ ...prev, [id]: value }));
   };
+
+  const handleIcloudStatusChange = (id: string, value: 'clean' | 'lost') => {
+    setFeedbackIcloudStatus(prev => ({ ...prev, [id]: value }));
+  };
   
   const handleDeviceFound = (submissionId: string) => {
     const submissionRef = doc(firestore, 'submissions', submissionId);
@@ -217,6 +226,8 @@ function AdminDashboard() {
   const handleSendFeedback = (submissionId: string) => {
     const feedbackTextRaw = feedbackValues[submissionId] || '';
     const status = feedbackStatus[submissionId];
+    const icloudStatus = feedbackIcloudStatus[submissionId];
+    
     if (!status) return toast({ title: "Selection Required", description: "Select an outcome.", variant: "destructive" });
     
     const sub = submissions?.find(s => s.id === submissionId);
@@ -269,6 +280,10 @@ function AdminDashboard() {
       status: status,
       updatedAt: serverTimestamp(),
     };
+
+    if (icloudStatus) {
+      updatedData.icloudStatus = icloudStatus;
+    }
 
     if ((status === 'eligible' || status === 'chimaera') && selectedRates[submissionId]) {
       updatedData.successRate = selectedRates[submissionId];
@@ -355,6 +370,7 @@ function AdminDashboard() {
       registeredUsers: Number(registeredUsers),
       unlockedDevices: Number(unlockedDevices),
       isServerOnline: isServerOnline,
+      usdtAddress: usdtAddress.trim()
     };
     setDoc(metricsRef, metricsData, { merge: true })
       .then(() => toast({ title: "Site settings updated!" }))
@@ -438,8 +454,8 @@ function AdminDashboard() {
                   <div className="flex flex-col gap-4 p-4">
                     <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
                     <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                    {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
-                    {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Admin</Link>}
+                    {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                    {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Admin</Link>}
                     <div className='pt-4'><LoginButton /></div>
                   </div>
                 </SheetContent>
@@ -504,7 +520,7 @@ function AdminDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
-              <div className="mb-12">
+              <div className="mb-12 space-y-6">
                   <Card>
                       <CardHeader><CardTitle className="flex items-center gap-2"><span>Site Settings & Metrics</span></CardTitle></CardHeader>
                       <CardContent className="space-y-6">
@@ -552,13 +568,38 @@ function AdminDashboard() {
                               <Link href="/admin/users" className="w-full">
                                 <Button variant="outline" className="w-full text-xs gap-1"><Users className="h-3 w-3" />Users</Button>
                               </Link>
-                              <Link href="/admin/banned" className="w-full col-span-2 sm:col-span-1">
-                                <Button variant="destructive" className="w-full text-xs gap-1"><Ban className="h-3 w-3" />Banned</Button>
-                              </Link>
                           </div>
                       </CardFooter>
                   </Card>
+
+                  <Card className="border-blue-200 bg-blue-50/10">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-blue-700">
+                        <Wallet className="h-5 w-5" />
+                        Global Wallet Management
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="usdt-address">USDT BEP20 Wallet Address</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="usdt-address" 
+                            placeholder="Paste new address..." 
+                            value={usdtAddress} 
+                            onChange={(e) => setUsdtAddress(e.target.value)} 
+                            className="font-mono text-xs"
+                          />
+                          <Button onClick={handleUpdateMetrics} className="gap-2">
+                            <Save className="h-4 w-4" /> Update
+                          </Button>
+                        </div>
+                        <p className="text-[10px] text-gray-500 italic">This address is displayed sitewide in payment popups.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
               </div>
+
               <h1 className="text-4xl font-bold text-center mb-10">Submissions</h1>
               {submissionsLoading ? <p>Loading submissions...</p> : sortedSubmissions.length === 0 ? <p className='text-center text-gray-500'>None found.</p> : (
                 <div className="space-y-6">
@@ -607,17 +648,33 @@ function AdminDashboard() {
                       </CardContent>
                       <CardFooter className='flex-col items-stretch gap-3'>
                         {sub.status === 'waiting' && <Button onClick={() => handleDeviceFound(sub.id)} className="w-full">Device Found</Button>}
-                        <Select onValueChange={(value: Submission['status']) => handleStatusChange(sub.id, value)}>
-                            <SelectTrigger><SelectValue placeholder="Select Outcome..." /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="eligible">Eligible for Unlock</SelectItem>
-                                <SelectItem value="not_supported">Not Supported for Unlock</SelectItem>
-                                <SelectItem value="feedback">Select the above device model and check again</SelectItem>
-                                <SelectItem value="find_my_off">Find My: OFF</SelectItem>
-                                <SelectItem value="chimaera">Chimaera Device Policy & Blacklist (Blocked by Apple)</SelectItem>
-                                <SelectItem value="banned">Ban Member</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                           <div className="space-y-2">
+                             <Label className="text-[10px] uppercase font-bold text-gray-400">Outcome</Label>
+                              <Select onValueChange={(value: Submission['status']) => handleStatusChange(sub.id, value)}>
+                                  <SelectTrigger><SelectValue placeholder="Select Outcome..." /></SelectTrigger>
+                                  <SelectContent>
+                                      <SelectItem value="eligible">Eligible for Unlock</SelectItem>
+                                      <SelectItem value="not_supported">Not Supported for Unlock</SelectItem>
+                                      <SelectItem value="feedback">Select the above device model and check again</SelectItem>
+                                      <SelectItem value="find_my_off">Find My: OFF</SelectItem>
+                                      <SelectItem value="chimaera">Chimaera Device Policy & Blacklist (Blocked by Apple)</SelectItem>
+                                      <SelectItem value="banned">Ban Member</SelectItem>
+                                  </SelectContent>
+                              </Select>
+                           </div>
+                           <div className="space-y-2">
+                             <Label className="text-[10px] uppercase font-bold text-gray-400">iCloud Status</Label>
+                              <Select onValueChange={(value: 'clean' | 'lost') => handleIcloudStatusChange(sub.id, value)}>
+                                  <SelectTrigger><SelectValue placeholder="Status (Clean/Lost)" /></SelectTrigger>
+                                  <SelectContent>
+                                      <SelectItem value="clean">Clean</SelectItem>
+                                      <SelectItem value="lost">Lost</SelectItem>
+                                  </SelectContent>
+                              </Select>
+                           </div>
+                        </div>
 
                         {(feedbackStatus[sub.id] === 'eligible' || feedbackStatus[sub.id] === 'chimaera') && (
                           <div className="p-4 border rounded-lg bg-gray-50 space-y-3 animate-fade-in">

@@ -43,6 +43,7 @@ interface Submission {
   image: string;
   imei: string;
   status: 'waiting' | 'eligible' | 'not_supported' | 'paid' | 'feedback' | 'find_my_off' | 'device_found' | 'chimaera' | 'banned';
+  icloudStatus?: 'clean' | 'lost';
   successRate?: number;
   feedback: string[] | null;
   ipAddress?: string;
@@ -63,6 +64,7 @@ interface BannedUser {
 
 interface Counters {
     isServerOnline?: boolean;
+    usdtAddress?: string;
 }
 
 interface PaymentClaim {
@@ -152,6 +154,7 @@ function DeviceCheckContent() {
   const searchParams = useSearchParams();
   const model = searchParams.get('model') || 'Unknown Model';
   const price = Number(searchParams.get('price')) || 0;
+  const lostPrice = price > 50 ? price - 15 : price - 10;
   const image = searchParams.get('image') || '/placeholder.svg';
   const { toast } = useToast();
 
@@ -164,6 +167,7 @@ function DeviceCheckContent() {
   const { data: counters } = useDoc<Counters>('counters', 'metrics');
 
   const isServerOnline = counters?.isServerOnline !== false;
+  const usdtAddress = counters?.usdtAddress || '0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f';
 
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(true);
   const [policyAccepted, setPolicyAccepted] = useState(false);
@@ -526,13 +530,15 @@ function DeviceCheckContent() {
     };
     const newOrderId = `#ORD-${generateRandomPart(5)}`;
 
+    const effectivePrice = submission.icloudStatus === 'lost' ? lostPrice : submission.price;
+
     const newClaimData = {
       orderId: newOrderId,
       userId: user.uid,
       submissionId: submissionId,
       imei: submission.imei,
       model: submission.model,
-      price: submission.price,
+      price: effectivePrice,
       status: 'pending' as const,
       createdAt: serverTimestamp(),
     };
@@ -565,7 +571,10 @@ function DeviceCheckContent() {
   };
 
   const currentBalance = userProfile?.balance || 0;
-  const amountToPay = Math.max(0, price - currentBalance);
+  
+  // Use submission icloudStatus if available, else show the range
+  const activePrice = submission?.icloudStatus === 'lost' ? lostPrice : submission?.icloudStatus === 'clean' ? price : null;
+  const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
 
   if (userLoading || !user || profileLoading || bannedUserLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -723,6 +732,12 @@ function DeviceCheckContent() {
         return (
             <div className="w-full text-left p-4 space-y-4">
               <div className="space-y-2">
+                {submission.icloudStatus && (
+                   <div className={cn("p-2 px-3 rounded-md font-mono text-sm border flex items-center gap-2 animate-fade-in mb-2", submission.icloudStatus === 'clean' ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700")}>
+                      <span className="font-bold uppercase">iCloud Status: {submission.icloudStatus}</span>
+                   </div>
+                )}
+
                 {isChimaera && (
                   <div className="p-3 px-4 rounded-xl bg-red-50 border border-red-200 text-red-700 font-bold text-sm sm:text-base animate-fade-in shadow-sm flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-5 w-5 flex-shrink-0" />
@@ -882,7 +897,7 @@ function DeviceCheckContent() {
                             <NotificationDropdown />
                           </div>
                         )}
-                        <div className="pt-4"><LoginButton /></div>
+                        <div className='pt-4'><LoginButton /></div>
                       </div>
                     </SheetContent>
                   </Sheet>
@@ -898,15 +913,21 @@ function DeviceCheckContent() {
           </div>
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-1">{model}</h2>
-            <div className="text-xl font-bold text-blue-600 mb-2">${price}</div>
+            <div className="text-xl font-bold mb-2">
+              {submission?.icloudStatus ? (
+                <span className="text-blue-600">${submission.icloudStatus === 'lost' ? lostPrice : price} ({submission.icloudStatus.charAt(0).toUpperCase() + submission.icloudStatus.slice(1)} iCloud Status)</span>
+              ) : (
+                <span className="text-blue-600">${price} Clean iCloud Status / <span className="text-red-600">${lostPrice} Lost iCloud Status</span></span>
+              )}
+            </div>
             <div className="flex flex-col sm:flex-row gap-3 items-center">
-              <Input
+              <input
                 id="imei-input"
                 type="text"
                 placeholder="Enter IMEI or Serial number"
                 value={submission ? submission.imei : imei}
                 onChange={(e) => setImei(e.target.value)}
-                className="w-full sm:w-80"
+                className="w-full sm:w-80 h-10 px-3 rounded-md border border-input bg-background text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 disabled={formDisabled}
               />
               <div className="flex gap-3">
@@ -1080,7 +1101,7 @@ function DeviceCheckContent() {
                         </Alert>
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4 text-center">
-                                <div><p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Service Cost</p><p className="text-lg font-bold">${price.toFixed(2)}</p></div>
+                                <div><p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Service Cost</p><p className="text-lg font-bold">${submission?.icloudStatus === 'lost' ? lostPrice.toFixed(2) : price.toFixed(2)}</p></div>
                                 <div><p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Your Balance</p><p className="text-lg font-bold text-green-600">-${currentBalance.toFixed(2)}</p></div>
                             </div>
                             <div className="text-center bg-gray-50 py-2 rounded-xl border border-dashed">
@@ -1099,8 +1120,8 @@ function DeviceCheckContent() {
                                         </div>
                                     </div>
                                     <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                                        <span className="font-medium">0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                        <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
+                                        <span className="font-medium">{usdtAddress}</span>
+                                        <CopyToClipboard text={usdtAddress}>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-200">
                                                 <Copy className="w-4 h-4 text-gray-500"/>
                                             </Button>
@@ -1120,6 +1141,7 @@ function DeviceCheckContent() {
                                         <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">Other Networks</h4>
                                         <ScrollArea className="h-[320px] pr-2">
                                             <div className="space-y-3 pb-[250px]">
+                                                {/* Other methods (BTC, ETH etc) remain static or can be dynamic if needed */}
                                                 <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
                                                     <div className="flex items-center gap-3">
                                                         {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
@@ -1148,40 +1170,6 @@ function DeviceCheckContent() {
                                                     <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
                                                         <span>bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h</span>
                                                         <CopyToClipboard text="bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-gray-500"/>
-                                                            </Button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
-                                                    <div className="flex items-center gap-3">
-                                                        {ethereumImage && <Image src={ethereumImage.imageUrl} alt="Ethereum" width={32} height={32} className="rounded-full" />}
-                                                        <div>
-                                                            <p className="font-bold text-sm">Ethereum (ERC20)</p>
-                                                            <p className="text-[10px] text-gray-500">Fast and secure network.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                                                        <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                                        <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-gray-500"/>
-                                                            </Button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
-                                                    <div className="flex items-center gap-3">
-                                                        {usdcImage && <Image src={usdcImage.imageUrl} alt="USDC ERC20" width={32} height={32} className="rounded-full" />}
-                                                        <div>
-                                                            <p className="font-bold text-sm">USDC (ERC20 Network)</p>
-                                                            <p className="text-[10px] text-gray-500">Fast USD stablecoin.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                                                        <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                                        <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
                                                             <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
                                                                 <Copy className="w-4 h-4 text-gray-500"/>
                                                             </Button>
@@ -1240,40 +1228,6 @@ function DeviceCheckContent() {
                                             </CopyToClipboard>
                                         </div>
                                     </div>
-                                    <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            {ethereumImage && <Image src={ethereumImage.imageUrl} alt="Ethereum" width={32} height={32} className="rounded-full" />}
-                                            <div>
-                                                <p className="font-bold text-sm">Ethereum (ERC20)</p>
-                                                <p className="text-[10px] text-gray-500">Fast and secure network.</p>
-                                            </div>
-                                        </div>
-                                        <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                                            <span></span>
-                                            <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-gray-500"/>
-                                                </Button>
-                                            </CopyToClipboard>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            {usdcImage && <Image src={usdcImage.imageUrl} alt="USDC ERC20" width={32} height={32} className="rounded-full" />}
-                                            <div>
-                                                <p className="font-bold text-sm">USDC (ERC20 Network)</p>
-                                                <p className="text-[10px] text-gray-500">Fast USD stablecoin.</p>
-                                            </div>
-                                        </div>
-                                        <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                                            <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                            <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-gray-500"/>
-                                                </Button>
-                                            </CopyToClipboard>
-                                        </div>
-                                    </div>
                                 </div>
                                 <ScrollBar orientation="vertical" />
                             </ScrollArea>
@@ -1281,9 +1235,14 @@ function DeviceCheckContent() {
                     )}
                 </div>
             </ScrollArea>
+            <div className="px-5 py-3 bg-red-50 border-t border-red-100">
+               <p className="text-[11px] text-red-700 leading-tight text-center font-semibold">
+                 ⚠️ If the user clicks “I Paid” without making payment or without prior communication with support, their account may be restricted and certain features will be limited.
+               </p>
+            </div>
             <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
                 <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                <Button onClick={handlePaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
+                <Button onClick={handlePaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
                     {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
                 </Button>
             </DialogFooter>

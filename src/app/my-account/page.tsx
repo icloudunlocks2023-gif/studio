@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -31,6 +31,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { updatePassword } from 'firebase/auth';
+import { Separator } from '@/components/ui/separator';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -57,6 +59,7 @@ interface Order {
 
 interface UserProfile {
     id: string;
+    displayName: string;
     balance?: number;
     email: string;
 }
@@ -69,8 +72,13 @@ interface SupportTicket {
   createdAt: { toDate: () => Date };
 }
 
+interface Counters {
+  usdtAddress?: string;
+}
+
 const CopyToClipboard = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const { toast } = useToast();
+  handleCopy();
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
     toast({
@@ -89,7 +97,7 @@ const CopyToClipboard = ({ text, children }: { text: string; children: React.Rea
 
 function MyAccountContent() {
   const { data: user, loading: userLoading } = useUser();
-  const { firestore } = useFirebase();
+  const { firestore, auth } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
   
@@ -114,6 +122,8 @@ function MyAccountContent() {
   );
   
   const { data: userProfile, loading: profileLoading } = useDoc<UserProfile>('users', user?.uid || ' ');
+  const { data: counters } = useDoc<Counters>('counters', 'metrics');
+  const usdtAddress = counters?.usdtAddress || '0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f';
   
   const [isBulkPayModalOpen, setIsBulkPayModalOpen] = useState(false);
   const [isSubmittingBulk, setIsSubmittingBulk] = useState(false);
@@ -131,6 +141,11 @@ function MyAccountContent() {
   // Deletion State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Password State
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -194,7 +209,6 @@ function MyAccountContent() {
 
     setIsWithdrawalProcessing(true);
     
-    // Simulate 2 minute processing as requested
     setTimeout(async () => {
       try {
         await addDoc(collection(firestore, 'withdrawals'), {
@@ -217,7 +231,6 @@ function MyAccountContent() {
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
-    // In a real app, this might create a deletion request ticket
     await addDoc(collection(firestore, 'tickets'), {
         userId: user?.uid,
         userName: user?.displayName || 'Client',
@@ -231,7 +244,6 @@ function MyAccountContent() {
         updatedAt: serverTimestamp(),
     });
     
-    // Notify admin
     const tgMessage = `⚠️ <b>ACCOUNT DELETION REQUEST!</b> ⚠️\n\n<b>User:</b> ${user?.email}\n<b>ID:</b> ${user?.uid}`;
     fetch('/api/telegram', {
         method: 'POST',
@@ -242,6 +254,39 @@ function MyAccountContent() {
     setIsDeleting(false);
     setIsDeleteModalOpen(false);
     toast({ title: "Request Submitted", description: "Our team will process your deletion request within 48 hours." });
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!newPassword || newPassword.length < 6) return toast({ title: "Short Password", description: "Min 6 characters.", variant: "destructive" });
+    if (!auth.currentUser) return;
+
+    setIsUpdatingPassword(true);
+    try {
+      await updatePassword(auth.currentUser, newPassword);
+      toast({ title: "Password Updated", description: "You have successfully changed your password." });
+      setIsPasswordModalOpen(false);
+      setNewPassword('');
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to update password. Try logging in again.", variant: "destructive" });
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleClaimDiscount = () => {
+    const completedOrders = orders?.filter(o => o.status === 'unlocked' || o.status === 'approved').length || 0;
+    if (completedOrders < 2) {
+      toast({ 
+        title: "Offer Unavailable", 
+        description: "You have not completed two separate unlock orders and do not qualify for the current discount offer.",
+        variant: "destructive" 
+      });
+    } else {
+      toast({ 
+        title: "Success", 
+        description: "You qualify for a loyalty discount! Contact support to apply it to your next order." 
+      });
+    }
   };
 
   const stats = useMemo(() => {
@@ -350,8 +395,46 @@ function MyAccountContent() {
       </nav>
 
       <main className="flex-grow max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full space-y-8">
-        <h1 className="text-4xl font-bold text-center mb-10">Your Account</h1>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+           <div>
+              <h1 className="text-4xl font-bold mb-2">Welcome Back, {userProfile?.displayName || 'User'}</h1>
+              <p className="text-gray-500">Manage your device unlocks and account details from here.</p>
+           </div>
+           <Button onClick={handleClaimDiscount} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold gap-2 h-11 px-8 rounded-xl shadow-lg transition-all hover:scale-105">
+             <Percent className="h-5 w-5" /> Claim Discount
+           </Button>
+        </div>
         
+        {/* User Details Card */}
+        <Card className="bg-white border-none shadow-sm overflow-hidden">
+          <CardHeader className="bg-gray-50/50 border-b">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Account Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Name</p>
+              <p className="text-lg font-semibold">{userProfile?.displayName || 'N/A'}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</p>
+              <p className="text-lg font-semibold">{userProfile?.email || 'N/A'}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">User ID / Username</p>
+              <p className="text-lg font-mono font-semibold text-blue-600 truncate">{user?.uid}</p>
+            </div>
+          </CardContent>
+          <Separator />
+          <CardFooter className="bg-gray-50/30 p-4">
+             <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-primary hover:bg-primary/5" onClick={() => setIsPasswordModalOpen(true)}>
+               <Key className="h-4 w-4" /> Change Password
+             </Button>
+          </CardFooter>
+        </Card>
+
         {/* Account Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-white border-l-4 border-l-blue-500 shadow-sm">
@@ -401,8 +484,8 @@ function MyAccountContent() {
                            <div className="flex-1">
                              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">USDT BEP20 Address:</p>
                              <div className="font-mono text-[11px] sm:text-xs bg-white p-3 rounded-xl break-all flex items-center justify-between border shadow-sm group">
-                                <span>0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                                <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
+                                <span>{usdtAddress}</span>
+                                <CopyToClipboard text={usdtAddress}>
                                     <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100">
                                         <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
                                     </Button>
@@ -605,6 +688,39 @@ function MyAccountContent() {
         </section>
       </main>
       
+      {/* Change Password Modal */}
+      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+               <Key className="h-5 w-5 text-primary" />
+               Change Your Password
+            </DialogTitle>
+            <DialogDescription>Enter a new secure password below.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+             <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input 
+                  id="new-password" 
+                  type="password" 
+                  placeholder="Min 6 characters..." 
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
+                />
+             </div>
+             <p className="text-[10px] text-gray-500 italic">For security, you may be asked to log in again after updating your password.</p>
+          </div>
+          <DialogFooter>
+             <Button variant="outline" onClick={() => setIsPasswordModalOpen(false)} disabled={isUpdatingPassword}>Cancel</Button>
+             <Button onClick={handleUpdatePassword} className="btn-primary text-white" disabled={isUpdatingPassword}>
+               {isUpdatingPassword ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
+               Update Password
+             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk Pay Modal */}
       <Dialog open={isBulkPayModalOpen} onOpenChange={setIsBulkPayModalOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
@@ -672,8 +788,8 @@ function MyAccountContent() {
                             </div>
                         </div>
                         <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
-                            <span className="font-medium">0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f</span>
-                            <CopyToClipboard text="0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f">
+                            <span className="font-medium">{usdtAddress}</span>
+                            <CopyToClipboard text={usdtAddress}>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-100">
                                     <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
                                 </Button>
@@ -695,6 +811,11 @@ function MyAccountContent() {
                   </Alert>
               </div>
             </ScrollArea>
+            <div className="px-5 py-3 bg-red-50 border-t border-red-100">
+               <p className="text-[11px] text-red-700 leading-tight text-center font-semibold">
+                 ⚠️ If the user clicks “I Paid” without making payment or without prior communication with support, their account may be restricted and certain features will be limited.
+               </p>
+            </div>
             <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
                 <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setIsBulkPayModalOpen(false)}>Cancel</Button>
                 <Button onClick={handleBulkPaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
@@ -702,7 +823,7 @@ function MyAccountContent() {
                       <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
                         Processing...
-                      </>
+                      </+>
                   ) : (
                     bulkAmountToPay > 0 ? 'Paid' : 'Confirm'
                   )}

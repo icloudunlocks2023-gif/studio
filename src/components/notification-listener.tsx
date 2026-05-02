@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -47,24 +46,30 @@ export function NotificationListener() {
     if (showPopup && lastNotificationId) {
       // Show popup for exactly 4 seconds
       const popupTimer = setTimeout(() => {
-        setShowPopup(false);
-        
-        // Trigger the dropdown tray to open automatically after the popup disappears
-        const event = new CustomEvent('open-notification-tray', { 
-            detail: { newId: lastNotificationId } 
-        });
-        window.dispatchEvent(event);
+        handleTriggerTray();
       }, 4000);
 
       return () => clearTimeout(popupTimer);
     }
   }, [showPopup, lastNotificationId]);
 
+  const handleTriggerTray = () => {
+    setShowPopup(false);
+    // Trigger the dropdown tray to open automatically
+    const event = new CustomEvent('open-notification-tray', { 
+        detail: { newId: lastNotificationId } 
+    });
+    window.dispatchEvent(event);
+  };
+
   if (!user || !showPopup) return null;
 
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="bg-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-md">
+    <div 
+      className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300 cursor-pointer"
+      onClick={handleTriggerTray}
+    >
+      <div className="bg-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-md hover:scale-105 transition-transform active:scale-95">
         <div className="relative">
             <Bell className="h-4 w-4 fill-white/20" />
             <span className="absolute -top-1 -right-1 flex h-2 w-2">
