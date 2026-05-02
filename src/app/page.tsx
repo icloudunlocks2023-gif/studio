@@ -219,7 +219,6 @@ export default function IcloudUnlocksPage() {
   const { data: user } = useUser();
   const isAdmin = user?.email === ADMIN_EMAIL;
   const { toast } = useToast();
-  const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
 
 
@@ -510,25 +509,25 @@ export default function IcloudUnlocksPage() {
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
                             <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Telegram Channel
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Support 1
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iUnlock_Apple" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Support 2
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Technician
                             </a>
                         </li>
