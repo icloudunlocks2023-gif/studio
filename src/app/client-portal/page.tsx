@@ -1230,7 +1230,7 @@ function DeviceCheckContent() {
             </ScrollArea>
             <div className="px-5 py-3 bg-red-50 border-t border-red-100">
                <p className="text-[11px] text-red-700 leading-tight text-center font-semibold">
-                 ⚠️ If the user clicks “I Paid” without making payment or without prior communication with support, their account may be restricted and certain features will be limited.
+                 ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
                </p>
             </div>
             <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
