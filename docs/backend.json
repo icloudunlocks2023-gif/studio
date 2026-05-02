@@ -118,6 +118,7 @@
       "properties": {
         "userId": { "type": "string", "description": "Specific user ID or 'all'" },
         "message": { "type": "string" },
+        "link": { "type": "string", "description": "Optional clickable link" },
         "createdAt": { "type": "string", "format": "date-time" },
         "readBy": { "type": "array", "items": { "type": "string" } }
       }

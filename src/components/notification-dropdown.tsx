@@ -4,7 +4,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useUser, useFirebase, useCollection } from '@/firebase';
 import { doc, updateDoc, arrayUnion, orderBy } from 'firebase/firestore';
-import { Bell, X, Clock, Info } from 'lucide-react';
+import { Bell, X, Clock, Info, ExternalLink } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,6 +16,7 @@ interface Notification {
   id: string;
   userId: string;
   message: string;
+  link?: string;
   createdAt: any;
   readBy: string[];
 }
@@ -170,7 +171,23 @@ export function NotificationDropdown() {
                                 <Badge className="bg-primary text-white text-[9px] animate-pulse">NEW</Badge>
                             )}
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
+                        
+                        {notif.link && (
+                          <div className="mt-2">
+                            <a 
+                              href={notif.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded-md transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Visit Link
+                            </a>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium mt-1">
                           <Clock className="h-3 w-3" />
                           {notif.createdAt?.toDate ? format(notif.createdAt.toDate(), 'MMM dd, p') : 'Just now'}
                         </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -6,7 +7,7 @@ import { useUser, useCollection } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Bell, Clock, Calendar } from 'lucide-react';
+import { ArrowLeft, Bell, Clock, Calendar, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -17,12 +18,13 @@ interface Notification {
   id: string;
   userId: string;
   message: string;
+  link?: string;
   createdAt: any;
   readBy: string[];
 }
 
 export default function UserNotificationsPage() {
-  const { data: user, loading: userLoading } = useUser();
+  const { data: user, loading: userLoading } = userUser();
   const router = useRouter();
 
   const { data: notifications, loading: notificationsLoading } = useCollection<Notification>('notifications', {
@@ -76,6 +78,20 @@ export default function UserNotificationsPage() {
                     )}
                   </div>
                   <p className="text-gray-800 leading-relaxed font-medium">{notif.message}</p>
+                  
+                  {notif.link && (
+                    <div className="mt-4">
+                      <a 
+                        href={notif.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-lg transition-colors border border-blue-100"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open Attached Link
+                      </a>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))

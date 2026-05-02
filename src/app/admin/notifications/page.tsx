@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Bell, Send, Users, User, Loader, Search } from 'lucide-react';
+import { ArrowLeft, Bell, Send, Users, User, Loader, Search, Link as LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
@@ -31,6 +31,7 @@ export default function AdminNotificationsPage() {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
+  const [link, setLink] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter users based on search term (ID, Email, or Name)
@@ -61,6 +62,7 @@ export default function AdminNotificationsPage() {
       const notifData = {
         userId: targetType === 'all' ? 'all' : selectedUser,
         message: message.trim(),
+        link: link.trim() || null,
         createdAt: serverTimestamp(),
         readBy: []
       };
@@ -68,6 +70,7 @@ export default function AdminNotificationsPage() {
       await addDoc(collection(firestore, 'notifications'), notifData);
       toast({ title: "Notification Sent Successfully!" });
       setMessage('');
+      setLink('');
       setSelectedUser('');
       setSearchTerm('');
     } catch (e) {
@@ -171,11 +174,22 @@ export default function AdminNotificationsPage() {
               <Label>Notification Message</Label>
               <Textarea 
                 placeholder="Type your announcement here..." 
-                className="min-h-[150px]"
+                className="min-h-[120px]"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-              <p className="text-[10px] text-gray-400 italic">This message will appear as a popup for online users.</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <LinkIcon className="h-3 w-3" /> Link (Optional)
+              </Label>
+              <Input 
+                placeholder="https://example.com" 
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+              />
+              <p className="text-[10px] text-gray-400 italic">This URL will be clickable in the user's notification tray.</p>
             </div>
           </CardContent>
           <CardFooter>
