@@ -78,7 +78,6 @@ interface Counters {
 
 const CopyToClipboard = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const { toast } = useToast();
-  handleCopy();
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
     toast({
@@ -405,7 +404,6 @@ function MyAccountContent() {
            </Button>
         </div>
         
-        {/* User Details Card */}
         <Card className="bg-white border-none shadow-sm overflow-hidden">
           <CardHeader className="bg-gray-50/50 border-b">
             <CardTitle className="text-lg flex items-center gap-2">
@@ -435,7 +433,6 @@ function MyAccountContent() {
           </CardFooter>
         </Card>
 
-        {/* Account Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-white border-l-4 border-l-blue-500 shadow-sm">
                 <CardContent className="p-6 flex items-center gap-4">
@@ -688,7 +685,6 @@ function MyAccountContent() {
         </section>
       </main>
       
-      {/* Change Password Modal */}
       <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
@@ -721,7 +717,6 @@ function MyAccountContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Pay Modal */}
       <Dialog open={isBulkPayModalOpen} onOpenChange={setIsBulkPayModalOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
             <DialogHeader className="px-5 py-2.5 border-b bg-white">
@@ -823,7 +818,7 @@ function MyAccountContent() {
                       <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
                         Processing...
-                      </+>
+                      </>
                   ) : (
                     bulkAmountToPay > 0 ? 'Paid' : 'Confirm'
                   )}
@@ -832,7 +827,6 @@ function MyAccountContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Withdrawal Modal */}
       <Dialog open={isWithdrawalModalOpen} onOpenChange={(v) => !isWithdrawing && !withdrawalSuccess && setIsWithdrawalModalOpen(v)}>
         <DialogContent className="sm:max-w-[450px]">
           {isWithdrawing ? (
@@ -891,7 +885,6 @@ function MyAccountContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>

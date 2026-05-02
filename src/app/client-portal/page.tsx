@@ -191,7 +191,6 @@ function DeviceCheckContent() {
   const [isOfflineSimulating, setIsOfflineSimulating] = useState(false);
   const [offlineError, setOfflineError] = useState(false);
 
-  // Verification Claim State
   const [verifyingClaimId, setVerifyingClaimId] = useState<string | null>(null);
   const [claimRejected, setClaimRejected] = useState(false);
 
@@ -322,7 +321,6 @@ function DeviceCheckContent() {
 
     setIsSearching(true);
 
-    // Fetch IP address and Country
     let clientIp = 'unknown';
     let country = 'unknown';
     try {
@@ -340,7 +338,6 @@ function DeviceCheckContent() {
         console.warn("IP/Country fetch failed during submission, proceeding with fallback.");
     }
 
-    // Trigger notification immediately to notify admin of the click attempt
     const tgMessage = `🚨 <b>Device Check Attempt!</b> 🚀\n\n<b>Model:</b> ${model}\n<b>IMEI/Serial:</b> ${trimmedImei || '<i>(empty)</i>'}\n<b>User ID:</b> ${user.uid}\n<b>IP:</b> ${clientIp}\n<b>Country:</b> ${country}\n<b>Format Status:</b> ${isImeiValid || isSerialValid ? 'Format OK' : 'Invalid Format'}`;
     
     fetch('/api/telegram', {
@@ -355,7 +352,6 @@ function DeviceCheckContent() {
       console.error('Notification network error:', err);
     });
 
-    // Check if IP is banned
     const ipBanRef = doc(firestore, 'banned_ips', clientIp.replace(/\./g, '_'));
     const ipBanDoc = await getDoc(ipBanRef);
     if (ipBanDoc.exists()) {
@@ -572,7 +568,6 @@ function DeviceCheckContent() {
 
   const currentBalance = userProfile?.balance || 0;
   
-  // Use submission icloudStatus if available, else show the range
   const activePrice = submission?.icloudStatus === 'lost' ? lostPrice : submission?.icloudStatus === 'clean' ? price : null;
   const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
 
@@ -1020,7 +1015,6 @@ function DeviceCheckContent() {
         </div>
       </footer>
       
-      {/* Policy Modal */}
       <Dialog open={isPolicyModalOpen} onOpenChange={() => {}}>
         <DialogContent 
             className="sm:max-w-[550px] p-0 overflow-hidden [&>button]:hidden" 
@@ -1141,7 +1135,6 @@ function DeviceCheckContent() {
                                         <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">Other Networks</h4>
                                         <ScrollArea className="h-[320px] pr-2">
                                             <div className="space-y-3 pb-[250px]">
-                                                {/* Other methods (BTC, ETH etc) remain static or can be dynamic if needed */}
                                                 <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
                                                     <div className="flex items-center gap-3">
                                                         {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
@@ -1242,7 +1235,7 @@ function DeviceCheckContent() {
             </div>
             <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
                 <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                <Button onClick={handlePaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
+                <Button onClick={handlePaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
                     {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
                 </Button>
             </DialogFooter>

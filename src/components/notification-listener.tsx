@@ -46,7 +46,12 @@ export function NotificationListener() {
     if (showPopup && lastNotificationId) {
       // Show popup for exactly 4 seconds
       const popupTimer = setTimeout(() => {
-        handleTriggerTray();
+        setShowPopup(false);
+        // After timeout, trigger the tray
+        const event = new CustomEvent('open-notification-tray', { 
+            detail: { newId: lastNotificationId } 
+        });
+        window.dispatchEvent(event);
       }, 4000);
 
       return () => clearTimeout(popupTimer);
