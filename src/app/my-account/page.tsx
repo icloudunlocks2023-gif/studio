@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { NotificationDropdown } from '@/components/notification-dropdown';
 import { updatePassword } from 'firebase/auth';
 import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -335,7 +336,7 @@ function MyAccountContent() {
   }
 
   return (
-    <div className="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -345,18 +346,20 @@ function MyAccountContent() {
               </Link>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-              <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</Link>
+              <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Services</Link>
               {user && (
-                  <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">My Account</Link>
+                  <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium ring-1 ring-inset ring-primary">My Account</Link>
               )}
               {isAdmin && (
-                <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
+                <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
               )}
               {user && <NotificationDropdown />}
+              <ThemeToggle />
               <LoginButton />
             </div>
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -368,17 +371,17 @@ function MyAccountContent() {
                     <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
-                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                        <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
                     {isAdmin && (
-                      <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                      <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                     )}
                     {user && (
                       <div className="flex items-center gap-2 py-2">
-                        <span className="text-gray-700 text-base font-medium">Notifications</span>
+                        <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Notifications</span>
                         <NotificationDropdown />
                       </div>
                     )}
@@ -396,37 +399,37 @@ function MyAccountContent() {
       <main className="flex-grow max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full space-y-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
            <div>
-              <h1 className="text-4xl font-bold mb-2">Welcome Back, {userProfile?.displayName || 'User'}</h1>
-              <p className="text-gray-500">Manage your device unlocks and account details from here.</p>
+              <h1 className="text-4xl font-bold mb-2 text-foreground">Welcome Back, {userProfile?.displayName || 'User'}</h1>
+              <p className="text-muted-foreground">Manage your device unlocks and account details from here.</p>
            </div>
-           <Button onClick={handleClaimDiscount} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold gap-2 h-11 px-8 rounded-xl shadow-lg transition-all hover:scale-105">
+           <Button onClick={handleClaimDiscount} className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white dark:text-white font-bold gap-2 h-11 px-8 rounded-xl shadow-lg transition-all hover:scale-105">
              <Percent className="h-5 w-5" /> Claim Discount
            </Button>
         </div>
         
-        <Card className="bg-white border-none shadow-sm overflow-hidden">
-          <CardHeader className="bg-gray-50/50 border-b">
-            <CardTitle className="text-lg flex items-center gap-2">
+        <Card className="bg-card border-none shadow-sm overflow-hidden border border-border">
+          <CardHeader className="bg-muted/30 border-b border-border">
+            <CardTitle className="text-lg flex items-center gap-2 text-foreground">
               <User className="h-5 w-5 text-primary" />
               Account Information
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-1">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Name</p>
-              <p className="text-lg font-semibold">{userProfile?.displayName || 'N/A'}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</p>
+              <p className="text-lg font-semibold text-foreground">{userProfile?.displayName || 'N/A'}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</p>
-              <p className="text-lg font-semibold">{userProfile?.email || 'N/A'}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Email Address</p>
+              <p className="text-lg font-semibold text-foreground">{userProfile?.email || 'N/A'}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">User ID / Username</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">User ID / Username</p>
               <p className="text-lg font-mono font-semibold text-blue-600 truncate">{user?.uid}</p>
             </div>
           </CardContent>
           <Separator />
-          <CardFooter className="bg-gray-50/30 p-4">
+          <CardFooter className="bg-muted/10 p-4">
              <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-primary hover:bg-primary/5" onClick={() => setIsPasswordModalOpen(true)}>
                <Key className="h-4 w-4" /> Change Password
              </Button>
@@ -434,40 +437,40 @@ function MyAccountContent() {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-white border-l-4 border-l-blue-500 shadow-sm">
+            <Card className="bg-card border-l-4 border-l-blue-500 shadow-sm border border-border">
                 <CardContent className="p-6 flex items-center gap-4">
-                    <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Wallet className="h-6 w-6" /></div>
-                    <div><p className="text-xs font-bold text-gray-400 uppercase">Balance</p><p className="text-2xl font-black">${userProfile?.balance?.toFixed(2) || '0.00'}</p></div>
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-2xl text-blue-600"><Wallet className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-muted-foreground uppercase">Balance</p><p className="text-2xl font-black text-foreground">${userProfile?.balance?.toFixed(2) || '0.00'}</p></div>
                 </CardContent>
             </Card>
-            <Card className="bg-white border-l-4 border-l-green-500 shadow-sm">
+            <Card className="bg-card border-l-4 border-l-green-500 shadow-sm border border-border">
                 <CardContent className="p-6 flex items-center gap-4">
-                    <div className="p-3 bg-green-50 rounded-2xl text-green-600"><CheckCircle2 className="h-6 w-6" /></div>
-                    <div><p className="text-xs font-bold text-gray-400 uppercase">Unlocked</p><p className="text-2xl font-black">{stats.unlocked}</p></div>
+                    <div className="p-3 bg-green-50 dark:bg-green-950 rounded-2xl text-green-600"><CheckCircle2 className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-muted-foreground uppercase">Unlocked</p><p className="text-2xl font-black text-foreground">{stats.unlocked}</p></div>
                 </CardContent>
             </Card>
-            <Card className="bg-white border-l-4 border-l-red-500 shadow-sm">
+            <Card className="bg-card border-l-4 border-l-red-500 shadow-sm border border-border">
                 <CardContent className="p-6 flex items-center gap-4">
-                    <div className="p-3 bg-red-50 rounded-2xl text-red-600"><XCircle className="h-6 w-6" /></div>
-                    <div><p className="text-xs font-bold text-gray-400 uppercase">Declined</p><p className="text-2xl font-black">{stats.declined}</p></div>
+                    <div className="p-3 bg-red-50 dark:bg-red-950 rounded-2xl text-red-600"><XCircle className="h-6 w-6" /></div>
+                    <div><p className="text-xs font-bold text-muted-foreground uppercase">Declined</p><p className="text-2xl font-black text-foreground">{stats.declined}</p></div>
                 </CardContent>
             </Card>
-            <Card className="bg-white border-l-4 border-l-primary shadow-sm">
+            <Card className="bg-card border-l-4 border-l-primary shadow-sm border border-border">
                 <CardContent className="p-6 flex items-center gap-4">
                     <div className="p-3 bg-primary/10 rounded-2xl text-primary"><BarChart3 className="h-6 w-6" /></div>
-                    <div><p className="text-xs font-bold text-gray-400 uppercase">Total Orders</p><p className="text-2xl font-black">{orders?.length || 0}</p></div>
+                    <div><p className="text-xs font-bold text-muted-foreground uppercase">Total Orders</p><p className="text-2xl font-black text-foreground">{orders?.length || 0}</p></div>
                 </CardContent>
             </Card>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <Card className="lg:col-span-2">
+            <Card className="lg:col-span-2 border border-border">
                 <CardHeader>
                     <CardTitle className="text-2xl text-blue-600 flex items-center gap-2"><Wallet className="h-6 w-6" /> Financial Management</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="p-6 rounded-2xl bg-gray-50 border border-dashed border-gray-200">
-                        <p className="font-bold mb-4">Deposit via Crypto:</p>
+                    <div className="p-6 rounded-2xl bg-muted/30 border border-dashed border-border">
+                        <p className="font-bold mb-4 text-foreground">Deposit via Crypto:</p>
                         <div className="flex items-center gap-3">
                            {usdtImage && (
                              <Image 
@@ -479,12 +482,12 @@ function MyAccountContent() {
                              />
                            )}
                            <div className="flex-1">
-                             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">USDT BEP20 Address:</p>
-                             <div className="font-mono text-[11px] sm:text-xs bg-white p-3 rounded-xl break-all flex items-center justify-between border shadow-sm group">
+                             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">USDT BEP20 Address:</p>
+                             <div className="font-mono text-[11px] sm:text-xs bg-background p-3 rounded-xl break-all flex items-center justify-between border border-border shadow-sm group text-foreground">
                                 <span>{usdtAddress}</span>
                                 <CopyToClipboard text={usdtAddress}>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100">
-                                        <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                                        <Copy className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors"/>
                                     </Button>
                                 </CopyToClipboard>
                              </div>
@@ -492,13 +495,13 @@ function MyAccountContent() {
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t">
-                        <h4 className="font-bold mb-2">Withdraw Funds</h4>
-                        <p className="text-sm text-gray-500 mb-4">You can request a withdrawal of your available balance. Min: $50.</p>
+                    <div className="pt-4 border-t border-border">
+                        <h4 className="font-bold mb-2 text-foreground">Withdraw Funds</h4>
+                        <p className="text-sm text-muted-foreground mb-4">You can request a withdrawal of your available balance. Min: $50.</p>
                         <Button 
                             onClick={() => setIsWithdrawalModalOpen(true)} 
                             variant="outline" 
-                            className="w-full sm:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 h-11 px-6 rounded-xl font-bold"
+                            className="w-full sm:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 h-11 px-6 rounded-xl font-bold"
                             disabled={currentBalance < 50}
                         >
                             Request Withdrawal
@@ -513,17 +516,17 @@ function MyAccountContent() {
             </Card>
 
             <div className="space-y-6">
-                <Card>
+                <Card className="border border-border">
                     <CardHeader>
-                        <CardTitle className="text-xl flex items-center gap-2">
+                        <CardTitle className="text-xl flex items-center gap-2 text-foreground">
                             <MessageSquare className="text-blue-600 h-5 w-5" />
                             Support Center
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-xs text-gray-600 mb-4 leading-relaxed">Having issues? Our technician is available 24/7. Response time: 1-24 hours.</p>
+                        <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Having issues? Our technician is available 24/7. Response time: 1-24 hours.</p>
                         <Link href="/my-account/tickets/new" className="w-full">
-                            <Button className="w-full btn-primary text-white h-11 rounded-xl shadow-lg">
+                            <Button className="w-full btn-primary text-white dark:text-white h-11 rounded-xl shadow-lg">
                                 <Ticket className="mr-2 h-4 w-4" />
                                 New Support Ticket
                             </Button>
@@ -531,7 +534,7 @@ function MyAccountContent() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-red-100 bg-red-50/30">
+                <Card className="border-red-100 dark:border-red-900/30 bg-red-50/30 dark:bg-red-950/10">
                     <CardHeader>
                         <CardTitle className="text-sm font-bold text-red-600 flex items-center gap-2">
                             <Trash2 className="h-4 w-4" />
@@ -539,7 +542,7 @@ function MyAccountContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-[10px] text-gray-500 mb-3">Permanently remove your account and all history.</p>
+                        <p className="text-[10px] text-muted-foreground mb-3">Permanently remove your account and all history.</p>
                         <Button 
                             variant="link" 
                             className="text-red-500 p-0 h-auto text-xs font-bold hover:text-red-700"
@@ -552,23 +555,23 @@ function MyAccountContent() {
             </div>
         </div>
 
-        <Alert className="mb-12 border-blue-200 bg-blue-50/50">
+        <Alert className="mb-12 border-blue-200 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-950/20">
             <AlertCircle className="h-4 w-4 text-blue-600" />
-            <AlertTitle className="text-blue-800 font-bold">Refresh Account</AlertTitle>
-            <AlertDescription className="text-blue-700 text-sm">
+            <AlertTitle className="text-blue-800 dark:text-blue-300 font-bold">Refresh Account</AlertTitle>
+            <AlertDescription className="text-blue-700 dark:text-blue-400 text-sm">
                 If you just deposited, click the refresh button below to update your balance and order status.
             </AlertDescription>
         </Alert>
 
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold flex items-center gap-3">
+            <h2 className="text-3xl font-bold flex items-center gap-3 text-foreground">
                 <Clock className="h-8 w-8 text-primary" />
                 Order History
             </h2>
             <div className="flex items-center gap-4">
                  {canPayBulk && (
-                    <Button onClick={handleOpenBulkModal} className="btn-primary text-white shadow-lg animate-pulse">
+                    <Button onClick={handleOpenBulkModal} className="btn-primary text-white dark:text-white shadow-lg animate-pulse">
                         Pay Bulk ({ordersForBulkPay.length})
                     </Button>
                 )}
@@ -579,27 +582,27 @@ function MyAccountContent() {
             </div>
           </div>
           {ordersLoading ? (
-            <div className="text-center py-16 px-6 bg-white rounded-2xl shadow-lg"><Loader className="animate-spin h-8 w-8 mx-auto text-primary" /></div>
+            <div className="text-center py-16 px-6 bg-card rounded-2xl shadow-lg border border-border"><Loader className="animate-spin h-8 w-8 mx-auto text-primary" /></div>
           ) : orders && orders.length > 0 ? (
-            <Card className="overflow-hidden border-none shadow-xl">
+            <Card className="overflow-hidden border-none shadow-xl border border-border">
               <Table>
-                <TableHeader className="bg-gray-50">
-                  <TableRow>
-                    <TableHead>Order Date</TableHead>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>IMEI/Serial</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                <TableHeader className="bg-muted/50">
+                  <TableRow className="border-border">
+                    <TableHead className="text-foreground">Order Date</TableHead>
+                    <TableHead className="text-foreground">Order ID</TableHead>
+                    <TableHead className="text-foreground">Device</TableHead>
+                    <TableHead className="text-foreground">IMEI/Serial</TableHead>
+                    <TableHead className="text-foreground">Status</TableHead>
+                    <TableHead className="text-right text-foreground">Amount</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {orders.map(order => (
-                    <TableRow key={order.id} className="hover:bg-gray-50/50">
-                      <TableCell className="text-xs text-gray-500">{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                    <TableRow key={order.id} className="hover:bg-muted/50 border-border">
+                      <TableCell className="text-xs text-muted-foreground">{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
                       <TableCell className="font-mono text-xs font-bold text-blue-600">{order.orderId}</TableCell>
-                      <TableCell className="text-sm font-semibold">{order.model}</TableCell>
-                      <TableCell className="font-mono text-[10px] text-gray-400">{order.imei}</TableCell>
+                      <TableCell className="text-sm font-semibold text-card-foreground">{order.model}</TableCell>
+                      <TableCell className="font-mono text-[10px] text-muted-foreground">{order.imei}</TableCell>
                       <TableCell>
                         <Badge variant={
                             order.status === 'approved' || order.status === 'unlocked' ? 'secondary' : 
@@ -608,44 +611,44 @@ function MyAccountContent() {
                           {formatStatus(order.status)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-black text-sm">${order.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-black text-sm text-foreground">${order.price.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </Card>
           ) : (
-            <div className="text-center py-20 px-6 bg-white rounded-3xl shadow-inner border border-dashed">
-                <p className="text-gray-400 font-medium">Your order history will appear here once you place an order.</p>
+            <div className="text-center py-20 px-6 bg-card rounded-3xl shadow-inner border border-dashed border-border">
+                <p className="text-muted-foreground font-medium">Your order history will appear here once you place an order.</p>
             </div>
           )}
         </section>
 
         <section>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold flex items-center gap-3">
+                <h2 className="text-3xl font-bold flex items-center gap-3 text-foreground">
                     <MessageSquare className="h-8 w-8 text-primary" />
                     Support Tickets
                 </h2>
                 <Link href="/my-account/tickets/new">
-                    <Button variant="outline" size="sm" className="bg-white border-blue-200 text-blue-600 hover:bg-blue-50 h-10 px-4 rounded-xl font-bold">
+                    <Button variant="outline" size="sm" className="bg-card border-blue-200 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 h-10 px-4 rounded-xl font-bold">
                         <Ticket className="mr-2 h-4 w-4" />
                         New Ticket
                     </Button>
                 </Link>
             </div>
             {ticketsLoading ? (
-                <p>Loading tickets...</p>
+                <p className="text-muted-foreground">Loading tickets...</p>
             ) : tickets && tickets.length > 0 ? (
-                <Card className="overflow-hidden border-none shadow-xl">
+                <Card className="overflow-hidden border-none shadow-xl border border-border">
                     <Table>
-                        <TableHeader className="bg-gray-50">
-                            <TableRow>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Subject</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Action</TableHead>
+                        <TableHeader className="bg-muted/50">
+                            <TableRow className="border-border">
+                                <TableHead className="text-foreground">Date</TableHead>
+                                <TableHead className="text-foreground">Category</TableHead>
+                                <TableHead className="text-foreground">Subject</TableHead>
+                                <TableHead className="text-foreground">Status</TableHead>
+                                <TableHead className="text-right text-foreground">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -654,10 +657,10 @@ function MyAccountContent() {
                                 const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
                                 return timeB - timeA;
                             }).map(ticket => (
-                                <TableRow key={ticket.id}>
-                                    <TableCell className="text-xs text-gray-500">{ticket.createdAt?.toDate ? ticket.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
-                                    <TableCell className="text-xs font-bold text-gray-400 uppercase">{ticket.category}</TableCell>
-                                    <TableCell className="font-semibold text-sm">{ticket.subject}</TableCell>
+                                <TableRow key={ticket.id} className="border-border">
+                                    <TableCell className="text-xs text-muted-foreground">{ticket.createdAt?.toDate ? ticket.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                                    <TableCell className="text-xs font-bold text-muted-foreground uppercase">{ticket.category}</TableCell>
+                                    <TableCell className="font-semibold text-sm text-card-foreground">{ticket.subject}</TableCell>
                                     <TableCell>
                                         <Badge variant={getStatusVariant(ticket.status)} className="text-[10px] uppercase font-bold">
                                             {ticket.status.replace('_', ' ')}
@@ -677,9 +680,9 @@ function MyAccountContent() {
                     </Table>
                 </Card>
             ) : (
-                <div className="text-center py-16 px-6 bg-white rounded-3xl shadow-inner border border-dashed">
-                    <MessageSquare className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-                    <p className="text-gray-400">You haven't submitted any support tickets yet.</p>
+                <div className="text-center py-16 px-6 bg-card rounded-3xl shadow-inner border border-dashed border-border">
+                    <MessageSquare className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground">You haven't submitted any support tickets yet.</p>
                 </div>
             )}
         </section>
@@ -688,11 +691,11 @@ function MyAccountContent() {
       <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-foreground">
                <Key className="h-5 w-5 text-primary" />
                Change Your Password
             </DialogTitle>
-            <DialogDescription>Enter a new secure password below.</DialogDescription>
+            <DialogDescription className="text-muted-foreground">Enter a new secure password below.</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
              <div className="space-y-2">
@@ -705,11 +708,11 @@ function MyAccountContent() {
                   onChange={(e) => setNewPassword(e.target.value)} 
                 />
              </div>
-             <p className="text-[10px] text-gray-500 italic">For security, you may be asked to log in again after updating your password.</p>
+             <p className="text-[10px] text-muted-foreground italic">For security, you may be asked to log in again after updating your password.</p>
           </div>
           <DialogFooter>
              <Button variant="outline" onClick={() => setIsPasswordModalOpen(false)} disabled={isUpdatingPassword}>Cancel</Button>
-             <Button onClick={handleUpdatePassword} className="btn-primary text-white" disabled={isUpdatingPassword}>
+             <Button onClick={handleUpdatePassword} className="btn-primary text-white dark:text-white" disabled={isUpdatingPassword}>
                {isUpdatingPassword ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
                Update Password
              </Button>
@@ -719,23 +722,23 @@ function MyAccountContent() {
 
       <Dialog open={isBulkPayModalOpen} onOpenChange={setIsBulkPayModalOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
-            <DialogHeader className="px-5 py-2.5 border-b bg-white">
-                <DialogTitle className="text-base sm:text-lg flex items-center gap-3 pr-12">
+            <DialogHeader className="px-5 py-2.5 border-b border-border bg-card">
+                <DialogTitle className="text-base sm:text-lg flex items-center gap-3 pr-12 text-foreground">
                     {timeLeft > 0 && (
-                        <span className="text-xs sm:text-sm font-mono bg-blue-100 text-blue-800 rounded-md px-2 py-0.5">
+                        <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">
                             {formatTime(timeLeft)}
                         </span>
                     )}
                     <span>Bulk Payment (20% Off)</span>
                 </DialogTitle>
-                <DialogDescription className="text-sm">
+                <DialogDescription className="text-sm text-muted-foreground">
                     Pay for multiple orders at once and receive a discount. Send the exact amount.
                 </DialogDescription>
             </DialogHeader>
             <ScrollArea className="flex-1 px-5">
               <div className="space-y-4 pt-1 pb-8">
-                  <div className="text-xs bg-gray-100 p-3 rounded-xl text-gray-600 space-y-1 mt-2">
-                      <p className="font-semibold text-gray-900">Unlocking {ordersForBulkPay.length} devices:</p>
+                  <div className="text-xs bg-muted p-3 rounded-xl text-muted-foreground space-y-1 mt-2">
+                      <p className="font-semibold text-foreground">Unlocking {ordersForBulkPay.length} devices:</p>
                       <ul className="list-disc list-inside text-xs leading-tight">
                           {ordersForBulkPay.map(order => (
                               <li key={order.id}>{order.model} - <span className='font-mono'>{order.imei}</span></li>
@@ -743,8 +746,8 @@ function MyAccountContent() {
                       </ul>
                   </div>
 
-                  <Alert variant="default" className="bg-blue-50 border-blue-200 py-1.5">
-                    <AlertDescription className="text-[11px] text-center">
+                  <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5">
+                    <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
                       For other payment options, contact the <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                     </AlertDescription>
                   </Alert>
@@ -752,41 +755,41 @@ function MyAccountContent() {
                   <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-4 text-center">
                           <div>
-                              <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Original Total</p>
-                              <p className="line-through text-base font-medium opacity-60">${bulkTotal.toFixed(2)}</p>
+                              <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Original Total</p>
+                              <p className="line-through text-base font-medium opacity-60 text-foreground">${bulkTotal.toFixed(2)}</p>
                           </div>
                           <div>
-                              <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Bulk Discount (20%)</p>
+                              <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Bulk Discount (20%)</p>
                               <p className="text-base font-bold text-green-600">-${bulkDiscount.toFixed(2)}</p>
                           </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-center">
                           <div>
-                              <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Your Balance</p>
+                              <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Your Balance</p>
                               <p className="text-base font-bold text-green-600">-${currentBalance.toFixed(2)}</p>
                           </div>
                           <div></div>
                       </div>
-                      <div className="text-center bg-gray-50 py-3 rounded-xl border border-dashed">
-                          <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Amount to Pay</p>
-                          <p className="text-3xl font-black">${bulkAmountToPay.toFixed(2)}</p>
+                      <div className="text-center bg-muted/30 py-3 rounded-xl border border-dashed border-border">
+                          <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Amount to Pay</p>
+                          <p className="text-3xl font-black text-foreground">${bulkAmountToPay.toFixed(2)}</p>
                       </div>
                   </div>
                   
                   {bulkAmountToPay > 0 && (
-                    <div className="px-4 py-4 border rounded-2xl bg-white shadow-sm space-y-3">
+                    <div className="px-4 py-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                         <div className="flex items-center gap-3">
                             {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT BEP20" width={36} height={36} className="rounded-full" data-ai-hint="usdt logo" />}
                             <div>
-                                <p className="font-bold text-sm">USDT (BEP20 Network)</p>
-                                <p className="text-[10px] text-gray-500">Recommended: Use Binance Smart Chain.</p>
+                                <p className="font-bold text-sm text-foreground">USDT (BEP20 Network)</p>
+                                <p className="text-[10px] text-muted-foreground">Recommended: Use Binance Smart Chain.</p>
                             </div>
                         </div>
-                        <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                        <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                             <span className="font-medium">{usdtAddress}</span>
                             <CopyToClipboard text={usdtAddress}>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-100">
-                                    <Copy className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"/>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                    <Copy className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors"/>
                                 </Button>
                             </CopyToClipboard>
                         </div>
@@ -794,26 +797,26 @@ function MyAccountContent() {
                   )}
 
                   {bulkAmountToPay <= 0 && (
-                    <div className="text-center p-6 bg-green-50 border border-green-100 text-green-800 rounded-2xl animate-fade-in">
+                    <div className="text-center p-6 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 text-green-800 dark:text-green-300 rounded-2xl animate-fade-in">
                         <CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500"/><p className="font-bold text-base">Your balance covers the full amount!</p><p className="text-xs opacity-80">Click "Confirm" to use your balance for this bulk order.</p>
                     </div>
                   )}
 
-                  <Alert className="bg-yellow-50 border-yellow-100 py-2 rounded-xl">
-                      <AlertDescription className="text-[10px] text-center text-yellow-800 font-medium">
+                  <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 py-2 rounded-xl">
+                      <AlertDescription className="text-[10px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
                           Payments made within the timer will be automatically applied.
                       </AlertDescription>
                   </Alert>
               </div>
             </ScrollArea>
-            <div className="px-5 py-3 bg-red-50 border-t border-red-100">
-               <p className="text-[11px] text-red-700 leading-tight text-center font-semibold">
+            <div className="px-5 py-3 bg-red-50 dark:bg-red-950/20 border-t border-red-100 dark:border-red-900/30">
+               <p className="text-[11px] text-red-700 dark:text-red-300 leading-tight text-center font-semibold">
                  ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
                </p>
             </div>
-            <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
+            <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
                 <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setIsBulkPayModalOpen(false)}>Cancel</Button>
-                <Button onClick={handleBulkPaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
+                <Button onClick={handleBulkPaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
                   {isSubmittingBulk ? (
                       <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -833,17 +836,17 @@ function MyAccountContent() {
             <div className="py-12 flex flex-col items-center justify-center space-y-6 text-center">
               <Loader className="h-16 w-16 animate-spin text-primary" />
               <div className="space-y-2">
-                <h3 className="text-xl font-bold">Processing Withdrawal</h3>
-                <p className="text-sm text-gray-500 px-6">We are verifying your account and processing the request. This may take a few moments...</p>
+                <h3 className="text-xl font-bold text-foreground">Processing Withdrawal</h3>
+                <p className="text-sm text-muted-foreground px-6">We are verifying your account and processing the request. This may take a few moments...</p>
               </div>
-              <p className="text-[10px] text-gray-400 font-mono animate-pulse">ESTIMATED TIME: 120s</p>
+              <p className="text-[10px] text-muted-foreground font-mono animate-pulse">ESTIMATED TIME: 120s</p>
             </div>
           ) : withdrawalSuccess ? (
             <div className="py-10 text-center space-y-6 animate-fade-in">
               <CheckCircle2 className="h-20 w-24 mx-auto text-green-500" />
               <div className="space-y-2">
-                <h3 className="text-2xl font-black">Request Submitted!</h3>
-                <div className="p-4 bg-green-50 border border-green-100 rounded-xl text-green-800 text-sm leading-relaxed mx-2">
+                <h3 className="text-2xl font-black text-foreground">Request Submitted!</h3>
+                <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 rounded-xl text-green-800 dark:text-green-300 text-sm leading-relaxed mx-2">
                     Support will review and process your withdrawal. If it takes more than 2 days, please submit a support ticket.
                 </div>
               </div>
@@ -852,8 +855,8 @@ function MyAccountContent() {
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle>Withdraw Funds</DialogTitle>
-                <DialogDescription>Minimum withdrawal amount is $50. Processing time: 1-48 hours.</DialogDescription>
+                <DialogTitle className="text-foreground">Withdraw Funds</DialogTitle>
+                <DialogDescription className="text-muted-foreground">Minimum withdrawal amount is $50. Processing time: 1-48 hours.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleWithdrawalSubmit} className="space-y-5 py-4">
                 <div className="space-y-2">
@@ -877,7 +880,7 @@ function MyAccountContent() {
                     <Textarea id="w-reason" placeholder="e.g., Change of plans, surplus balance..." value={withdrawReason} onChange={(e) => setWithdrawalReason(e.target.value)} required />
                 </div>
                 <DialogFooter>
-                    <Button type="submit" className="w-full btn-primary text-white h-12 font-bold shadow-lg">Proceed with Withdrawal</Button>
+                    <Button type="submit" className="w-full btn-primary text-white dark:text-white h-12 font-bold shadow-lg">Proceed with Withdrawal</Button>
                 </DialogFooter>
               </form>
             </>
@@ -889,9 +892,9 @@ function MyAccountContent() {
         <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
                 <DialogTitle className="text-red-600 flex items-center gap-2">Confirm Account Deletion</DialogTitle>
-                <DialogDescription>This action is irreversible. All your orders, balance, and history will be lost.</DialogDescription>
+                <DialogDescription className="text-muted-foreground">This action is irreversible. All your orders, balance, and history will be lost.</DialogDescription>
             </DialogHeader>
-            <div className="py-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-800 text-xs font-medium">
+            <div className="py-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl text-red-800 dark:text-red-300 text-xs font-medium">
                 ⚠️ Your request will be reviewed by an administrator within 48 hours. If you have an active balance, it will be forfeited unless withdrawn first.
             </div>
             <DialogFooter className="gap-3">
@@ -904,7 +907,7 @@ function MyAccountContent() {
       </Dialog>
 
 
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>

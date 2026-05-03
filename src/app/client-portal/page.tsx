@@ -34,6 +34,7 @@ import { PaymentVerificationAnimation } from '@/components/ui/payment-verificati
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface Submission {
   id: string;
@@ -122,7 +123,7 @@ function VerificationSteps({ steps }: { steps: string[] }) {
                     ) : (
                         <Loader className="h-5 w-5 animate-spin text-blue-500 flex-shrink-0" />
                     )}
-                    <span className="text-gray-700">{step}</span>
+                    <span className="text-foreground">{step}</span>
                 </div>
             ))}
         </div>
@@ -584,8 +585,8 @@ function DeviceCheckContent() {
       return (
         <div className="w-full max-w-lg mx-auto p-8 text-center animate-fade-in">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Verification Failed</h3>
-          <div className="bg-red-50 border border-red-100 rounded-xl p-6 text-red-800 text-sm leading-relaxed">
+          <h3 className="text-2xl font-bold text-foreground mb-4">Verification Failed</h3>
+          <div className="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl p-6 text-red-800 dark:text-red-300 text-sm leading-relaxed">
             "No payment matching this order has been detected. If you believe this is an error, please contact support or submit a support ticket with your payment details so our team can review the transaction and assist you.."
           </div>
           <Button variant="outline" className="mt-6" onClick={() => setClaimRejected(false)}>
@@ -598,7 +599,7 @@ function DeviceCheckContent() {
     if (validationError) {
       return (
           <div className="w-full text-left p-4">
-              <div className="p-4 px-5 rounded-md bg-red-100 border border-red-200 text-sm whitespace-pre-wrap font-mono text-red-800 animate-fade-in leading-relaxed">
+              <div className="p-4 px-5 rounded-md bg-red-100 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-sm whitespace-pre-wrap font-mono text-red-800 dark:text-red-300 animate-fade-in leading-relaxed">
                 {validationError}
               </div>
           </div>
@@ -611,8 +612,8 @@ function DeviceCheckContent() {
                 <div className="flex justify-center mb-4">
                     <AlertTriangle className="h-12 w-12 text-yellow-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">⚠️ Device Check Failed</h3>
-                <div className="space-y-4 text-gray-700 text-lg leading-relaxed">
+                <h3 className="text-2xl font-bold text-foreground mb-4">⚠️ Device Check Failed</h3>
+                <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
                     <p>We are currently unable to complete your IMEI / Serial device check. One or more device check servers may be temporarily offline or experiencing high traffic volume.</p>
                     <p>Please try again later. Our system will automatically resume full compatibility validation once the server connection is restored.</p>
                     <p className="font-semibold">We appreciate your patience.</p>
@@ -627,10 +628,10 @@ function DeviceCheckContent() {
       return (
         <div className="flex flex-col items-center justify-center h-full animate-pop-in">
           <CheckCircle2 className="w-24 h-24 text-blue-500 mb-4" />
-          <h2 className="text-3xl font-bold text-gray-800 text-center px-4">Device data already in the database</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center px-4">Device data already in the database</h2>
           <div className="flex items-center gap-3 mt-4">
             <Loader className="h-6 w-6 animate-spin text-blue-500" />
-            <p className="text-lg text-gray-600">Loading existing information...</p>
+            <p className="text-lg text-muted-foreground">Loading existing information...</p>
           </div>
         </div>
       );
@@ -639,8 +640,8 @@ function DeviceCheckContent() {
     if (!submissionId) {
         return (
             <div className="flex flex-col items-center justify-center h-full animate-fade-in">
-              <p className="font-semibold text-gray-700">No IMEI submitted yet.</p>
-              <p className="text-sm text-gray-500">Submit your IMEI or serial number to check if unlock is supported.</p>
+              <p className="font-semibold text-foreground">No IMEI submitted yet.</p>
+              <p className="text-sm text-muted-foreground">Submit your IMEI or serial number to check if unlock is supported.</p>
             </div>
         );
     }
@@ -648,7 +649,7 @@ function DeviceCheckContent() {
         return (
             <div className="flex flex-col items-center justify-center h-full animate-fade-in">
               <p className="font-semibold text-destructive">This submission was not found.</p>
-              <p className="text-sm text-gray-500">It may have been deleted by an administrator. Please clear and try again.</p>
+              <p className="text-sm text-muted-foreground">It may have been deleted by an administrator. Please clear and try again.</p>
             </div>
         );
     }
@@ -658,8 +659,8 @@ function DeviceCheckContent() {
             return (
                 <div className="flex flex-col items-center justify-center h-full animate-pop-in text-center px-6">
                     <CheckCircle2 className="w-24 h-24 text-green-500 mb-4" />
-                    <h2 className="text-3xl font-bold text-gray-800 mb-2">Device Identified.</h2>
-                    <div className="text-lg text-gray-600 flex items-center justify-center">
+                    <h2 className="text-3xl font-bold text-foreground mb-2">Device Identified.</h2>
+                    <div className="text-lg text-muted-foreground flex items-center justify-center">
                         <span>Initializing unlock verification sequence</span>
                         <span className="inline-flex ml-1 font-bold">
                             <span className="animate-pulse">.</span>
@@ -678,7 +679,7 @@ function DeviceCheckContent() {
             const feedbackText = feedbackData.lines.join('\n');
             return (
                 <div className="w-full text-left p-4 space-y-6">
-                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-sm leading-relaxed whitespace-pre-wrap font-mono animate-fade-in shadow-sm">
+                    <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-900 dark:text-red-200 text-sm leading-relaxed whitespace-pre-wrap font-mono animate-fade-in shadow-sm">
                         {feedbackText}
                     </div>
                     
@@ -728,13 +729,13 @@ function DeviceCheckContent() {
             <div className="w-full text-left p-4 space-y-4">
               <div className="space-y-2">
                 {submission.icloudStatus && (
-                   <div className={cn("p-2 px-3 rounded-md font-mono text-sm border flex items-center gap-2 animate-fade-in mb-2", submission.icloudStatus === 'clean' ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700")}>
+                   <div className={cn("p-2 px-3 rounded-md font-mono text-sm border flex items-center gap-2 animate-fade-in mb-2", submission.icloudStatus === 'clean' ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300")}>
                       <span className="font-bold uppercase">iCloud Status: {submission.icloudStatus}</span>
                    </div>
                 )}
 
                 {isChimaera && (
-                  <div className="p-3 px-4 rounded-xl bg-red-50 border border-red-200 text-red-700 font-bold text-sm sm:text-base animate-fade-in shadow-sm flex items-center gap-2 mb-2">
+                  <div className="p-3 px-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300 font-bold text-sm sm:text-base animate-fade-in shadow-sm flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-5 w-5 flex-shrink-0" />
                     <span>{chimaeraHeading}</span>
                   </div>
@@ -743,16 +744,16 @@ function DeviceCheckContent() {
                 {specialStatusLines.map((line, index) => {
                   if (line === 'FIND_MY_ON_STATUS') {
                     return (
-                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-white border border-gray-200 text-sm font-mono flex items-center gap-2 animate-fade-in">
-                        <span>Find My:</span>
+                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in">
+                        <span className="text-foreground">Find My:</span>
                         <span className="bg-red-500 text-white font-bold px-2 py-0.5 rounded-md text-xs">ON</span>
                       </div>
                     )
                   }
                   if (line === 'FIND_MY_OFF_STATUS') {
                     return (
-                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-white border border-gray-200 text-sm font-mono flex items-center gap-2 animate-fade-in">
-                        <span>Find My:</span>
+                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in">
+                        <span className="text-foreground">Find My:</span>
                         <span className="bg-green-500 text-white font-bold px-2 py-0.5 rounded-md text-xs">OFF</span>
                       </div>
                     )
@@ -765,10 +766,10 @@ function DeviceCheckContent() {
                     <TypingAnimation 
                         text={feedbackText} 
                         duration={5000} 
-                        className="p-2 px-3 rounded-md bg-white border border-gray-200 text-sm font-mono"
+                        className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono text-foreground"
                     />
                   ) : (
-                    <div className="p-2 px-3 rounded-md bg-white border border-gray-200 text-sm font-mono whitespace-pre-wrap animate-fade-in">
+                    <div className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono whitespace-pre-wrap animate-fade-in text-foreground">
                       {feedbackText}
                     </div>
                   )
@@ -786,7 +787,7 @@ function DeviceCheckContent() {
                         {submission.successRate}%
                       </span>
                     </div>
-                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                       <div 
                         className={cn("h-full transition-all duration-1000", submission.successRate >= 75 ? "bg-green-500" : "bg-red-500")}
                         style={{ width: `${submission.successRate}%` }}
@@ -795,23 +796,23 @@ function DeviceCheckContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[13px] font-bold text-gray-900">
+                    <p className="text-[13px] font-bold text-foreground">
                       Estimated processing time: {getEstimatedTime(submission.successRate)}
                     </p>
-                    <div className="flex gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <div className="flex gap-2 bg-muted/30 p-3 rounded-xl border border-border">
                       <Info className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-gray-500 leading-relaxed italic">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed italic">
                         Unlock processing time depends on server response, device verification stages, and Apple activation server synchronization. In most cases it is completed within the estimated time, but delays can occasionally occur due to server traffic or additional verification checks.
                       </p>
                     </div>
                   </div>
                   
                   {submission.successRate <= 45 && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-[13px] text-red-800 space-y-3 leading-relaxed shadow-sm">
+                    <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-[13px] text-red-800 dark:text-red-300 space-y-3 leading-relaxed shadow-sm">
                       <p className="font-bold">Advice: It is recommended not to proceed with the unlock due to the low success probability.</p>
                       <p>If you choose to proceed, please note that in the event the unlock is unsuccessful, only 70% of the payment will be refunded. The remaining 30% will be retained as a processing service fee.</p>
                       <p>If you agree to these terms, you may still proceed with the unlock order.</p>
-                      <div className="pt-2 border-t border-red-200 space-y-1 text-xs opacity-90">
+                      <div className="pt-2 border-t border-red-200 dark:border-red-900/50 space-y-1 text-xs opacity-90">
                         <p>• Refunds will be processed using the same payment method used for the original transaction.</p>
                         <p>• If the unlock order is confirmed unsuccessful, the client must submit a support ticket or contact support with their Order ID to request the refund.</p>
                       </div>
@@ -821,17 +822,17 @@ function DeviceCheckContent() {
               )}
 
               {feedbackData.timestamp && (
-                <p className="text-xs text-gray-500 mt-2 text-right animate-fade-in">Feedback received: {feedbackData.timestamp}</p>
+                <p className="text-xs text-muted-foreground mt-2 text-right animate-fade-in">Feedback received: {feedbackData.timestamp}</p>
               )}
               {(submission.status === 'eligible' || submission.status === 'chimaera') && (
                 <div className="mt-4 flex flex-col sm:flex-row items-center sm:justify-end gap-4 animate-fade-in">
-                  <p className="bg-green-100 text-green-800 font-semibold p-2 px-3 rounded-lg text-sm block w-full sm:w-auto text-center">
+                  <p className="bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-300 font-semibold p-2 px-3 rounded-lg text-sm block w-full sm:w-auto text-center">
                     ✅ This device is eligible for iCloud Unlock
                   </p>
                   <Button 
                     onClick={openPaymentModal} 
                     variant="outline" 
-                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-bold shadow-sm w-full sm:w-auto"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:hover:text-white transition-all font-bold shadow-sm w-full sm:w-auto"
                   >
                     Proceed with Unlock
                     <ChevronRight className="ml-1 h-4 w-4" />
@@ -839,16 +840,16 @@ function DeviceCheckContent() {
                 </div>
               )}
                {submission.status === 'not_supported' && (
-                 <p className="bg-red-100 text-red-800 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">❌ Unable to proceed with the unlock.</p>
+                 <p className="bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">❌ Unable to proceed with the unlock.</p>
                )}
                {submission.status === 'find_my_off' && (
-                 <p className="bg-blue-100 text-blue-800 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm leading-relaxed">
+                 <p className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm leading-relaxed">
                     Find My is OFF. If you need help restoring your device, please contact the {' '}
                     <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-bold">technician</a>.
                  </p>
                )}
                {submission.status === 'feedback' && (
-                 <p className="bg-blue-100 text-blue-800 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">ℹ️ Select the above device model and check again.</p>
+                 <p className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">ℹ️ Select the above device model and check again.</p>
                )}
             </div>
         );
@@ -857,7 +858,7 @@ function DeviceCheckContent() {
   }
 
   return (
-    <div className="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -867,14 +868,16 @@ function DeviceCheckContent() {
                     </Link>
                 </div>
                 <div className="hidden md:flex items-center gap-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
-                    {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>}
-                    {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>}
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium ring-1 ring-inset ring-primary">Services</Link>
+                    {user && <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">My Account</Link>}
+                    {isAdmin && <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin</Link>}
                     {user && <NotificationDropdown />}
+                    <ThemeToggle />
                     <LoginButton />
                 </div>
-                <div className="md:hidden">
+                <div className="md:hidden flex items-center gap-2">
+                  <ThemeToggle />
                   <Sheet>
                     <SheetTrigger asChild><Button variant="ghost" size="icon"><Menu /></Button></SheetTrigger>
                     <SheetContent side="right">
@@ -882,13 +885,13 @@ function DeviceCheckContent() {
                         <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                       </SheetHeader>
                       <div className="flex flex-col gap-4 p-4">
-                        <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                        <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                        {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
-                        {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
+                        <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                        <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
+                        {user && <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                        {isAdmin && <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Admin</Link>}
                         {user && (
                           <div className="flex items-center gap-2 py-2">
-                            <span className="text-gray-700 text-base font-medium">Notifications</span>
+                            <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Notifications</span>
                             <NotificationDropdown />
                           </div>
                         )}
@@ -902,12 +905,12 @@ function DeviceCheckContent() {
       </nav>
 
       <main className="flex-grow max-w-4xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white p-6 rounded-2xl shadow-lg md:flex md:gap-6 md:items-center">
-          <div className="relative w-full md:w-56 h-36 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden mb-4 md:mb-0">
+        <div className="bg-card p-6 rounded-2xl shadow-lg md:flex md:gap-6 md:items-center border border-border">
+          <div className="relative w-full md:w-56 h-36 flex-shrink-0 rounded-lg bg-muted overflow-hidden mb-4 md:mb-0">
              <Image src={image} alt={model} layout="fill" objectFit="cover" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-1">{model}</h2>
+            <h2 className="text-2xl font-bold mb-1 text-foreground">{model}</h2>
             <div className="text-xl font-bold mb-2">
               {submission?.icloudStatus ? (
                 <span className="text-blue-600">${submission.icloudStatus === 'lost' ? lostPrice : price} ({submission.icloudStatus.charAt(0).toUpperCase() + submission.icloudStatus.slice(1)} iCloud Status)</span>
@@ -922,7 +925,7 @@ function DeviceCheckContent() {
                 placeholder="Enter IMEI or Serial number"
                 value={submission ? submission.imei : imei}
                 onChange={(e) => setImei(e.target.value)}
-                className="w-full sm:w-80 h-10 px-3 rounded-md border border-input bg-background text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                className="w-full sm:w-80 h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 disabled={formDisabled}
               />
               <div className="flex gap-3">
@@ -933,18 +936,18 @@ function DeviceCheckContent() {
                 <Button onClick={handleClear} variant="outline" disabled={formDisabled}>Clear</Button>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               The server will run checks on the submitted IMEI or serial number and return the results on this page. Please do not close the page until the feedback loads. You may minimize the page while waiting.
             </p>
           </div>
         </div>
 
-        <div className={cn("mt-5 rounded-lg border border-gray-200", (shouldShowLoader || verifyingClaimId) ? "bg-white overflow-hidden" : "p-4 bg-gray-50 min-h-[120px] flex items-center justify-center flex-col text-center")}>
+        <div className={cn("mt-5 rounded-lg border border-border", (shouldShowLoader || verifyingClaimId) ? "bg-card overflow-hidden" : "p-4 bg-muted/30 min-h-[120px] flex items-center justify-center flex-col text-center")}>
           {renderContent()}
         </div>
       </main>
 
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
@@ -1021,38 +1024,38 @@ function DeviceCheckContent() {
             onPointerDownOutside={(e) => e.preventDefault()} 
             onEscapeKeyDown={(e) => e.preventDefault()}
         >
-            <DialogHeader className="px-6 py-4 border-b bg-gray-50">
-                <DialogTitle className="text-xl font-bold text-gray-900">Device Check Policy & Account Limits</DialogTitle>
+            <DialogHeader className="px-6 py-4 border-b bg-muted/30">
+                <DialogTitle className="text-xl font-bold text-foreground">Device Check Policy & Account Limits</DialogTitle>
             </DialogHeader>
             <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
-                <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
-                    <p className="font-semibold text-gray-900 text-base">For new accounts, you are provided with:</p>
+                <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+                    <p className="font-semibold text-foreground text-base">For new accounts, you are provided with:</p>
                     <ul className="list-disc list-inside space-y-1 pl-2">
                         <li>2 premium checks (detailed device information)</li>
                         <li>2 standard checks (less detailed information)</li>
                     </ul>
                     <p>If no unlock order is placed after these checks, your account will be restricted on the 5th check, and access to iCloud unlock services will be limited.</p>
                     
-                    <p className="font-semibold text-gray-900 text-base">To restore access, you can:</p>
+                    <p className="font-semibold text-foreground text-base">To restore access, you can:</p>
                     <ul className="list-disc list-inside space-y-1 pl-2">
                         <li>Deposit the required amount to unlock a device, or</li>
                         <li>Contact Admin for assistance</li>
                     </ul>
 
-                    <p className="font-semibold text-gray-900 text-base">If you make a deposit and the device is not supported, you may either:</p>
+                    <p className="font-semibold text-foreground text-base">If you make a deposit and the device is not supported, you may either:</p>
                     <ul className="list-disc list-inside space-y-1 pl-2">
                         <li>Use the balance to try unlocking another device, or</li>
                         <li>Request a 100% refund via the same payment method used</li>
                     </ul>
 
-                    <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-lg text-yellow-800 text-xs">
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900/30 rounded-lg text-yellow-800 dark:text-yellow-300 text-xs">
                         <p>⚠️ <strong>Please only check devices you are ready to unlock to avoid restrictions.</strong></p>
                     </div>
 
-                    <p className="text-gray-600 italic">For accounts that have successfully placed unlock orders, all future checks will include premium, detailed device information.</p>
+                    <p className="text-muted-foreground italic">For accounts that have successfully placed unlock orders, all future checks will include premium, detailed device information.</p>
                 </div>
             </div>
-            <div className="px-6 py-4 border-t bg-gray-50 space-y-4">
+            <div className="px-6 py-4 border-t bg-muted/30 space-y-4">
                 <div className="flex items-start gap-3">
                     <Checkbox 
                         id="policy-check" 
@@ -1060,7 +1063,7 @@ function DeviceCheckContent() {
                         onCheckedChange={(val) => setPolicyAccepted(!!val)} 
                         className="mt-1"
                     />
-                    <Label htmlFor="policy-check" className="text-sm font-medium leading-snug cursor-pointer">
+                    <Label htmlFor="policy-check" className="text-sm font-medium leading-snug cursor-pointer text-foreground">
                         I have read and agree to the Device Check Policy & Account Limits
                     </Label>
                 </div>
@@ -1077,94 +1080,94 @@ function DeviceCheckContent() {
 
       <Dialog open={isPaymentModalOpen} onOpenChange={setPaymentModalOpen}>
         <DialogContent className={cn("sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden transition-all duration-300", showOtherPayments && "lg:max-w-[950px]")}>
-            <DialogHeader className="px-5 py-2.5 border-b bg-white">
-                <DialogTitle className='flex items-center gap-3 text-base sm:text-lg pr-12'>
-                    {timeLeft > 0 && <span className="text-xs sm:text-sm font-mono bg-blue-100 text-blue-800 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
+            <DialogHeader className="px-5 py-2.5 border-b bg-card">
+                <DialogTitle className='flex items-center gap-3 text-base sm:text-lg pr-12 text-foreground'>
+                    {timeLeft > 0 && <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
                     <span>Pay with Crypto</span>
                 </DialogTitle>
-                <DialogDescription className="text-sm">Pay unlock fees for this device. Send the exact crypto amount.</DialogDescription>
-                 {submission && <div className="text-xs bg-gray-100 p-2 rounded-md text-gray-600 mt-1"><p><strong>Model:</strong> {submission.model} | <strong>IMEI/Serial:</strong> {submission.imei}</p></div>}
+                <DialogDescription className="text-sm text-muted-foreground">Pay unlock fees for this device. Send the exact crypto amount.</DialogDescription>
+                 {submission && <div className="text-xs bg-muted p-2 rounded-md text-muted-foreground mt-1"><p><strong>Model:</strong> {submission.model} | <strong>IMEI/Serial:</strong> {submission.imei}</p></div>}
             </DialogHeader>
              <ScrollArea className="flex-1 px-5">
                 <div className={cn("grid grid-cols-1 gap-4 pt-1 pb-4", showOtherPayments && "lg:grid-cols-2 lg:gap-8")}>
                     <div className="space-y-3 animate-fade-in">
-                        <Alert variant="default" className="bg-blue-50 border-blue-200 py-1.5 mt-2">
-                            <AlertDescription className="text-[11px] text-center">
+                        <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5 mt-2">
+                            <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
                                 For other payment options, contact the <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                             </AlertDescription>
                         </Alert>
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4 text-center">
-                                <div><p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Service Cost</p><p className="text-lg font-bold">${submission?.icloudStatus === 'lost' ? lostPrice.toFixed(2) : price.toFixed(2)}</p></div>
-                                <div><p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Your Balance</p><p className="text-lg font-bold text-green-600">-${currentBalance.toFixed(2)}</p></div>
+                                <div><p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Service Cost</p><p className="text-lg font-bold text-foreground">${submission?.icloudStatus === 'lost' ? lostPrice.toFixed(2) : price.toFixed(2)}</p></div>
+                                <div><p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Your Balance</p><p className="text-lg font-bold text-green-600">-${currentBalance.toFixed(2)}</p></div>
                             </div>
-                            <div className="text-center bg-gray-50 py-2 rounded-xl border border-dashed">
-                                <p className="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Amount to Pay</p>
-                                <p className="text-3xl font-black">${amountToPay.toFixed(2)}</p>
+                            <div className="text-center bg-muted/30 py-2 rounded-xl border border-dashed border-border">
+                                <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Amount to Pay</p>
+                                <p className="text-3xl font-black text-foreground">${amountToPay.toFixed(2)}</p>
                             </div>
                         </div>
                         {amountToPay > 0 && (
                             <>
-                                <div className="px-4 py-3 border rounded-2xl bg-white shadow-sm space-y-2">
+                                <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
                                     <div className="flex items-center gap-3">
                                         {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT" width={32} height={32} className="rounded-full" />}
                                         <div>
-                                            <p className="font-bold text-sm">USDT (BEP20 Network) - <span className="text-green-600">Recommended</span></p>
-                                            <p className="text-[10px] text-gray-500">Use Binance Smart Chain for low fees.</p>
+                                            <p className="font-bold text-sm text-foreground">USDT (BEP20 Network) - <span className="text-green-600">Recommended</span></p>
+                                            <p className="text-[10px] text-muted-foreground">Use Binance Smart Chain for low fees.</p>
                                         </div>
                                     </div>
-                                    <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                                         <span className="font-medium">{usdtAddress}</span>
                                         <CopyToClipboard text={usdtAddress}>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-gray-200">
-                                                <Copy className="w-4 h-4 text-gray-500"/>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                                <Copy className="w-4 h-4 text-muted-foreground"/>
                                             </Button>
                                         </CopyToClipboard>
                                     </div>
                                 </div>
                                 <Button 
                                     variant="outline" 
-                                    className="w-full h-10 text-gray-700 bg-gray-50 hover:bg-gray-100 hover:text-gray-700 flex items-center justify-center gap-2 border border-gray-200 rounded-xl transition-all font-semibold shadow-none"
+                                    className="w-full h-10 text-foreground bg-muted/50 hover:bg-muted flex items-center justify-center gap-2 border border-border rounded-xl transition-all font-semibold shadow-none"
                                     onClick={() => setShowOtherPayments(!showOtherPayments)}
                                 >
                                     <span className="text-sm">Show Other Payment Methods</span>
-                                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 text-gray-500", showOtherPayments && "rotate-180")} />
+                                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 text-muted-foreground", showOtherPayments && "rotate-180")} />
                                 </Button>
                                 {showOtherPayments && (
                                     <div className="lg:hidden mt-1">
-                                        <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">Other Networks</h4>
+                                        <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Networks</h4>
                                         <ScrollArea className="h-[320px] pr-2">
                                             <div className="space-y-3 pb-[250px]">
-                                                <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
+                                                <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                                                     <div className="flex items-center gap-3">
                                                         {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
                                                         <div>
-                                                            <p className="font-bold text-sm">USDT (TRC20 Network)</p>
-                                                            <p className="text-[10px] text-gray-500">Standard Tether network.</p>
+                                                            <p className="font-bold text-sm text-foreground">USDT (TRC20 Network)</p>
+                                                            <p className="text-[10px] text-muted-foreground">Standard Tether network.</p>
                                                         </div>
                                                     </div>
-                                                    <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                                                         <span>TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw</span>
                                                         <CopyToClipboard text="TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw">
                                                             <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-gray-500"/>
+                                                                <Copy className="w-4 h-4 text-muted-foreground"/>
                                                             </Button>
                                                         </CopyToClipboard>
                                                     </div>
                                                 </div>
-                                                <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
+                                                <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                                                     <div className="flex items-center gap-3">
                                                         {bitcoinImage && <Image src={bitcoinImage.imageUrl} alt="Bitcoin" width={32} height={32} className="rounded-full" />}
                                                         <div>
-                                                            <p className="font-bold text-sm">Bitcoin (BTC)</p>
-                                                            <p className="text-[10px] text-gray-500">Standard network confirmation.</p>
+                                                            <p className="font-bold text-sm text-foreground">Bitcoin (BTC)</p>
+                                                            <p className="text-[10px] text-muted-foreground">Standard network confirmation.</p>
                                                         </div>
                                                     </div>
-                                                    <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                                                         <span>bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h</span>
                                                         <CopyToClipboard text="bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h">
                                                             <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-gray-500"/>
+                                                                <Copy className="w-4 h-4 text-muted-foreground"/>
                                                             </Button>
                                                         </CopyToClipboard>
                                                     </div>
@@ -1174,49 +1177,49 @@ function DeviceCheckContent() {
                                         </ScrollArea>
                                     </div>
                                 )}
-                                <Alert className="bg-yellow-50 border-yellow-100 py-2 rounded-xl">
-                                    <AlertDescription className="text-[11px] text-center text-yellow-800 font-medium">
+                                <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 py-2 rounded-xl">
+                                    <AlertDescription className="text-[11px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
                                         Payments made within the timer will be automatically applied.
                                     </AlertDescription>
                                 </Alert>
                             </>)}
-                        {amountToPay <= 0 && <div className="text-center p-6 bg-green-50 border border-green-100 text-green-800 rounded-2xl animate-fade-in"><CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500"/><p className="font-bold text-base">Your balance covers the full amount!</p><p className="text-xs opacity-80">Click "Confirm" to use your balance for this unlock.</p></div>}
+                        {amountToPay <= 0 && <div className="text-center p-6 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 text-green-800 dark:text-green-300 rounded-2xl animate-fade-in"><CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500"/><p className="font-bold text-base">Your balance covers the full amount!</p><p className="text-xs opacity-80">Click "Confirm" to use your balance for this unlock.</p></div>}
                     </div>
                     {showOtherPayments && (
-                        <div className="hidden lg:block space-y-3 animate-fade-in border-l pl-8">
-                            <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">Other Networks</h4>
+                        <div className="hidden lg:block space-y-3 animate-fade-in border-l border-border pl-8">
+                            <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Networks</h4>
                             <ScrollArea className="h-[400px] pr-4">
                                 <div className="space-y-3 pb-8">
-                                    <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
+                                    <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                                         <div className="flex items-center gap-3">
                                             {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
                                             <div>
-                                                <p className="font-bold text-sm">USDT (TRC20 Network)</p>
-                                                <p className="text-[10px] text-gray-500">Standard Tether network.</p>
+                                                <p className="font-bold text-sm text-foreground">USDT (TRC20 Network)</p>
+                                                <p className="text-[10px] text-muted-foreground">Standard Tether network.</p>
                                             </div>
                                         </div>
-                                        <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                                        <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                                             <span>TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw</span>
                                             <CopyToClipboard text="TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw">
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-gray-500"/>
+                                                    <Copy className="w-4 h-4 text-muted-foreground"/>
                                                 </Button>
                                             </CopyToClipboard>
                                         </div>
                                     </div>
-                                    <div className="p-4 border rounded-2xl bg-white shadow-sm space-y-3">
+                                    <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                                         <div className="flex items-center gap-3">
                                             {bitcoinImage && <Image src={bitcoinImage.imageUrl} alt="Bitcoin" width={32} height={32} className="rounded-full" />}
                                             <div>
-                                                <p className="font-bold text-sm">Bitcoin (BTC)</p>
-                                                <p className="text-[10px] text-gray-500">Standard network confirmation.</p>
+                                                <p className="font-bold text-sm text-foreground">Bitcoin (BTC)</p>
+                                                <p className="text-[10px] text-muted-foreground">Standard network confirmation.</p>
                                             </div>
                                         </div>
-                                        <div className="font-mono bg-gray-100 p-3 rounded-xl break-all text-xs flex items-center justify-between border">
+                                        <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
                                             <span>bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h</span>
                                             <CopyToClipboard text="bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h">
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-gray-500"/>
+                                                    <Copy className="w-4 h-4 text-muted-foreground"/>
                                                 </Button>
                                             </CopyToClipboard>
                                         </div>
@@ -1228,20 +1231,20 @@ function DeviceCheckContent() {
                     )}
                 </div>
             </ScrollArea>
-            <div className="px-5 py-3 bg-red-50 border-t border-red-100">
-               <p className="text-[11px] text-red-700 leading-tight text-center font-semibold">
+            <div className="px-5 py-3 bg-red-50 dark:bg-red-950/20 border-t border-red-100 dark:border-red-900/30">
+               <p className="text-[11px] text-red-700 dark:text-red-300 leading-tight text-center font-semibold">
                  ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
                </p>
             </div>
-            <DialogFooter className="p-3 border-t flex flex-row gap-3 mt-auto bg-gray-50">
+            <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
                 <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                <Button onClick={handlePaid} className="btn-primary text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
+                <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
                     {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
                 </Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
-      {isLoading && <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"><div className="spinner w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div><p className="font-semibold text-gray-600">{loadingMessage}</p></div>}
+      {isLoading && <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"><div className="spinner w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div><p className="font-semibold text-foreground">{loadingMessage}</p></div>}
     </div>
   );
 }

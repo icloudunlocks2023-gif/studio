@@ -38,6 +38,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface Submission {
   id: string;
@@ -434,28 +435,30 @@ function AdminDashboard() {
   if (userLoading || !user || !isAdmin) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
        <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2"><Image src="https://i.postimg.cc/9MCd4HJx/icloud-unlocks-logo.png" alt="iCloud Unlocks Logo" width={90} height={24} /></Link>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-              <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</Link>
-              {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>}
-              {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">Admin</Link>}
+              <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Services</Link>
+              {user && <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">My Account</Link>}
+              {isAdmin && <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium ring-1 ring-inset ring-primary">Admin</Link>}
+              <ThemeToggle />
               <LoginButton />
             </div>
-             <div className="md:hidden">
+             <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild><Button variant="ghost" size="icon"><Menu /></Button></SheetTrigger>
                 <SheetContent side="right">
                   <SheetHeader><SheetTitle className="sr-only">Mobile Menu</SheetTitle></SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
-                    {user && <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
-                    {isAdmin && <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Admin</Link>}
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    {user && <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>}
+                    {isAdmin && <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Admin</Link>}
                     <div className='pt-4'><LoginButton /></div>
                   </div>
                 </SheetContent>
@@ -468,7 +471,7 @@ function AdminDashboard() {
       <main className="max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 space-y-12">
         {pendingClaims.length > 0 && (
           <section className="animate-fade-in">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
               <Clock className="text-blue-600" />
               Payment Verification Requests ({pendingClaims.length})
             </h2>
@@ -476,29 +479,29 @@ function AdminDashboard() {
               {pendingClaims.map(claim => {
                 const client = getUserDetails(claim.userId);
                 return (
-                  <Card key={claim.id} className="border-2 border-blue-200 bg-blue-50/30">
+                  <Card key={claim.id} className="border-2 border-blue-200 dark:border-blue-900/50 bg-blue-50/30 dark:bg-blue-950/20">
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg font-bold text-blue-900">{claim.orderId}</CardTitle>
-                        <Badge variant="outline" className="bg-blue-100 text-blue-700">Verifying...</Badge>
+                        <CardTitle className="text-lg font-bold text-blue-900 dark:text-blue-200">{claim.orderId}</CardTitle>
+                        <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">Verifying...</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3 text-sm">
                       <div className="space-y-1">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client Info</p>
-                        <p className="font-medium">{client?.displayName || 'N/A'}</p>
-                        <p className="text-xs text-gray-500">{client?.email || 'N/A'}</p>
-                        <p className="text-[10px] font-mono text-gray-400 break-all">UID: {claim.userId}</p>
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Client Info</p>
+                        <p className="font-medium text-foreground">{client?.displayName || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">{client?.email || 'N/A'}</p>
+                        <p className="text-[10px] font-mono text-muted-foreground break-all">UID: {claim.userId}</p>
                         <p className="text-xs font-semibold text-green-600">Balance: ${client?.balance?.toFixed(2) || '0.00'}</p>
                       </div>
-                      <Separator className="bg-blue-100" />
+                      <Separator className="bg-blue-100 dark:bg-blue-900/50" />
                       <div className="space-y-1">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Device Details</p>
-                        <p className="font-bold">{claim.model}</p>
-                        <p className="font-mono text-[11px] bg-white/50 px-2 py-1 rounded border break-all">{claim.imei}</p>
-                        <p className="font-bold text-blue-700 mt-1">Cost: ${claim.price.toFixed(2)}</p>
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Device Details</p>
+                        <p className="font-bold text-foreground">{claim.model}</p>
+                        <p className="font-mono text-[11px] bg-background/50 px-2 py-1 rounded border border-border break-all text-foreground">{claim.imei}</p>
+                        <p className="font-bold text-blue-700 dark:text-blue-400 mt-1">Cost: ${claim.price.toFixed(2)}</p>
                       </div>
-                      <div className="text-[10px] text-gray-400 flex items-center gap-1 pt-2">
+                      <div className="text-[10px] text-muted-foreground flex items-center gap-1 pt-2">
                         <Clock className="h-3 w-3" />
                         Clicked "I Paid": {claim.createdAt?.toDate ? format(claim.createdAt.toDate(), 'PPpp') : 'Just now'}
                       </div>
@@ -507,7 +510,7 @@ function AdminDashboard() {
                       <Button onClick={() => handleApproveClaim(claim)} className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-2 h-9 text-xs">
                         <CheckCircle className="h-4 w-4" /> Approve
                       </Button>
-                      <Button onClick={() => handleRejectClaim(claim.id)} variant="outline" className="flex-1 border-red-200 text-red-600 hover:bg-red-50 gap-2 h-9 text-xs">
+                      <Button onClick={() => handleRejectClaim(claim.id)} variant="outline" className="flex-1 border-red-200 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2 h-9 text-xs">
                         <XCircle className="h-4 w-4" /> No Payment
                       </Button>
                     </CardFooter>
@@ -521,23 +524,23 @@ function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
               <div className="mb-12 space-y-6">
-                  <Card>
-                      <CardHeader><CardTitle className="flex items-center gap-2"><span>Site Settings & Metrics</span></CardTitle></CardHeader>
+                  <Card className="border border-border">
+                      <CardHeader><CardTitle className="flex items-center gap-2 text-foreground"><span>Site Settings & Metrics</span></CardTitle></CardHeader>
                       <CardContent className="space-y-6">
-                          {countersLoading ? <p>Loading settings...</p> : (
+                          {countersLoading ? <p className="text-muted-foreground">Loading settings...</p> : (
                               <>
-                                  <div className="p-4 rounded-lg bg-gray-50 border flex items-center justify-between">
+                                  <div className="p-4 rounded-lg bg-muted/30 border border-border flex items-center justify-between">
                                       <div className="flex items-center gap-3">
-                                          <div className={`p-2 rounded-full ${isServerOnline ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                          <div className={`p-2 rounded-full ${isServerOnline ? 'bg-green-100 dark:bg-green-950 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400'}`}>
                                               {isServerOnline ? <Server size={20} /> : <ServerOff size={20} />}
                                           </div>
-                                          <div><Label htmlFor="server-status" className="text-base font-bold">Device Check Server</Label><p className="text-sm text-gray-500">Status: <span className={isServerOnline ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{isServerOnline ? 'ONLINE' : 'OFFLINE'}</span></p></div>
+                                          <div><Label htmlFor="server-status" className="text-base font-bold text-foreground">Device Check Server</Label><p className="text-sm text-muted-foreground">Status: <span className={isServerOnline ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{isServerOnline ? 'ONLINE' : 'OFFLINE'}</span></p></div>
                                       </div>
                                       <Switch id="server-status" checked={isServerOnline} onCheckedChange={handleToggleServer} />
                                   </div>
                                   <div className='grid gap-4 sm:grid-cols-2'>
-                                      <div className='grid gap-2'><Label htmlFor="registeredUsers">Registered Users</Label><Input id="registeredUsers" type="number" value={registeredUsers} onChange={(e) => setRegisteredUsers(Number(e.target.value))} /></div>
-                                      <div className='grid gap-2'><Label htmlFor="unlockedDevices">Unlocked Devices</Label><Input id="unlockedDevices" type="number" value={unlockedDevices} onChange={(e) => setUnlockedDevices(Number(e.target.value))} /></div>
+                                      <div className='grid gap-2'><Label htmlFor="registeredUsers" className="text-foreground">Registered Users</Label><Input id="registeredUsers" type="number" value={registeredUsers} onChange={(e) => setRegisteredUsers(Number(e.target.value))} /></div>
+                                      <div className='grid gap-2'><Label htmlFor="unlockedDevices" className="text-foreground">Unlocked Devices</Label><Input id="unlockedDevices" type="number" value={unlockedDevices} onChange={(e) => setUnlockedDevices(Number(e.target.value))} /></div>
                                   </div>
                               </>)}
                       </CardContent>
@@ -545,17 +548,17 @@ function AdminDashboard() {
                           <Button onClick={handleUpdateMetrics} className="btn-primary text-white w-full">Save All Settings</Button>
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                               <Link href="/admin/activities" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-blue-200">
+                                <Button variant="outline" className="w-full text-xs gap-1 border-border">
                                   <Activity className="h-3 w-3" /> Activities
                                 </Button>
                               </Link>
                               <Link href="/admin/notifications" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-primary/30">
+                                <Button variant="outline" className="w-full text-xs gap-1 border-border">
                                   <Bell className="h-3 w-3" /> Notifications
                                 </Button>
                               </Link>
                               <Link href="/admin/tickets" className="w-full">
-                                <Button variant="outline" className="relative w-full text-xs gap-1 border-blue-200 bg-blue-50 text-blue-700">
+                                <Button variant="outline" className="relative w-full text-xs gap-1 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">
                                   <MessageSquare className="h-3 w-3" /> Tickets
                                   {hasOpenTickets && (
                                     <span className="absolute -top-1 -right-1 flex h-2 w-2">
@@ -566,22 +569,22 @@ function AdminDashboard() {
                                 </Button>
                               </Link>
                               <Link href="/admin/users" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1"><Users className="h-3 w-3" />Users</Button>
+                                <Button variant="outline" className="w-full text-xs gap-1 border-border"><Users className="h-3 w-3" />Users</Button>
                               </Link>
                           </div>
                       </CardFooter>
                   </Card>
 
-                  <Card className="border-blue-200 bg-blue-50/10">
+                  <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/10 dark:bg-blue-950/10 border border-border">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-blue-700">
+                      <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                         <Wallet className="h-5 w-5" />
                         Global Wallet Management
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="usdt-address">USDT BEP20 Wallet Address</Label>
+                        <Label htmlFor="usdt-address" className="text-foreground">USDT BEP20 Wallet Address</Label>
                         <div className="flex gap-2">
                           <Input 
                             id="usdt-address" 
@@ -594,54 +597,54 @@ function AdminDashboard() {
                             <Save className="h-4 w-4" /> Update
                           </Button>
                         </div>
-                        <p className="text-[10px] text-gray-500 italic">This address is displayed sitewide in payment popups.</p>
+                        <p className="text-[10px] text-muted-foreground italic">This address is displayed sitewide in payment popups.</p>
                       </div>
                     </CardContent>
                   </Card>
               </div>
 
-              <h1 className="text-4xl font-bold text-center mb-10">Submissions</h1>
-              {submissionsLoading ? <p>Loading submissions...</p> : sortedSubmissions.length === 0 ? <p className='text-center text-gray-500'>None found.</p> : (
+              <h1 className="text-4xl font-bold text-center mb-10 text-foreground">Submissions</h1>
+              {submissionsLoading ? <p className="text-muted-foreground">Loading submissions...</p> : sortedSubmissions.length === 0 ? <p className='text-center text-muted-foreground'>None found.</p> : (
                 <div className="space-y-6">
                   {sortedSubmissions.map(sub => (
-                    <Card key={sub.id} className={`bg-white ${sub.status === 'waiting' || sub.status === 'device_found' ? 'border-2 border-primary' : ''}`}>
-                      <CardHeader><CardTitle className='flex justify-between items-center'><span>{sub.model}</span><Badge variant={sub.status === 'waiting' ? 'default' : 'secondary'} className={sub.status === 'waiting' || sub.status === 'device_found' ? 'animate-pulse' : ''}>{sub.status.replace('_', ' ')}</Badge></CardTitle></CardHeader>
+                    <Card key={sub.id} className={`bg-card border-border ${sub.status === 'waiting' || sub.status === 'device_found' ? 'border-2 border-primary' : 'border'}`}>
+                      <CardHeader><CardTitle className='flex justify-between items-center text-foreground'><span>{sub.model}</span><Badge variant={sub.status === 'waiting' ? 'default' : 'secondary'} className={sub.status === 'waiting' || sub.status === 'device_found' ? 'animate-pulse' : ''}>{sub.status.replace('_', ' ')}</Badge></CardTitle></CardHeader>
                       <CardContent className="space-y-1">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-4">
                             <div className="space-y-1">
-                                <p className="text-gray-400 uppercase font-bold tracking-tighter">Client Details</p>
-                                <p className="break-all">UID: <span className="font-mono">{sub.userId}</span></p>
-                                <p className="font-bold text-blue-600">Submissions: {userIdCounts[sub.userId] || 0}</p>
+                                <p className="text-muted-foreground uppercase font-bold tracking-tighter">Client Details</p>
+                                <p className="text-foreground break-all">UID: <span className="font-mono">{sub.userId}</span></p>
+                                <p className="font-bold text-blue-600 dark:text-blue-400">Submissions: {userIdCounts[sub.userId] || 0}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-gray-400 uppercase font-bold tracking-tighter">Network Info</p>
-                                <p className="break-all flex items-center gap-1">
-                                  IP: <span className="font-mono text-blue-700">{sub.ipAddress || 'unknown'}</span>
+                                <p className="text-muted-foreground uppercase font-bold tracking-tighter">Network Info</p>
+                                <p className="break-all flex items-center gap-1 text-foreground">
+                                  IP: <span className="font-mono text-blue-700 dark:text-blue-300">{sub.ipAddress || 'unknown'}</span>
                                 </p>
-                                <p className="flex items-center gap-1 font-semibold text-gray-700">
+                                <p className="flex items-center gap-1 font-semibold text-foreground">
                                   <MapPin className="h-3 w-3 text-red-500" />
                                   Country: <span className="text-primary">{sub.country || 'Auto-detecting...'}</span>
                                 </p>
-                                <p className="font-bold text-red-600">IP Frequency: {sub.ipAddress ? ipCounts[sub.ipAddress] : 0}</p>
+                                <p className="font-bold text-red-600 dark:text-red-400">IP Frequency: {sub.ipAddress ? ipCounts[sub.ipAddress] : 0}</p>
                             </div>
                         </div>
-                        <p className="text-sm text-gray-600 break-all">IMEI/Serial: <strong>{sub.imei}</strong></p>
-                        <p className="text-sm text-gray-600">Price: ${sub.price}</p>
+                        <p className="text-sm text-muted-foreground break-all">IMEI/Serial: <strong className="text-foreground">{sub.imei}</strong></p>
+                        <p className="text-sm text-muted-foreground">Price: ${sub.price}</p>
                         <div className="mt-4 space-y-4">
                             <div>
-                                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Sent Feedback History:</label>
+                                <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Sent Feedback History:</label>
                                 {sub.feedback && sub.feedback.length > 0 ? (
-                                    <div className="p-2 bg-gray-50 border rounded-md max-h-32 overflow-y-auto text-[10px] font-mono text-gray-600 space-y-1 shadow-inner">
+                                    <div className="p-2 bg-muted/30 border border-border rounded-md max-h-32 overflow-y-auto text-[10px] font-mono text-muted-foreground space-y-1 shadow-inner">
                                         {sub.feedback.map((line, idx) => (
-                                            <div key={idx} className={line.startsWith('TIMESTAMP:') ? 'text-blue-500 border-t mt-1 pt-1' : ''}>{line}</div>
+                                            <div key={idx} className={line.startsWith('TIMESTAMP:') ? 'text-blue-500 dark:text-blue-400 border-t border-border mt-1 pt-1' : ''}>{line}</div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-2 bg-gray-50 border rounded-md text-[10px] text-gray-400 italic">No feedback sent yet.</div>
+                                    <div className="p-2 bg-muted/30 border border-border rounded-md text-[10px] text-muted-foreground italic">No feedback sent yet.</div>
                                 )}
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Update Feedback Message:</label>
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-foreground mb-1">Update Feedback Message:</label>
                                 <Textarea value={feedbackValues[sub.id] || sub.feedback?.filter(l => !l.startsWith('FIND_MY_') && !l.startsWith('TIMESTAMP:') && !l.includes('Chimaera Device Policy')).join('\n') || ''} onChange={(e) => handleFeedbackChange(sub.id, e.target.value)} className="font-mono text-sm" placeholder="Type message to send to client..." />
                             </div>
                         </div>
@@ -651,9 +654,9 @@ function AdminDashboard() {
                         
                         <div className="grid grid-cols-2 gap-2">
                            <div className="space-y-2">
-                             <Label className="text-[10px] uppercase font-bold text-gray-400">Outcome</Label>
+                             <Label className="text-[10px] uppercase font-bold text-muted-foreground">Outcome</Label>
                               <Select onValueChange={(value: Submission['status']) => handleStatusChange(sub.id, value)}>
-                                  <SelectTrigger><SelectValue placeholder="Select Outcome..." /></SelectTrigger>
+                                  <SelectTrigger className="bg-background"><SelectValue placeholder="Select Outcome..." /></SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="eligible">Eligible for Unlock</SelectItem>
                                       <SelectItem value="not_supported">Not Supported for Unlock</SelectItem>
@@ -665,9 +668,9 @@ function AdminDashboard() {
                               </Select>
                            </div>
                            <div className="space-y-2">
-                             <Label className="text-[10px] uppercase font-bold text-gray-400">iCloud Status</Label>
+                             <Label className="text-[10px] uppercase font-bold text-muted-foreground">iCloud Status</Label>
                               <Select onValueChange={(value: 'clean' | 'lost') => handleIcloudStatusChange(sub.id, value)}>
-                                  <SelectTrigger><SelectValue placeholder="Status (Clean/Lost)" /></SelectTrigger>
+                                  <SelectTrigger className="bg-background"><SelectValue placeholder="Status (Clean/Lost)" /></SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="clean">Clean</SelectItem>
                                       <SelectItem value="lost">Lost</SelectItem>
@@ -677,11 +680,11 @@ function AdminDashboard() {
                         </div>
 
                         {(feedbackStatus[sub.id] === 'eligible' || feedbackStatus[sub.id] === 'chimaera') && (
-                          <div className="p-4 border rounded-lg bg-gray-50 space-y-3 animate-fade-in">
-                            <Label className="text-xs font-bold uppercase text-gray-500">Select Success Rate</Label>
+                          <div className="p-4 border border-border rounded-lg bg-muted/30 space-y-3 animate-fade-in">
+                            <Label className="text-xs font-bold uppercase text-muted-foreground">Select Success Rate</Label>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <p className="text-[10px] font-bold text-green-600 uppercase tracking-wider">High Success Rate</p>
+                                <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">High Success Rate</p>
                                 <div className="flex gap-2">
                                   <Button 
                                     variant={selectedRates[sub.id] === 98 ? 'default' : 'outline'} 
@@ -692,13 +695,13 @@ function AdminDashboard() {
                                   <Button 
                                     variant={selectedRates[sub.id] === 75 ? 'default' : 'outline'} 
                                     size="sm"
-                                    className={cn("flex-1 h-8", selectedRates[sub.id] === 75 && "bg-green-50 hover:bg-green-600")}
+                                    className={cn("flex-1 h-8", selectedRates[sub.id] === 75 && "bg-green-50 dark:bg-green-950 hover:bg-green-600")}
                                     onClick={() => setSelectedRates(prev => ({...prev, [sub.id]: 75}))}
                                   >75%</Button>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Low Success Rate</p>
+                                <p className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Low Success Rate</p>
                                 <div className="flex gap-2">
                                   <Button 
                                     variant={selectedRates[sub.id] === 45 ? 'default' : 'outline'} 
@@ -721,7 +724,7 @@ function AdminDashboard() {
                         <div className='flex items-center gap-2 flex-wrap'>
                             <Button onClick={() => handleSendFeedback(sub.id)} className="btn-primary text-white flex-1">Send Feedback</Button>
                             {sub.ipAddress && (
-                                <Button variant="outline" size="icon" title="Ban IP Address" onClick={() => handleBanIp(sub.ipAddress!)} className="text-red-600 border-red-200 hover:bg-red-50">
+                                <Button variant="outline" size="icon" title="Ban IP Address" onClick={() => handleBanIp(sub.ipAddress!)} className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950">
                                     <ShieldAlert className="h-4 w-4" />
                                 </Button>
                             )}
@@ -732,20 +735,20 @@ function AdminDashboard() {
                 </div>)}
           </div>
           <div>
-              <h1 className="text-4xl font-bold text-center mb-10">Client Orders</h1>
-              {ordersLoading ? <p>Loading orders...</p> : orders?.length === 0 ? <p className='text-center text-gray-500'>No orders found.</p> : (
-                  <Card>
+              <h1 className="text-4xl font-bold text-center mb-10 text-foreground">Client Orders</h1>
+              {ordersLoading ? <p className="text-muted-foreground">Loading orders...</p> : orders?.length === 0 ? <p className='text-center text-muted-foreground'>No orders found.</p> : (
+                  <Card className="border border-border">
                       <Table>
-                          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Order ID</TableHead><TableHead>Model</TableHead><TableHead>IMEI</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+                          <TableHeader className="bg-muted/50"><TableRow className="border-border"><TableHead className="text-foreground">Date</TableHead><TableHead className="text-foreground">Order ID</TableHead><TableHead className="text-foreground">Model</TableHead><TableHead className="text-foreground">IMEI</TableHead><TableHead className="text-foreground">Status</TableHead><TableHead className="text-foreground text-right">Actions</TableHead></TableRow></TableHeader>
                           <TableBody>
                           {orders?.map(order => (
-                              <TableRow key={order.id}>
-                                  <TableCell>{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
-                                  <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
-                                  <TableCell>{order.model}</TableCell>
-                                  <TableCell className="font-mono text-xs break-all">{order.imei}</TableCell>
+                              <TableRow key={order.id} className="border-border">
+                                  <TableCell className="text-muted-foreground">{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                                  <TableCell className="font-mono text-xs text-foreground font-bold">{order.orderId}</TableCell>
+                                  <TableCell className="text-foreground">{order.model}</TableCell>
+                                  <TableCell className="font-mono text-xs break-all text-muted-foreground">{order.imei}</TableCell>
                                   <TableCell><Badge variant={order.status === 'approved' || order.status === 'unlocked' ? 'secondary' : order.status === 'declined' ? 'destructive' : 'default'} className={order.status === 'confirming_payment' || order.status === 'processing' ? 'animate-pulse' : ''}>{order.status.replace(/_/g, ' ')}</Badge></TableCell>
-                                  <TableCell><Select value={order.status} onValueChange={(value: Order['status']) => handleOrderStatusChange(order.id, value)}><SelectTrigger className='h-8'><SelectValue placeholder="Update Status" /></SelectTrigger><SelectContent><SelectItem value="confirming_payment">Confirming Payment</SelectItem><SelectItem value="processing">Processing</SelectItem><SelectItem value="approved">Approved</SelectItem><SelectItem value="declined">Declined</SelectItem><SelectItem value="unlocked">Unlocked</SelectItem><SelectItem value="ready_for_activation">Ready for activation</SelectItem><SelectItem value="ready_for_activation_bulk">Ready for activation (bulk)</SelectItem></SelectContent></Select></TableCell>
+                                  <TableCell className="text-right"><Select value={order.status} onValueChange={(value: Order['status']) => handleOrderStatusChange(order.id, value)}><SelectTrigger className='h-8 w-[140px] bg-background ml-auto'><SelectValue placeholder="Update Status" /></SelectTrigger><SelectContent><SelectItem value="confirming_payment">Confirming Payment</SelectItem><SelectItem value="processing">Processing</SelectItem><SelectItem value="approved">Approved</SelectItem><SelectItem value="declined">Declined</SelectItem><SelectItem value="unlocked">Unlocked</SelectItem><SelectItem value="ready_for_activation">Ready for activation</SelectItem><SelectItem value="ready_for_activation_bulk">Ready for activation (bulk)</SelectItem></SelectContent></Select></TableCell>
                               </TableRow>))}
                           </TableBody>
                       </Table>

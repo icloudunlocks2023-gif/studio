@@ -10,6 +10,7 @@ import { LoginButton } from '@/components/login-button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Clock, ChevronRight } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -180,7 +181,7 @@ export default function ServicesPage() {
 
 
   return (
-    <div className="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -190,18 +191,20 @@ export default function ServicesPage() {
                     </Link>
                 </div>
                 <div className="hidden md:flex items-center gap-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium ring-1 ring-inset ring-primary">Services</Link>
                     {user && (
-                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>
+                        <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">My Account</Link>
                     )}
                     {isAdmin && (
-                        <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
+                        <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
                     )}
                     {user && <NotificationDropdown />}
+                    <ThemeToggle />
                     <LoginButton />
                 </div>
-                <div className="md:hidden">
+                <div className="md:hidden flex items-center gap-2">
+                  <ThemeToggle />
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button variant="ghost" size="icon">
@@ -213,17 +216,17 @@ export default function ServicesPage() {
                         <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                       </SheetHeader>
                       <div className="flex flex-col gap-4 p-4">
-                        <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                        <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
+                        <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                        <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                         {user && (
-                            <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                            <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                         )}
                         {isAdmin && (
-                            <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                            <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                         )}
                         {user && (
                           <div className="flex items-center gap-2 py-2">
-                            <span className="text-gray-700 text-base font-medium">Notifications</span>
+                            <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Notifications</span>
                             <NotificationDropdown />
                           </div>
                         )}
@@ -240,30 +243,30 @@ export default function ServicesPage() {
 
       <main className="pt-16 flex-grow">
         <section className="text-center py-12 px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">Permanent iCloud Unlock (FMI OFF)</h1>
-          <p className="mt-4 text-lg text-gray-600">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">Permanent iCloud Unlock (FMI OFF)</h1>
+          <p className="mt-4 text-lg text-muted-foreground">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
         </section>
 
         <section className="py-12 px-4">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">📱 iPhone Unlock Prices</h2>
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPhone Unlock Prices</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                            <tr className="border-b">
-                                <th className="p-2">Model</th>
-                                <th className="p-2">Price (Clean iCloud Status)</th>
-                                <th className="p-2">Price (Lost iCloud Status)</th>
+                            <tr className="border-b border-border">
+                                <th className="p-2 text-foreground">Model</th>
+                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
+                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {iphoneModels.map(device => (
-                                <tr key={device.name} className="border-b">
-                                <td className="p-2">{device.name}</td>
-                                <td className="p-2">${device.price}</td>
-                                <td className="p-2">${device.lostPrice}</td>
+                                <tr key={device.name} className="border-b border-border">
+                                <td className="p-2 text-card-foreground">{device.name}</td>
+                                <td className="p-2 text-card-foreground">${device.price}</td>
+                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -282,24 +285,24 @@ export default function ServicesPage() {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">💻 MacBook Unlock Prices</h2>
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                    <h2 className="text-2xl font-bold text-foreground mb-4">💻 MacBook Unlock Prices</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                            <tr className="border-b">
-                                <th className="p-2">Model</th>
-                                <th className="p-2">Price (Clean iCloud Status)</th>
-                                <th className="p-2">Price (Lost iCloud Status)</th>
+                            <tr className="border-b border-border">
+                                <th className="p-2 text-foreground">Model</th>
+                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
+                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {macbookModels.map(device => (
-                                <tr key={device.name} className="border-b">
-                                <td className="p-2">{device.name}</td>
-                                <td className="p-2">${device.price}</td>
-                                <td className="p-2">${device.lostPrice}</td>
+                                <tr key={device.name} className="border-b border-border">
+                                <td className="p-2 text-card-foreground">{device.name}</td>
+                                <td className="p-2 text-card-foreground">${device.price}</td>
+                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -318,24 +321,24 @@ export default function ServicesPage() {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">⌚ Apple Watch Unlock Prices</h2>
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                    <h2 className="text-2xl font-bold text-foreground mb-4">⌚ Apple Watch Unlock Prices</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                            <tr className="border-b">
-                                <th className="p-2">Model</th>
-                                <th className="p-2">Price (Clean iCloud Status)</th>
-                                <th className="p-2">Price (Lost iCloud Status)</th>
+                            <tr className="border-b border-border">
+                                <th className="p-2 text-foreground">Model</th>
+                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
+                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {watchModels.map(device => (
-                                <tr key={device.name} className="border-b">
-                                <td className="p-2">{device.name}</td>
-                                <td className="p-2">${device.price}</td>
-                                <td className="p-2">${device.lostPrice}</td>
+                                <tr key={device.name} className="border-b border-border">
+                                <td className="p-2 text-card-foreground">{device.name}</td>
+                                <td className="p-2 text-card-foreground">${device.price}</td>
+                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -354,24 +357,24 @@ export default function ServicesPage() {
                     </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">📱 iPad Unlock Prices</h2>
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPad Unlock Prices</h2>
                      <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                            <tr className="border-b">
-                                <th className="p-2">Model</th>
-                                <th className="p-2">Price (Clean iCloud Status)</th>
-                                <th className="p-2">Price (Lost iCloud Status)</th>
+                            <tr className="border-b border-border">
+                                <th className="p-2 text-foreground">Model</th>
+                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
+                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {ipadModels.map(device => (
-                                <tr key={device.name} className="border-b">
-                                <td className="p-2">{device.name}</td>
-                                <td className="p-2">${device.price}</td>
-                                <td className="p-2">${device.lostPrice}</td>
+                                <tr key={device.name} className="border-b border-border">
+                                <td className="p-2 text-card-foreground">{device.name}</td>
+                                <td className="p-2 text-card-foreground">${device.price}</td>
+                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
                                 <td className="p-2">
                                   <Button 
                                     size="sm" 
@@ -392,32 +395,32 @@ export default function ServicesPage() {
             </div>
         </section>
 
-        <section id="contact" className="py-20 bg-white">
+        <section id="contact" className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h2>
-            <p className="text-xl text-gray-600">We're here to help you</p>
+            <h2 className="text-4xl font-bold text-foreground mb-4">Contact Us</h2>
+            <p className="text-xl text-muted-foreground">We're here to help you</p>
           </div>
           
           <div className="max-w-lg mx-auto">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Get in Touch</h3>
+              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Get in Touch</h3>
               <div className="grid sm:grid-cols-2 gap-6">
-                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border hover:bg-gray-100 transition-colors">
+                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors border-border">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                      {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={28} height={28} />}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">WhatsApp</p>
+                    <p className="font-semibold text-card-foreground">WhatsApp</p>
                     <p className="text-blue-600">Chat with us</p>
                   </div>
                 </a>
-                <div className="flex items-center p-4 rounded-lg border">
+                <div className="flex items-center p-4 rounded-lg border bg-card border-border">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                     <Clock className="text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Hours</p>
-                    <p className="text-gray-600">24/7 Support</p>
+                    <p className="font-semibold text-card-foreground">Hours</p>
+                    <p className="text-muted-foreground">24/7 Support</p>
                   </div>
                 </div>
               </div>
@@ -426,7 +429,7 @@ export default function ServicesPage() {
       </section>
       </main>
 
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>

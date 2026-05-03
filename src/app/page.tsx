@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 
 const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
@@ -232,7 +233,7 @@ export default function IcloudUnlocksPage() {
   };
   
   return (
-    <div className="bg-gray-50 flex flex-col min-h-screen">
+    <div className="bg-background flex flex-col min-h-screen">
       {/* Navigation */}
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -243,18 +244,20 @@ export default function IcloudUnlocksPage() {
               </Link>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-              <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</Link>
+              <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Services</Link>
                {user && (
-                  <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>
+                  <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">My Account</Link>
               )}
               {isAdmin && (
-                <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
+                <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
               )}
               {user && <NotificationDropdown />}
+              <ThemeToggle />
               <LoginButton />
             </div>
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -266,17 +269,17 @@ export default function IcloudUnlocksPage() {
                     <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
-                        <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                        <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
                     {isAdmin && (
-                      <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                      <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                     )}
                     {user && (
                       <div className="flex items-center gap-2 py-2">
-                        <span className="text-gray-700 text-base font-medium">Notifications</span>
+                        <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Notifications</span>
                         <NotificationDropdown />
                       </div>
                     )}
@@ -351,16 +354,16 @@ export default function IcloudUnlocksPage() {
       </section>
 
       {/* Services Section */}
-        <section id="services" className="py-20 bg-white">
+        <section id="services" className="py-20 bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
-                    <p className="text-xl text-gray-600">Professional unlocking for all Apple devices</p>
+                    <h2 className="text-4xl font-bold text-foreground mb-4">Our Services</h2>
+                    <p className="text-xl text-muted-foreground">Professional unlocking for all Apple devices</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {services.map((service, index) => (
                       <Link href="/services" key={index} className="block">
-                        <div className="bg-gray-100 rounded-2xl p-6 text-center hover-lift h-full flex flex-col">
+                        <div className="bg-card rounded-2xl p-6 text-center hover-lift h-full flex flex-col border border-border">
                             <div className="relative h-40 w-full mb-4 rounded-lg overflow-hidden">
                                 <Image
                                     src={service.imageUrl}
@@ -369,8 +372,8 @@ export default function IcloudUnlocksPage() {
                                     objectFit="contain"
                                 />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                            <p className="text-gray-600 mb-4 flex-grow">{service.description}</p>
+                            <h3 className="text-xl font-bold text-card-foreground mb-2">{service.title}</h3>
+                            <p className="text-muted-foreground mb-4 flex-grow">{service.description}</p>
                             <Button className="w-full btn-primary text-white py-2 rounded-lg mt-auto">
                                 Unlock Now
                             </Button>
@@ -382,7 +385,7 @@ export default function IcloudUnlocksPage() {
         </section>
 
       {/* About Us Section */}
-      <section id="about-us" className="py-20 bg-white">
+      <section id="about-us" className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div className="relative h-96">
@@ -395,8 +398,8 @@ export default function IcloudUnlocksPage() {
                     />
                 </div>
                 <div>
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">About Us</h2>
-                    <div className="space-y-4 text-gray-600">
+                    <h2 className="text-4xl font-bold text-foreground mb-4">About Us</h2>
+                    <div className="space-y-4 text-muted-foreground">
                         <p>iCloud Unlocks was founded in 2023 with a mission to deliver fast, secure, and reliable iCloud and device unlock services for iPhones, iPads, Apple Watches, and MacBooks. We specialize in permanent, server-based unlocks—no bypass tricks, no jailbreaks, and no access to your personal data.</p>
                         <p>Our process is straightforward: clients submit their device IMEI or serial number, which the server checks to provide full device details and determine unlock eligibility. Once confirmed, the device can then be registered for unlock on the server, and after processing, activation is completed which turns OFF the “Find My”.</p>
                         <p>Since our launch, we’ve helped thousands of users regain full access to their devices with transparency, professionalism, and dedicated customer support.</p>
@@ -407,11 +410,11 @@ export default function IcloudUnlocksPage() {
       </section>
 
       {/* Reviews Section */}
-      <section id="about" className="py-20 bg-gray-50">
+      <section id="about" className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Customer Reviews</h2>
-            <p className="text-xl text-gray-600">Trusted by thousands of customers worldwide</p>
+            <h2 className="text-4xl font-bold text-foreground mb-4">Customer Reviews</h2>
+            <p className="text-xl text-muted-foreground">Trusted by thousands of customers worldwide</p>
           </div>
           <div className="text-center mb-16">
             <Button onClick={handleAddReviewClick} className="btn-primary text-white">Add review</Button>
@@ -419,27 +422,27 @@ export default function IcloudUnlocksPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {reviews.map((review, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row gap-6">
+              <div key={index} className="bg-card rounded-2xl p-6 shadow-lg flex flex-col md:flex-row gap-6 border border-border">
                 <div className="flex-shrink-0 md:w-1/3">
                     <div className="flex items-center mb-3">
                       <Image src={review.avatarUrl} alt={review.name} width={40} height={40} className="rounded-full mr-3" />
                       <div>
-                        <p className="font-semibold text-gray-900 flex items-center">{review.name} <span className="ml-2">{review.flag}</span></p>
-                        <p className="text-xs text-gray-500">Reviewed on: {review.date}</p>
+                        <p className="font-semibold text-card-foreground flex items-center">{review.name} <span className="ml-2">{review.flag}</span></p>
+                        <p className="text-xs text-muted-foreground">Reviewed on: {review.date}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-border">
                         <Image src={review.images[0]} alt="Review image 1" layout="fill" objectFit="cover" data-ai-hint={review.imageHints.join(' ')} />
                       </div>
-                       <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
+                       <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-border">
                         <Image src={review.images[1]} alt="Review image 2" layout="fill" objectFit="cover" data-ai-hint={review.imageHints.join(' ')} />
                       </div>
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    <p className="text-gray-700 text-sm mb-4 flex-grow">{review.review}</p>
-                    <p className="text-sm font-semibold text-gray-500 mt-auto">Unlocked: {review.unlockedDevice}</p>
+                    <p className="text-muted-foreground text-sm mb-4 flex-grow">{review.review}</p>
+                    <p className="text-sm font-semibold text-muted-foreground mt-auto">Unlocked: {review.unlockedDevice}</p>
                 </div>
               </div>
             ))}
@@ -448,32 +451,32 @@ export default function IcloudUnlocksPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white">
+      <section id="contact" className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h2>
-            <p className="text-xl text-gray-600">We're here to help you</p>
+            <h2 className="text-4xl font-bold text-foreground mb-4">Contact Us</h2>
+            <p className="text-xl text-muted-foreground">We're here to help you</p>
           </div>
           
           <div className="max-w-lg mx-auto">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Get in Touch</h3>
+              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Get in Touch</h3>
               <div className="grid sm:grid-cols-2 gap-6">
-                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border hover:bg-gray-100 transition-colors">
+                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                      {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={28} height={28} />}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">WhatsApp</p>
+                    <p className="font-semibold text-card-foreground">WhatsApp</p>
                     <p className="text-blue-600">Chat with us</p>
                   </div>
                 </a>
-                <div className="flex items-center p-4 rounded-lg border">
+                <div className="flex items-center p-4 rounded-lg border bg-card">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                     <Clock className="text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Hours</p>
-                    <p className="text-gray-600">24/7 Support</p>
+                    <p className="font-semibold text-card-foreground">Hours</p>
+                    <p className="text-muted-foreground">24/7 Support</p>
                   </div>
                 </div>
               </div>
@@ -483,7 +486,7 @@ export default function IcloudUnlocksPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
