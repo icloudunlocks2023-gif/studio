@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
+import { getImage } from '@/lib/placeholder-images';
 import { LoginButton } from '@/components/login-button';
 import { where, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
@@ -21,10 +21,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -248,7 +248,7 @@ function MyAccountContent() {
         setIsWithdrawalProcessing(false);
         toast({ title: "Error", description: "Failed to submit request.", variant: "destructive" });
       }
-    }, 120000); // 2 minutes
+    }, 120000); 
   };
 
   const handleDepositSubmitRequest = () => {
@@ -404,8 +404,6 @@ function MyAccountContent() {
   const bitcoinImage = getImage('bitcoin-icon');
   const usdcImage = getImage('usdc-icon');
   const ethImage = getImage('eth-icon');
-  const telegramIcon = getImage('telegram-icon');
-  const whatsappIcon = getImage('whatsapp-icon');
 
   const cryptoMethodsList = [
     { id: 'usdt', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress },
@@ -501,7 +499,7 @@ function MyAccountContent() {
            </Button>
         </div>
         
-        <Card className="bg-card border-none shadow-sm overflow-hidden border border-border">
+        <Card className="bg-card border border-border shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 border-b border-border">
             <CardTitle className="text-lg flex items-center gap-2 text-foreground">
               <User className="h-5 w-5 text-primary" />
@@ -833,7 +831,7 @@ function MyAccountContent() {
           {ordersLoading ? (
             <div className="text-center py-16 px-6 bg-card rounded-2xl shadow-lg border border-border"><Loader className="animate-spin h-8 w-8 mx-auto text-primary" /></div>
           ) : orders && orders.length > 0 ? (
-            <Card className="overflow-hidden border-none shadow-xl border border-border">
+            <Card className="overflow-hidden border border-border shadow-xl">
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow className="border-border">
@@ -889,7 +887,7 @@ function MyAccountContent() {
             {ticketsLoading ? (
                 <p className="text-muted-foreground">Loading tickets...</p>
             ) : tickets && tickets.length > 0 ? (
-                <Card className="overflow-hidden border-none shadow-xl border border-border">
+                <Card className="overflow-hidden border border-border shadow-xl">
                     <Table>
                         <TableHeader className="bg-muted/50">
                             <TableRow className="border-border">
@@ -943,7 +941,7 @@ function MyAccountContent() {
             <DialogTitle className="flex items-center gap-2 text-foreground">
                <Key className="h-5 w-5 text-primary" />
                Change Your Password
-            </Key>
+            </DialogTitle>
             <DialogDescription className="text-muted-foreground">Enter a new secure password below.</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
@@ -1028,7 +1026,7 @@ function MyAccountContent() {
                   {bulkAmountToPay > 0 && (
                     <div className="px-4 py-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
                         <div className="flex items-center gap-3">
-                            {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT BEP20" width={36} height={36} className="rounded-full" data-ai-hint="usdt logo" />}
+                            {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT BEP20" width={36} height={36} className="rounded-full" />}
                             <div>
                                 <p className="font-bold text-sm text-foreground">USDT (BEP20 Network)</p>
                                 <p className="text-[10px] text-muted-foreground">Recommended: Use Binance Smart Chain.</p>
@@ -1172,7 +1170,6 @@ function MyAccountContent() {
         </DialogContent>
       </Dialog>
 
-
       <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -1199,31 +1196,31 @@ function MyAccountContent() {
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
                             <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Telegram Channel
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Support 1
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iUnlock_Apple" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Support 2
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Technician
                             </a>
                         </li>
                         <li className='block'>
                            <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
+                                <Image src="https://i.postimg.cc/3Jbr4p5L/icon.png" alt="WhatsApp" width={18} height={18} className="mr-2" />
                                 WhatsApp
                             </a>
                         </li>
@@ -1255,7 +1252,6 @@ function MyAccountContent() {
     </div>
   );
 }
-
 
 export default function MyAccountPage() {
     return <MyAccountContent />
