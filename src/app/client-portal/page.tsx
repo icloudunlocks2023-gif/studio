@@ -21,7 +21,7 @@ import { addDoc, collection, serverTimestamp, query, where, getDocs, limit, doc,
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Menu, Loader, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, ChevronRight, XCircle, Info, MessageSquare, Bell } from 'lucide-react';
+import { Copy, Menu, Loader, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, ChevronRight, XCircle, Info, MessageSquare, Bell, Mail } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -195,13 +195,16 @@ function DeviceCheckContent() {
   const [verifyingClaimId, setVerifyingClaimId] = useState<string | null>(null);
   const [claimRejected, setClaimRejected] = useState(false);
 
+  // New States for enhanced payment flow
+  const [selectedNonCrypto, setSelectedNonCrypto] = useState<any>(null);
+  const [nonCryptoEmail, setNonCryptoEmail] = useState('');
+  const [showDepositRequestSuccess, setShowDepositRequestSuccess] = useState(false);
+
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
   const usdtImage = getImage('usdt-icon');
-  const usdtTrc20Image = getImage('usdt-trc20-icon');
   const bitcoinImage = getImage('bitcoin-icon');
   const ethereumImage = getImage('eth-icon');
-  const usdcImage = getImage('usdc-icon');
 
   const formDisabled = isChecking || isSearching || !!submission || isOfflineSimulating || !!verifyingClaimId || isPolicyModalOpen;
   const shouldShowLoader = (isChecking || (submission && submission.status === 'waiting') || isOfflineSimulating) && !offlineError;
@@ -257,7 +260,7 @@ function DeviceCheckContent() {
       timer = setInterval(() => {
         setTimeLeft(prevTime => prevTime - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && isPaymentModalOpen) {
       setPaymentModalOpen(false);
       toast({
         title: "Payment window expired",
@@ -292,6 +295,8 @@ function DeviceCheckContent() {
     setIsSearching(false);
     setVerifyingClaimId(null);
     setClaimRejected(false);
+    setSelectedNonCrypto(null);
+    setNonCryptoEmail('');
   };
 
   useEffect(() => {
@@ -498,6 +503,7 @@ function DeviceCheckContent() {
     setTimeLeft(20 * 60);
     setLoadingMessage('Processing payment...');
     setShowOtherPayments(false);
+    setSelectedNonCrypto(null);
 
     setTimeout(() => {
       setLoadingMessage('Checking account balance...');
@@ -561,6 +567,61 @@ function DeviceCheckContent() {
       });
   };
 
+  const handleNonCryptoProceed = async () => {
+    if (!nonCryptoEmail || !nonCryptoEmail.includes('@')) {
+        return toast({ title: "Valid Email Required", variant: "destructive" });
+    }
+    if (isSubmittingOrder) return;
+    setIsSubmittingOrder(true);
+
+    const generateRandomPart = (length: number) => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    };
+    const newOrderId = `#ORD-${generateRandomPart(5)}`;
+    const effectivePrice = submission?.icloudStatus === 'lost' ? lostPrice : submission?.price || price;
+
+    const claimData = {
+      orderId: newOrderId,
+      userId: user?.uid,
+      submissionId: submissionId,
+      imei: submission?.imei,
+      model: submission?.model,
+      price: effectivePrice,
+      status: 'pending' as const,
+      method: selectedNonCrypto.name,
+      clientEmail: nonCryptoEmail,
+      createdAt: serverTimestamp(),
+    };
+
+    try {
+        await addDoc(collection(firestore, 'payment_claims'), claimData);
+        const tgMessage = `💰 <b>NON-CRYPTO UNLOCK REQUEST!</b> 💰\n\n<b>User:</b> ${user?.email}\n<b>Device:</b> ${submission?.model}\n<b>IMEI:</b> ${submission?.imei}\n<b>Amount:</b> $${effectivePrice}\n<b>Method:</b> ${selectedNonCrypto.name}\n<b>Client Email:</b> ${nonCryptoEmail}`;
+        
+        await fetch('/api/telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: tgMessage }),
+        });
+
+        setPaymentModalOpen(false);
+        setShowDepositRequestSuccess(true);
+        setIsSubmittingOrder(false);
+
+        setTimeout(() => {
+            router.push('/my-account');
+        }, 5000);
+
+    } catch (e) {
+        setIsSubmittingOrder(false);
+        toast({ title: "Error", description: "Failed to notify support.", variant: "destructive" });
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -571,6 +632,15 @@ function DeviceCheckContent() {
   
   const activePrice = submission?.icloudStatus === 'lost' ? lostPrice : submission?.icloudStatus === 'clean' ? price : null;
   const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
+
+  const nonCryptoMethods = [
+    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon') },
+    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon') },
+    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon') },
+    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon') },
+    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon') },
+    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon') },
+  ];
 
   if (userLoading || !user || profileLoading || bannedUserLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -840,7 +910,7 @@ function DeviceCheckContent() {
                 </div>
               )}
                {submission.status === 'not_supported' && (
-                 <p className="bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">❌ Unable to proceed with the unlock.</p>
+                 <p className="bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-green-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">❌ Unable to proceed with the unlock.</p>
                )}
                {submission.status === 'find_my_off' && (
                  <p className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm leading-relaxed">
@@ -1081,11 +1151,11 @@ function DeviceCheckContent() {
       <Dialog open={isPaymentModalOpen} onOpenChange={setPaymentModalOpen}>
         <DialogContent className={cn("sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden transition-all duration-300", showOtherPayments && "lg:max-w-[950px]")}>
             <DialogHeader className="px-5 py-2.5 border-b bg-card">
-                <DialogTitle className='flex items-center gap-3 text-base sm:text-lg pr-12 text-foreground'>
-                    {timeLeft > 0 && <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
-                    <span>Pay with Crypto</span>
+                <DialogTitle className='flex items-center gap-3 text-base sm:text-lg pr-12 text-foreground uppercase tracking-tight font-black'>
+                    {timeLeft > 0 && !selectedNonCrypto && <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
+                    <span>Make Unlock Payment</span>
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">Pay unlock fees for this device. Send the exact crypto amount.</DialogDescription>
+                <DialogDescription className="text-sm text-muted-foreground">Pay unlock fees for this device. Send the exact amount.</DialogDescription>
                  {submission && <div className="text-xs bg-muted p-2 rounded-md text-muted-foreground mt-1"><p><strong>Model:</strong> {submission.model} | <strong>IMEI/Serial:</strong> {submission.imei}</p></div>}
             </DialogHeader>
              <ScrollArea className="flex-1 px-5">
@@ -1106,124 +1176,182 @@ function DeviceCheckContent() {
                                 <p className="text-3xl font-black text-foreground">${amountToPay.toFixed(2)}</p>
                             </div>
                         </div>
+
+                        {/* Step-based content for Crypto/Non-Crypto */}
                         {amountToPay > 0 && (
                             <>
-                                <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
-                                    <div className="flex items-center gap-3">
-                                        {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT" width={32} height={32} className="rounded-full" />}
-                                        <div>
-                                            <p className="font-bold text-sm text-foreground">USDT (BEP20 Network) - <span className="text-green-600">Recommended</span></p>
-                                            <p className="text-[10px] text-muted-foreground">Use Binance Smart Chain for low fees.</p>
-                                        </div>
-                                    </div>
-                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
-                                        <span className="font-medium">{usdtAddress}</span>
-                                        <CopyToClipboard text={usdtAddress}>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
-                                                <Copy className="w-4 h-4 text-muted-foreground"/>
-                                            </Button>
-                                        </CopyToClipboard>
-                                    </div>
-                                </div>
-                                <Button 
-                                    variant="outline" 
-                                    className="w-full h-10 text-foreground bg-muted/50 hover:bg-muted flex items-center justify-center gap-2 border border-border rounded-xl transition-all font-semibold shadow-none"
-                                    onClick={() => setShowOtherPayments(!showOtherPayments)}
-                                >
-                                    <span className="text-sm">Show Other Payment Methods</span>
-                                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 text-muted-foreground", showOtherPayments && "rotate-180")} />
-                                </Button>
-                                {showOtherPayments && (
-                                    <div className="lg:hidden mt-1">
-                                        <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Networks</h4>
-                                        <ScrollArea className="h-[320px] pr-2">
-                                            <div className="space-y-3 pb-[250px]">
-                                                <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
-                                                    <div className="flex items-center gap-3">
-                                                        {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
-                                                        <div>
-                                                            <p className="font-bold text-sm text-foreground">USDT (TRC20 Network)</p>
-                                                            <p className="text-[10px] text-muted-foreground">Standard Tether network.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
-                                                        <span>TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw</span>
-                                                        <CopyToClipboard text="TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-muted-foreground"/>
-                                                            </Button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
-                                                    <div className="flex items-center gap-3">
-                                                        {bitcoinImage && <Image src={bitcoinImage.imageUrl} alt="Bitcoin" width={32} height={32} className="rounded-full" />}
-                                                        <div>
-                                                            <p className="font-bold text-sm text-foreground">Bitcoin (BTC)</p>
-                                                            <p className="text-[10px] text-muted-foreground">Standard network confirmation.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
-                                                        <span>bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h</span>
-                                                        <CopyToClipboard text="bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                                <Copy className="w-4 h-4 text-muted-foreground"/>
-                                                            </Button>
-                                                        </CopyToClipboard>
-                                                    </div>
+                                {!selectedNonCrypto ? (
+                                    <div className="space-y-4">
+                                        <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
+                                            <div className="flex items-center gap-3">
+                                                {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT" width={32} height={32} className="rounded-full" />}
+                                                <div>
+                                                    <p className="font-bold text-sm text-foreground">USDT (BEP20 Network) - <span className="text-green-600">Recommended</span></p>
+                                                    <p className="text-[10px] text-muted-foreground">Low fees on Binance Smart Chain.</p>
                                                 </div>
                                             </div>
-                                            <ScrollBar orientation="vertical" />
-                                        </ScrollArea>
+                                            <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground shadow-inner">
+                                                <span className="font-medium">{usdtAddress}</span>
+                                                <CopyToClipboard text={usdtAddress}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                                        <Copy className="w-4 h-4 text-muted-foreground"/>
+                                                    </Button>
+                                                </CopyToClipboard>
+                                            </div>
+                                        </div>
+
+                                        <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
+                                            <div className="flex items-center gap-3">
+                                                {ethereumImage && <Image src={ethereumImage.imageUrl} alt="ETH" width={32} height={32} className="rounded-full" />}
+                                                <div>
+                                                    <p className="font-bold text-sm text-foreground">Ethereum (ETH)</p>
+                                                    <p className="text-[10px] text-muted-foreground">ERC20 Network.</p>
+                                                </div>
+                                            </div>
+                                            <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground shadow-inner">
+                                                <span className="font-medium">0xE976F1c7b06411e21b0F67f33116af92CB1dcABA</span>
+                                                <CopyToClipboard text="0xE976F1c7b06411e21b0F67f33116af92CB1dcABA">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                                        <Copy className="w-4 h-4 text-muted-foreground"/>
+                                                    </Button>
+                                                </CopyToClipboard>
+                                            </div>
+                                        </div>
+
+                                        <Button 
+                                            variant="outline" 
+                                            className="w-full h-10 text-foreground bg-muted/50 hover:bg-muted flex items-center justify-center gap-2 border border-border rounded-xl transition-all font-semibold shadow-none"
+                                            onClick={() => setShowOtherPayments(!showOtherPayments)}
+                                        >
+                                            <span className="text-sm">Show Other Payment Methods</span>
+                                            <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 text-muted-foreground", showOtherPayments && "rotate-180")} />
+                                        </Button>
+
+                                        {/* Mobile view for other payments when toggled */}
+                                        {showOtherPayments && (
+                                            <div className="lg:hidden mt-1 animate-fade-in">
+                                                <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
+                                                <div className="grid grid-cols-1 gap-2">
+                                                    {nonCryptoMethods.map(method => {
+                                                        const isAmountLow = amountToPay < 200;
+                                                        return (
+                                                            <button 
+                                                                key={method.id}
+                                                                disabled={isAmountLow}
+                                                                onClick={() => { setSelectedNonCrypto(method); }}
+                                                                className={cn(
+                                                                    "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
+                                                                    isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
+                                                                )}
+                                                            >
+                                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
+                                                                    {method.name.charAt(0)}
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
+                                                                    {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
+                                                                </div>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4 animate-fade-in">
+                                        <div className="flex items-center justify-between border-b pb-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center font-black text-white text-xs">
+                                                    {selectedNonCrypto.name.charAt(0)}
+                                                </div>
+                                                <h3 className="font-bold text-sm">{selectedNonCrypto.name} Request</h3>
+                                            </div>
+                                            <Button variant="ghost" size="sm" onClick={() => setSelectedNonCrypto(null)} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Change Method</Button>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="p-4 bg-muted/30 border border-border rounded-2xl space-y-3">
+                                                <Label htmlFor="manual-email" className="text-sm font-bold">Confirm Your Contact Email</Label>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    <Input 
+                                                        id="manual-email" 
+                                                        type="email" 
+                                                        placeholder="your@email.com" 
+                                                        value={nonCryptoEmail} 
+                                                        onChange={(e) => setNonCryptoEmail(e.target.value)}
+                                                        className="pl-10 h-11 rounded-xl bg-background border-border"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 rounded-2xl">
+                                                <p className="text-[10px] text-yellow-800 dark:text-yellow-300 leading-relaxed italic">
+                                                    "Minimum amount for these payment methods is $200. Support will provide payment details via email/notifications after submission."
+                                                </p>
+                                            </div>
+
+                                            <Button 
+                                                onClick={handleNonCryptoProceed}
+                                                disabled={isSubmittingOrder}
+                                                className="w-full h-12 btn-primary text-white font-black rounded-2xl shadow-lg transition-all active:scale-95"
+                                            >
+                                                {isSubmittingOrder ? <Loader className="animate-spin" /> : 'Proceed with Deposit Request'}
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
-                                <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 py-2 rounded-xl">
-                                    <AlertDescription className="text-[11px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
-                                        Payments made within the timer will be automatically applied.
-                                    </AlertDescription>
-                                </Alert>
-                            </>)}
+                                
+                                {!selectedNonCrypto && (
+                                    <div className="space-y-3 pt-2">
+                                        <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 py-2 rounded-xl">
+                                            <AlertDescription className="text-[10px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
+                                                Payments made within the timer will be automatically applied.
+                                            </AlertDescription>
+                                        </Alert>
+                                        
+                                        <div className="px-5 py-3 bg-red-50 dark:bg-red-950/20 border border-red-100 rounded-2xl">
+                                           <p className="text-[10px] text-red-700 dark:text-red-300 leading-tight text-center font-bold">
+                                             ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
+                                           </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
                         {amountToPay <= 0 && <div className="text-center p-6 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 text-green-800 dark:text-green-300 rounded-2xl animate-fade-in"><CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500"/><p className="font-bold text-base">Your balance covers the full amount!</p><p className="text-xs opacity-80">Click "Confirm" to use your balance for this unlock.</p></div>}
                     </div>
-                    {showOtherPayments && (
-                        <div className="hidden lg:block space-y-3 animate-fade-in border-l border-border pl-8">
-                            <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Networks</h4>
-                            <ScrollArea className="h-[400px] pr-4">
-                                <div className="space-y-3 pb-8">
-                                    <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            {usdtTrc20Image && <Image src={usdtTrc20Image.imageUrl} alt="USDT TRC20" width={32} height={32} className="rounded-full" />}
-                                            <div>
-                                                <p className="font-bold text-sm text-foreground">USDT (TRC20 Network)</p>
-                                                <p className="text-[10px] text-muted-foreground">Standard Tether network.</p>
-                                            </div>
-                                        </div>
-                                        <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
-                                            <span>TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw</span>
-                                            <CopyToClipboard text="TL5qvz8Jb82QvMMfKkNXDwMu6SrZfKg1kw">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-muted-foreground"/>
-                                                </Button>
-                                            </CopyToClipboard>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 border border-border rounded-2xl bg-card shadow-sm space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            {bitcoinImage && <Image src={bitcoinImage.imageUrl} alt="Bitcoin" width={32} height={32} className="rounded-full" />}
-                                            <div>
-                                                <p className="font-bold text-sm text-foreground">Bitcoin (BTC)</p>
-                                                <p className="text-[10px] text-muted-foreground">Standard network confirmation.</p>
-                                            </div>
-                                        </div>
-                                        <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground">
-                                            <span>bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h</span>
-                                            <CopyToClipboard text="bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                                    <Copy className="w-4 h-4 text-muted-foreground"/>
-                                                </Button>
-                                            </CopyToClipboard>
-                                        </div>
-                                    </div>
+
+                    {/* Desktop Side Section for Other Payments */}
+                    {showOtherPayments && !selectedNonCrypto && (
+                        <div className="hidden lg:flex flex-col space-y-3 animate-fade-in border-l border-border pl-8">
+                            <h4 className="font-black text-xs text-muted-foreground uppercase tracking-widest mb-2">Other Payment Methods</h4>
+                            <ScrollArea className="h-[420px] pr-4">
+                                <div className="space-y-2 pb-8">
+                                    {nonCryptoMethods.map(method => {
+                                        const isAmountLow = amountToPay < 200;
+                                        return (
+                                            <button 
+                                                key={method.id}
+                                                disabled={isAmountLow}
+                                                onClick={() => { setSelectedNonCrypto(method); }}
+                                                className={cn(
+                                                    "flex items-center gap-3 p-4 w-full rounded-xl border transition-all text-left relative",
+                                                    isAmountLow ? "bg-muted/50 border-border opacity-50 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
+                                                )}
+                                            >
+                                                <div className="h-9 w-9 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
+                                                    {method.name.charAt(0)}
+                                                </div>
+                                                <div className="flex flex-col flex-1">
+                                                    <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
+                                                    {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Minimum amount for these payment methods is $200</span>}
+                                                </div>
+                                                {!isAmountLow && <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                                 <ScrollBar orientation="vertical" />
                             </ScrollArea>
@@ -1231,19 +1359,36 @@ function DeviceCheckContent() {
                     )}
                 </div>
             </ScrollArea>
-            <div className="px-5 py-3 bg-red-50 dark:bg-red-950/20 border-t border-red-100 dark:border-red-900/30">
-               <p className="text-[11px] text-red-700 dark:text-red-300 leading-tight text-center font-semibold">
-                 ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
-               </p>
-            </div>
-            <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
-                <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
-                    {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
-                </Button>
-            </DialogFooter>
+
+            {!selectedNonCrypto && (
+                <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
+                    <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
+                    <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
+                        {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
+                    </Button>
+                </DialogFooter>
+            )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showDepositRequestSuccess} onOpenChange={setShowDepositRequestSuccess}>
+        <DialogContent className="sm:max-w-[450px]">
+            <div className="py-10 text-center space-y-6 animate-fade-in">
+                <div className="h-20 w-20 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600">
+                    <CheckCircle2 className="h-10 w-10" />
+                </div>
+                <div className="space-y-3">
+                    <DialogTitle className="text-2xl font-black text-foreground">Request Received!</DialogTitle>
+                    <div className="p-5 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 rounded-2xl text-green-800 dark:text-green-300 text-sm leading-relaxed mx-2 shadow-sm">
+                        "Your deposit request has been received. Support has been notified and will provide payment details and instructions via notifications and email shortly."
+                    </div>
+                    <p className="text-xs text-muted-foreground animate-pulse mt-4">Redirecting to your account dashboard...</p>
+                </div>
+                <Button onClick={() => router.push('/my-account')} className="w-full btn-primary text-white h-12 rounded-xl font-bold shadow-lg">Go to Account</Button>
+            </div>
+        </DialogContent>
+      </Dialog>
+
       {isLoading && <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"><div className="spinner w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div><p className="font-semibold text-foreground">{loadingMessage}</p></div>}
     </div>
   );
