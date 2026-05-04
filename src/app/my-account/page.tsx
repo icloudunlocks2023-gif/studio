@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Bell, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -130,6 +130,15 @@ function MyAccountContent() {
   const [bulkPaid, setBulkPaid] = useState(false);
   const [timeLeft, setTimeLeft] = useState(20 * 60);
 
+  // Deposit State
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositStep, setDepositStep] = useState<'amount' | 'methods' | 'crypto' | 'non-crypto'>('amount');
+  const [selectedDepositMethod, setSelectedDepositMethod] = useState<any>(null);
+  const [depositEmail, setDepositEmail] = useState('');
+  const [depositTimer, setDepositTimer] = useState(20 * 60);
+  const [showDepositRequestSuccess, setShowDepositRequestSuccess] = useState(false);
+  const [isProcessingDeposit, setIsProcessingDeposit] = useState(false);
+
   // Withdrawal State
   const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
   const [isWithdrawing, setIsWithdrawalProcessing] = useState(false);
@@ -170,6 +179,19 @@ function MyAccountContent() {
 
     return () => clearInterval(timer);
   }, [isBulkPayModalOpen, timeLeft, toast]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (depositStep === 'crypto' && depositTimer > 0) {
+        timer = setInterval(() => {
+            setDepositTimer(prev => prev - 1);
+        }, 1000);
+    } else if (depositTimer === 0 && depositStep === 'crypto') {
+        setDepositStep('methods');
+        toast({ title: "Session Expired", description: "Deposit session timed out. Please try again.", variant: "destructive" });
+    }
+    return () => clearInterval(timer);
+  }, [depositStep, depositTimer, toast]);
 
   const handleOpenBulkModal = () => {
     setTimeLeft(20 * 60);
@@ -227,6 +249,59 @@ function MyAccountContent() {
         toast({ title: "Error", description: "Failed to submit request.", variant: "destructive" });
       }
     }, 120000); // 2 minutes
+  };
+
+  const handleDepositSubmitRequest = () => {
+    const amt = parseFloat(depositAmount);
+    if (isNaN(amt) || amt < 15) {
+        return toast({ title: "Invalid Amount", description: "Minimum deposit is $15.00", variant: "destructive" });
+    }
+    setDepositStep('methods');
+  };
+
+  const handleNonCryptoProceed = async () => {
+    if (!depositEmail || !depositEmail.includes('@')) {
+        return toast({ title: "Valid Email Required", variant: "destructive" });
+    }
+    setIsProcessingDeposit(true);
+
+    const tgMessage = `💰 <b>NEW NON-CRYPTO DEPOSIT REQUEST!</b> 💰\n\n<b>User:</b> ${user?.email}\n<b>Amount:</b> $${depositAmount}\n<b>Method:</b> ${selectedDepositMethod.name}\n<b>Client Email:</b> ${depositEmail}`;
+    
+    try {
+        await fetch('/api/telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: tgMessage }),
+        });
+        setShowDepositRequestSuccess(true);
+        setDepositStep('amount');
+        setDepositAmount('');
+        setDepositEmail('');
+    } catch (e) {
+        toast({ title: "Error", description: "Failed to notify support.", variant: "destructive" });
+    } finally {
+        setIsProcessingDeposit(false);
+    }
+  };
+
+  const handleCryptoPaid = async () => {
+      setIsProcessingDeposit(true);
+      const tgMessage = `🚀 <b>CRYPTO DEPOSIT CLAIM!</b> 🚀\n\n<b>User:</b> ${user?.email}\n<b>Amount:</b> $${depositAmount}\n<b>Method:</b> ${selectedDepositMethod.name}`;
+      
+      try {
+          await fetch('/api/telegram', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: tgMessage }),
+          });
+          toast({ title: "Deposit Notification Sent", description: "Administrator will verify your transaction shortly." });
+          setDepositStep('amount');
+          setDepositAmount('');
+      } catch (e) {
+          toast({ title: "Error", description: "Failed to notify admin.", variant: "destructive" });
+      } finally {
+          setIsProcessingDeposit(false);
+      }
   };
 
   const handleDeleteAccount = async () => {
@@ -326,8 +401,27 @@ function MyAccountContent() {
   };
 
   const usdtImage = getImage('usdt-icon');
+  const bitcoinImage = getImage('bitcoin-icon');
+  const usdcImage = getImage('usdc-icon');
+  const ethImage = getImage('eth-icon');
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
+
+  const cryptoMethodsList = [
+    { id: 'usdt', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress },
+    { id: 'btc', name: 'Bitcoin', icon: bitcoinImage, address: 'bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h' },
+    { id: 'usdc', name: 'USDC (BEP20)', icon: usdcImage, address: usdtAddress },
+    { id: 'eth', name: 'Ethereum', icon: ethImage, address: '0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f' },
+  ];
+
+  const nonCryptoMethodsList = [
+    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon') },
+    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon') },
+    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon') },
+    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon') },
+    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon') },
+    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon') },
+  ];
   
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
 
@@ -464,54 +558,209 @@ function MyAccountContent() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <Card className="lg:col-span-2 border border-border">
-                <CardHeader>
-                    <CardTitle className="text-2xl text-blue-600 flex items-center gap-2"><Wallet className="h-6 w-6" /> Financial Management</CardTitle>
+            <Card className="lg:col-span-2 border border-border overflow-hidden">
+                <CardHeader className="bg-muted/10 border-b border-border">
+                    <CardTitle className="text-2xl text-blue-600 flex items-center gap-2"><Wallet className="h-6 w-6" /> Deposit Funds into Account</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="p-6 rounded-2xl bg-muted/30 border border-dashed border-border">
-                        <p className="font-bold mb-4 text-foreground">Deposit via Crypto:</p>
-                        <div className="flex items-center gap-3">
-                           {usdtImage && (
-                             <Image 
-                                src={usdtImage.imageUrl} 
-                                alt="USDT" 
-                                width={48} 
-                                height={42} 
-                                className="rounded-full shadow-sm"
-                             />
-                           )}
-                           <div className="flex-1">
-                             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">USDT BEP20 Address:</p>
-                             <div className="font-mono text-[11px] sm:text-xs bg-background p-3 rounded-xl break-all flex items-center justify-between border border-border shadow-sm group text-foreground">
-                                <span>{usdtAddress}</span>
-                                <CopyToClipboard text={usdtAddress}>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
-                                        <Copy className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors"/>
-                                    </Button>
-                                </CopyToClipboard>
-                             </div>
-                           </div>
-                        </div>
+                <CardContent className="p-6 space-y-6">
+                    <div className="p-5 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl">
+                        <p className="text-xs font-black text-blue-800 dark:text-blue-300 uppercase tracking-widest mb-2 flex items-center gap-2">
+                           <Info className="h-3 w-3" /> Note:
+                        </p>
+                        <p className="text-[11px] text-blue-700 dark:text-blue-400 leading-relaxed mb-3">
+                            USDT, Bitcoin, USDC, and Ethereum payments are instant, recommended, and more convenient. <strong>Minimum deposit: $15.00</strong>
+                        </p>
+                        <p className="text-[11px] text-blue-700 dark:text-blue-400 leading-relaxed">
+                            Other payment methods (Cash App, PayPal, Venmo, Zelle, Apple Cash, Western Union) require a <strong>minimum deposit of $200</strong> and may take longer to process.
+                        </p>
                     </div>
 
-                    <div className="pt-4 border-t border-border">
-                        <h4 className="font-bold mb-2 text-foreground">Withdraw Funds</h4>
-                        <p className="text-sm text-muted-foreground mb-4">You can request a withdrawal of your available balance. Min: $50.</p>
-                        <Button 
-                            onClick={() => setIsWithdrawalModalOpen(true)} 
-                            variant="outline" 
-                            className="w-full sm:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 h-11 px-6 rounded-xl font-bold"
-                            disabled={currentBalance < 50}
-                        >
-                            Request Withdrawal
-                        </Button>
-                        {currentBalance < 50 && (
-                            <p className="text-[10px] text-red-500 mt-2 font-medium flex items-center gap-1">
-                                <Info className="h-3 w-3" /> You do not have sufficient balance to withdraw.
-                            </p>
-                        )}
-                    </div>
+                    {depositStep === 'amount' && (
+                        <div className="space-y-5 animate-fade-in">
+                            <div className="space-y-3">
+                                <Label htmlFor="deposit-amount" className="text-sm font-bold text-foreground">Enter Amount to Deposit (USD)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black text-muted-foreground">$</span>
+                                    <Input 
+                                        id="deposit-amount" 
+                                        type="number" 
+                                        placeholder="0.00" 
+                                        value={depositAmount} 
+                                        onChange={(e) => setDepositAmount(e.target.value)} 
+                                        className="h-16 pl-10 text-3xl font-black text-foreground bg-background border-2 border-border focus:border-primary transition-all rounded-2xl"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-muted-foreground italic pl-1">Enter the exact amount you wish to add to your balance.</p>
+                            </div>
+                            <Button 
+                                onClick={handleDepositSubmitRequest}
+                                className="w-full h-14 btn-primary text-white text-lg font-black rounded-2xl shadow-xl transition-all active:scale-95"
+                            >
+                                Submit Deposit Request
+                            </Button>
+                        </div>
+                    )}
+
+                    {depositStep === 'methods' && (
+                        <div className="space-y-6 animate-fade-in">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-black text-foreground">Select Payment Method</h3>
+                                <Button variant="ghost" size="sm" onClick={() => setDepositStep('amount')} className="text-xs text-muted-foreground gap-1"><ArrowLeft className="h-3 w-3" /> Back</Button>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Crypto Options</p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {cryptoMethodsList.map(method => (
+                                            <button 
+                                                key={method.id}
+                                                onClick={() => { setSelectedDepositMethod(method); setDepositStep('crypto'); setDepositTimer(20 * 60); }}
+                                                className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left group"
+                                            >
+                                                <div className="h-10 w-10 flex-shrink-0 relative overflow-hidden rounded-full bg-background border border-border p-1">
+                                                    {method.icon && <Image src={method.icon.imageUrl} alt={method.name} fill style={{objectFit: 'contain'}} />}
+                                                </div>
+                                                <span className="font-bold text-sm text-foreground group-hover:text-primary">{method.name}</span>
+                                                <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {nonCryptoMethodsList.map(method => {
+                                            const isAmountLow = parseFloat(depositAmount) < 200;
+                                            return (
+                                                <button 
+                                                    key={method.id}
+                                                    disabled={isAmountLow}
+                                                    onClick={() => { setSelectedDepositMethod(method); setDepositStep('non-crypto'); }}
+                                                    className={cn(
+                                                        "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
+                                                        isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
+                                                    )}
+                                                >
+                                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
+                                                        {method.name.charAt(0)}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
+                                                        {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
+                                                    </div>
+                                                    {!isAmountLow && <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {depositStep === 'crypto' && selectedDepositMethod && (
+                        <div className="space-y-6 animate-fade-in p-2">
+                            <div className="flex items-center justify-between border-b border-border pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-12 w-12 flex-shrink-0 relative overflow-hidden rounded-full bg-background border border-border p-1.5 shadow-sm">
+                                        {selectedDepositMethod.icon && <Image src={selectedDepositMethod.icon.imageUrl} alt={selectedDepositMethod.name} fill style={{objectFit: 'contain'}} />}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-black text-foreground">Pay with {selectedDepositMethod.name}</h3>
+                                        <p className="text-xs text-muted-foreground">Send exact amount: <span className="text-foreground font-black">${depositAmount}</span></p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                    <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-mono text-sm px-3 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
+                                        {formatTime(depositTimer)}
+                                    </div>
+                                    <Button variant="ghost" size="sm" onClick={() => setDepositStep('methods')} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Cancel</Button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="p-4 bg-muted/30 border border-dashed border-border rounded-2xl">
+                                    <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest block mb-2">{selectedDepositMethod.name} Address:</Label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-1 font-mono text-xs bg-background p-4 rounded-xl border border-border break-all text-foreground shadow-inner">
+                                            {selectedDepositMethod.address}
+                                        </div>
+                                        <CopyToClipboard text={selectedDepositMethod.address}>
+                                            <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl border-2 hover:bg-muted active:scale-90 transition-all">
+                                                <Copy className="h-5 w-5 text-primary" />
+                                            </Button>
+                                        </CopyToClipboard>
+                                    </div>
+                                </div>
+
+                                <Alert variant="default" className="bg-muted/50 border-border rounded-2xl py-3">
+                                    <Info className="h-4 w-4 text-blue-600" />
+                                    <AlertDescription className="text-xs text-muted-foreground leading-relaxed">
+                                        Please complete your payment within the time provided. After payment, click the <strong>‘I Paid’</strong> button to verify and update your account balance.
+                                    </AlertDescription>
+                                </Alert>
+
+                                <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-2xl">
+                                    <p className="text-[11px] text-red-700 dark:text-red-300 leading-tight text-center font-black uppercase tracking-tighter">
+                                        ⚠️ Clicking “I Paid” button without making payment or without prior communication with support account may be restricted and certain features will be limited.
+                                    </p>
+                                </div>
+
+                                <Button 
+                                    onClick={handleCryptoPaid}
+                                    disabled={isProcessingDeposit}
+                                    className="w-full h-14 btn-primary text-white text-lg font-black rounded-2xl shadow-xl transition-all active:scale-95"
+                                >
+                                    {isProcessingDeposit ? <Loader className="animate-spin h-6 w-6" /> : 'I Paid'}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {depositStep === 'non-crypto' && selectedDepositMethod && (
+                        <div className="space-y-6 animate-fade-in">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-600 flex items-center justify-center font-black text-white shadow-lg">
+                                        {selectedDepositMethod.name.charAt(0)}
+                                    </div>
+                                    <h3 className="font-black text-foreground">Request Details for {selectedDepositMethod.name}</h3>
+                                </div>
+                                <Button variant="ghost" size="sm" onClick={() => setDepositStep('methods')} className="text-xs text-muted-foreground">Change Method</Button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="p-4 bg-muted/30 border border-border rounded-2xl space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="non-crypto-email" className="text-sm font-bold text-foreground">Confirm Your Contact Email</Label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                            <Input 
+                                                id="non-crypto-email" 
+                                                type="email" 
+                                                placeholder="your@email.com" 
+                                                value={depositEmail} 
+                                                onChange={(e) => setDepositEmail(e.target.value)}
+                                                className="pl-10 h-12 rounded-xl bg-background border-border text-foreground"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground italic">We will send payment instructions to this email address.</p>
+                                    </div>
+                                    <div className="text-center py-2 bg-background/50 rounded-xl border border-dashed border-border">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Requesting Deposit for</p>
+                                        <p className="text-2xl font-black text-foreground">${depositAmount}</p>
+                                    </div>
+                                </div>
+                                <Button 
+                                    onClick={handleNonCryptoProceed}
+                                    disabled={isProcessingDeposit}
+                                    className="w-full h-14 btn-primary text-white font-black rounded-2xl shadow-xl transition-all active:scale-95"
+                                >
+                                    {isProcessingDeposit ? <Loader className="animate-spin h-6 w-6" /> : 'Proceed with Deposit Request'}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
@@ -694,7 +943,7 @@ function MyAccountContent() {
             <DialogTitle className="flex items-center gap-2 text-foreground">
                <Key className="h-5 w-5 text-primary" />
                Change Your Password
-            </DialogTitle>
+            </Key>
             <DialogDescription className="text-muted-foreground">Enter a new secure password below.</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
@@ -903,6 +1152,23 @@ function MyAccountContent() {
                     {isDeleting ? <Loader className="animate-spin h-4 w-4" /> : 'Confirm Deletion'}
                 </Button>
             </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDepositRequestSuccess} onOpenChange={setShowDepositRequestSuccess}>
+        <DialogContent className="sm:max-w-[450px]">
+            <div className="py-10 text-center space-y-6 animate-fade-in">
+                <div className="h-20 w-20 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600">
+                    <CheckCircle2 className="h-10 w-10" />
+                </div>
+                <div className="space-y-3">
+                    <DialogTitle className="text-2xl font-black text-foreground">Request Received!</DialogTitle>
+                    <div className="p-5 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 rounded-2xl text-green-800 dark:text-green-300 text-sm leading-relaxed mx-2 shadow-sm">
+                        "Your deposit request has been received. Support has been notified and will provide payment details and instructions via notifications and email shortly."
+                    </div>
+                </div>
+                <Button onClick={() => setShowDepositRequestSuccess(false)} className="w-full btn-primary text-white h-12 rounded-xl font-bold shadow-lg">Understood, Thanks</Button>
+            </div>
         </DialogContent>
       </Dialog>
 
