@@ -196,7 +196,7 @@ function DeviceCheckContent() {
   const [claimRejected, setClaimRejected] = useState(false);
 
   // New States for enhanced payment flow
-  const [selectedNonCrypto, setSelectedNonCrypto] = useState<any>(null);
+  const [selectedMethod, setSelectedMethod] = useState<any>(null);
   const [nonCryptoEmail, setNonCryptoEmail] = useState('');
   const [showDepositRequestSuccess, setShowDepositRequestSuccess] = useState(false);
 
@@ -205,6 +205,7 @@ function DeviceCheckContent() {
   const usdtImage = getImage('usdt-icon');
   const bitcoinImage = getImage('bitcoin-icon');
   const ethereumImage = getImage('eth-icon');
+  const usdcImage = getImage('usdc-icon');
 
   const formDisabled = isChecking || isSearching || !!submission || isOfflineSimulating || !!verifyingClaimId || isPolicyModalOpen;
   const shouldShowLoader = (isChecking || (submission && submission.status === 'waiting') || isOfflineSimulating) && !offlineError;
@@ -295,7 +296,7 @@ function DeviceCheckContent() {
     setIsSearching(false);
     setVerifyingClaimId(null);
     setClaimRejected(false);
-    setSelectedNonCrypto(null);
+    setSelectedMethod(null);
     setNonCryptoEmail('');
   };
 
@@ -503,7 +504,7 @@ function DeviceCheckContent() {
     setTimeLeft(20 * 60);
     setLoadingMessage('Processing payment...');
     setShowOtherPayments(false);
-    setSelectedNonCrypto(null);
+    setSelectedMethod(null);
 
     setTimeout(() => {
       setLoadingMessage('Checking account balance...');
@@ -593,14 +594,14 @@ function DeviceCheckContent() {
       model: submission?.model,
       price: effectivePrice,
       status: 'pending' as const,
-      method: selectedNonCrypto.name,
+      method: selectedMethod.name,
       clientEmail: nonCryptoEmail,
       createdAt: serverTimestamp(),
     };
 
     try {
         await addDoc(collection(firestore, 'payment_claims'), claimData);
-        const tgMessage = `💰 <b>NON-CRYPTO UNLOCK REQUEST!</b> 💰\n\n<b>User:</b> ${user?.email}\n<b>Device:</b> ${submission?.model}\n<b>IMEI:</b> ${submission?.imei}\n<b>Amount:</b> $${effectivePrice}\n<b>Method:</b> ${selectedNonCrypto.name}\n<b>Client Email:</b> ${nonCryptoEmail}`;
+        const tgMessage = `💰 <b>NON-CRYPTO UNLOCK REQUEST!</b> 💰\n\n<b>User:</b> ${user?.email}\n<b>Device:</b> ${submission?.model}\n<b>IMEI:</b> ${submission?.imei}\n<b>Amount:</b> $${effectivePrice}\n<b>Method:</b> ${selectedMethod.name}\n<b>Client Email:</b> ${nonCryptoEmail}`;
         
         await fetch('/api/telegram', {
             method: 'POST',
@@ -633,13 +634,17 @@ function DeviceCheckContent() {
   const activePrice = submission?.icloudStatus === 'lost' ? lostPrice : submission?.icloudStatus === 'clean' ? price : null;
   const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
 
-  const nonCryptoMethods = [
-    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon') },
-    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon') },
-    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon') },
-    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon') },
-    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon') },
-    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon') },
+  const additionalMethods = [
+    { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qxk6lezz8qna2zqc5p9kzluyqg0tnnc9n2yf2s5', type: 'crypto', icon: getImage('bitcoin-icon') },
+    { id: 'usdt-trc20', name: 'USDT (TRC20)', address: 'TXcf9y4fmH2dU4SD7psf4v4PmDUbiEz9yB', type: 'crypto', icon: getImage('usdt-trc20-icon') },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto', icon: getImage('usdc-icon') },
+    { id: 'eth', name: 'Ethereum (ETH)', address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto', icon: getImage('eth-icon') },
+    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
+    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
+    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
+    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon'), type: 'manual' },
+    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon'), type: 'manual' },
+    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon'), type: 'manual' },
   ];
 
   if (userLoading || !user || profileLoading || bannedUserLoading) {
@@ -1152,7 +1157,7 @@ function DeviceCheckContent() {
         <DialogContent className={cn("sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden transition-all duration-300", showOtherPayments && "lg:max-w-[950px]")}>
             <DialogHeader className="px-5 py-2.5 border-b bg-card">
                 <DialogTitle className='flex items-center gap-3 text-base sm:text-lg pr-12 text-foreground uppercase tracking-tight font-black'>
-                    {timeLeft > 0 && !selectedNonCrypto && <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
+                    {timeLeft > 0 && (!selectedMethod || selectedMethod.type === 'crypto') && <span className="text-xs sm:text-sm font-mono bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 rounded-md px-2 py-0.5">{formatTime(timeLeft)}</span>}
                     <span>Make Unlock Payment</span>
                 </DialogTitle>
                 <DialogDescription className="text-sm text-muted-foreground">Pay unlock fees for this device. Send the exact amount.</DialogDescription>
@@ -1177,40 +1182,21 @@ function DeviceCheckContent() {
                             </div>
                         </div>
 
-                        {/* Step-based content for Crypto/Non-Crypto */}
                         {amountToPay > 0 && (
                             <>
-                                {!selectedNonCrypto ? (
+                                {(!selectedMethod || selectedMethod.type === 'crypto') ? (
                                     <div className="space-y-4">
                                         <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
                                             <div className="flex items-center gap-3">
                                                 {usdtImage && <Image src={usdtImage.imageUrl} alt="USDT" width={32} height={32} className="rounded-full" />}
                                                 <div>
-                                                    <p className="font-bold text-sm text-foreground">USDT (BEP20 Network) - <span className="text-green-600">Recommended</span></p>
-                                                    <p className="text-[10px] text-muted-foreground">Low fees on Binance Smart Chain.</p>
+                                                    <p className="font-bold text-sm text-foreground">{(selectedMethod && selectedMethod.type === 'crypto') ? selectedMethod.name : 'USDT (BEP20 Network) - Recommended'}</p>
+                                                    <p className="text-[10px] text-muted-foreground">{(selectedMethod && selectedMethod.type === 'crypto') ? 'Send exact amount below.' : 'Low fees on Binance Smart Chain.'}</p>
                                                 </div>
                                             </div>
                                             <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground shadow-inner">
-                                                <span className="font-medium">{usdtAddress}</span>
-                                                <CopyToClipboard text={usdtAddress}>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
-                                                        <Copy className="w-4 h-4 text-muted-foreground"/>
-                                                    </Button>
-                                                </CopyToClipboard>
-                                            </div>
-                                        </div>
-
-                                        <div className="px-4 py-3 border border-border rounded-2xl bg-card shadow-sm space-y-2">
-                                            <div className="flex items-center gap-3">
-                                                {ethereumImage && <Image src={ethereumImage.imageUrl} alt="ETH" width={32} height={32} className="rounded-full" />}
-                                                <div>
-                                                    <p className="font-bold text-sm text-foreground">Ethereum (ETH)</p>
-                                                    <p className="text-[10px] text-muted-foreground">ERC20 Network.</p>
-                                                </div>
-                                            </div>
-                                            <div className="font-mono bg-muted p-3 rounded-xl break-all text-xs flex items-center justify-between border border-border text-foreground shadow-inner">
-                                                <span className="font-medium">0xE976F1c7b06411e21b0F67f33116af92CB1dcABA</span>
-                                                <CopyToClipboard text="0xE976F1c7b06411e21b0F67f33116af92CB1dcABA">
+                                                <span className="font-medium">{(selectedMethod && selectedMethod.type === 'crypto') ? selectedMethod.address : usdtAddress}</span>
+                                                <CopyToClipboard text={(selectedMethod && selectedMethod.type === 'crypto') ? selectedMethod.address : usdtAddress}>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 hover:bg-black/5 dark:hover:bg-white/5">
                                                         <Copy className="w-4 h-4 text-muted-foreground"/>
                                                     </Button>
@@ -1227,25 +1213,24 @@ function DeviceCheckContent() {
                                             <ChevronDown className={cn("h-4 w-4 transition-transform duration-200 text-muted-foreground", showOtherPayments && "rotate-180")} />
                                         </Button>
 
-                                        {/* Mobile view for other payments when toggled */}
                                         {showOtherPayments && (
                                             <div className="lg:hidden mt-1 animate-fade-in">
                                                 <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
                                                 <div className="grid grid-cols-1 gap-2">
-                                                    {nonCryptoMethods.map(method => {
-                                                        const isAmountLow = amountToPay < 200;
+                                                    {additionalMethods.map(method => {
+                                                        const isAmountLow = method.type === 'manual' && amountToPay < 200;
                                                         return (
                                                             <button 
                                                                 key={method.id}
                                                                 disabled={isAmountLow}
-                                                                onClick={() => { setSelectedNonCrypto(method); }}
+                                                                onClick={() => { setSelectedMethod(method); }}
                                                                 className={cn(
                                                                     "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
                                                                     isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
                                                                 )}
                                                             >
-                                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
-                                                                    {method.name.charAt(0)}
+                                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground overflow-hidden">
+                                                                    {method.icon ? <Image src={method.icon.imageUrl} alt={method.name} width={40} height={40} /> : method.name.charAt(0)}
                                                                 </div>
                                                                 <div className="flex flex-col">
                                                                     <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
@@ -1263,11 +1248,11 @@ function DeviceCheckContent() {
                                         <div className="flex items-center justify-between border-b pb-2">
                                             <div className="flex items-center gap-2">
                                                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center font-black text-white text-xs">
-                                                    {selectedNonCrypto.name.charAt(0)}
+                                                    {selectedMethod.name.charAt(0)}
                                                 </div>
-                                                <h3 className="font-bold text-sm">{selectedNonCrypto.name} Request</h3>
+                                                <h3 className="font-bold text-sm">{selectedMethod.name} Request</h3>
                                             </div>
-                                            <Button variant="ghost" size="sm" onClick={() => setSelectedNonCrypto(null)} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Change Method</Button>
+                                            <Button variant="ghost" size="sm" onClick={() => setSelectedMethod(null)} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Change Method</Button>
                                         </div>
 
                                         <div className="space-y-4">
@@ -1303,7 +1288,7 @@ function DeviceCheckContent() {
                                     </div>
                                 )}
                                 
-                                {!selectedNonCrypto && (
+                                {(!selectedMethod || selectedMethod.type === 'crypto') && (
                                     <div className="space-y-3 pt-2">
                                         <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 py-2 rounded-xl">
                                             <AlertDescription className="text-[10px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
@@ -1323,26 +1308,25 @@ function DeviceCheckContent() {
                         {amountToPay <= 0 && <div className="text-center p-6 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 text-green-800 dark:text-green-300 rounded-2xl animate-fade-in"><CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-green-500"/><p className="font-bold text-base">Your balance covers the full amount!</p><p className="text-xs opacity-80">Click "Confirm" to use your balance for this unlock.</p></div>}
                     </div>
 
-                    {/* Desktop Side Section for Other Payments */}
-                    {showOtherPayments && !selectedNonCrypto && (
+                    {showOtherPayments && (!selectedMethod || selectedMethod.type === 'crypto') && (
                         <div className="hidden lg:flex flex-col space-y-3 animate-fade-in border-l border-border pl-8">
                             <h4 className="font-black text-xs text-muted-foreground uppercase tracking-widest mb-2">Other Payment Methods</h4>
                             <ScrollArea className="h-[420px] pr-4">
                                 <div className="space-y-2 pb-8">
-                                    {nonCryptoMethods.map(method => {
-                                        const isAmountLow = amountToPay < 200;
+                                    {additionalMethods.map(method => {
+                                        const isAmountLow = method.type === 'manual' && amountToPay < 200;
                                         return (
                                             <button 
                                                 key={method.id}
                                                 disabled={isAmountLow}
-                                                onClick={() => { setSelectedNonCrypto(method); }}
+                                                onClick={() => { setSelectedMethod(method); }}
                                                 className={cn(
                                                     "flex items-center gap-3 p-4 w-full rounded-xl border transition-all text-left relative",
                                                     isAmountLow ? "bg-muted/50 border-border opacity-50 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
                                                 )}
                                             >
-                                                <div className="h-9 w-9 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
-                                                    {method.name.charAt(0)}
+                                                <div className="h-9 w-9 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground overflow-hidden">
+                                                    {method.icon ? <Image src={method.icon.imageUrl} alt={method.name} width={40} height={40} /> : method.name.charAt(0)}
                                                 </div>
                                                 <div className="flex flex-col flex-1">
                                                     <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
@@ -1360,7 +1344,7 @@ function DeviceCheckContent() {
                 </div>
             </ScrollArea>
 
-            {!selectedNonCrypto && (
+            {(!selectedMethod || selectedMethod.type === 'crypto') && (
                 <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
                     <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
                     <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>

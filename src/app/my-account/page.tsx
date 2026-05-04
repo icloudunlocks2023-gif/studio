@@ -132,7 +132,7 @@ function MyAccountContent() {
 
   // Deposit State
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositStep, setDepositStep] = useState<'amount' | 'methods' | 'crypto' | 'non-crypto'>('amount');
+  const [depositStep, setDepositStep] = useState<'amount' | 'methods' | 'details'>('amount');
   const [selectedDepositMethod, setSelectedDepositMethod] = useState<any>(null);
   const [depositEmail, setDepositEmail] = useState('');
   const [depositTimer, setDepositTimer] = useState(20 * 60);
@@ -182,16 +182,16 @@ function MyAccountContent() {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (depositStep === 'crypto' && depositTimer > 0) {
+    if (depositStep === 'details' && selectedDepositMethod?.type === 'crypto' && depositTimer > 0) {
         timer = setInterval(() => {
             setDepositTimer(prev => prev - 1);
         }, 1000);
-    } else if (depositTimer === 0 && depositStep === 'crypto') {
+    } else if (depositTimer === 0 && depositStep === 'details' && selectedDepositMethod?.type === 'crypto') {
         setDepositStep('methods');
         toast({ title: "Session Expired", description: "Deposit session timed out. Please try again.", variant: "destructive" });
     }
     return () => clearInterval(timer);
-  }, [depositStep, depositTimer, toast]);
+  }, [depositStep, depositTimer, selectedDepositMethod, toast]);
 
   const handleOpenBulkModal = () => {
     setTimeLeft(20 * 60);
@@ -405,20 +405,18 @@ function MyAccountContent() {
   const usdcImage = getImage('usdc-icon');
   const ethImage = getImage('eth-icon');
 
-  const cryptoMethodsList = [
-    { id: 'usdt', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress },
-    { id: 'btc', name: 'Bitcoin', icon: bitcoinImage, address: 'bc1qtluc3xw76uwa0wf0klmvuvf5plwe6vxas0es2h' },
-    { id: 'usdc', name: 'USDC (BEP20)', icon: usdcImage, address: usdtAddress },
-    { id: 'eth', name: 'Ethereum', icon: ethImage, address: '0x2a2aA545c902de10dbE882ddaF4aF431982a8E5f' },
-  ];
-
-  const nonCryptoMethodsList = [
-    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon') },
-    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon') },
-    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon') },
-    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon') },
-    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon') },
-    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon') },
+  const additionalMethods = [
+    { id: 'usdt-bep20', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress, type: 'crypto' },
+    { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qxk6lezz8qna2zqc5p9kzluyqg0tnnc9n2yf2s5', type: 'crypto' },
+    { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TXcf9y4fmH2dU4SD7psf4v4PmDUbiEz9yB', type: 'crypto' },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto' },
+    { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto' },
+    { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
+    { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
+    { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
+    { id: 'zelle', name: 'Zelle', icon: getImage('zelle-icon'), type: 'manual' },
+    { id: 'applecash', name: 'Apple Cash', icon: getImage('apple-pay-icon'), type: 'manual' },
+    { id: 'wu', name: 'Western Union', icon: getImage('wu-icon'), type: 'manual' },
   ];
   
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
@@ -464,7 +462,7 @@ function MyAccountContent() {
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
                     <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                     {user && (
                         <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
@@ -579,13 +577,13 @@ function MyAccountContent() {
                                 <Label htmlFor="deposit-amount" className="text-sm font-bold text-foreground">Enter Amount to Deposit (USD)</Label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black text-muted-foreground">$</span>
-                                    <Input 
+                                    <input 
                                         id="deposit-amount" 
                                         type="number" 
                                         placeholder="0.00" 
                                         value={depositAmount} 
                                         onChange={(e) => setDepositAmount(e.target.value)} 
-                                        className="h-16 pl-10 text-3xl font-black text-foreground bg-background border-2 border-border focus:border-primary transition-all rounded-2xl"
+                                        className="w-full h-16 pl-10 text-3xl font-black text-foreground bg-background border-2 border-border focus:border-primary transition-all rounded-2xl outline-none"
                                     />
                                 </div>
                                 <p className="text-[10px] text-muted-foreground italic pl-1">Enter the exact amount you wish to add to your balance.</p>
@@ -609,10 +607,10 @@ function MyAccountContent() {
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Crypto Options</p>
                                     <div className="grid grid-cols-1 gap-2">
-                                        {cryptoMethodsList.map(method => (
+                                        {additionalMethods.filter(m => m.type === 'crypto').map(method => (
                                             <button 
                                                 key={method.id}
-                                                onClick={() => { setSelectedDepositMethod(method); setDepositStep('crypto'); setDepositTimer(20 * 60); }}
+                                                onClick={() => { setSelectedDepositMethod(method); setDepositStep('details'); setDepositTimer(20 * 60); }}
                                                 className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left group"
                                             >
                                                 <div className="h-10 w-10 flex-shrink-0 relative overflow-hidden rounded-full bg-background border border-border p-1">
@@ -627,20 +625,20 @@ function MyAccountContent() {
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
                                     <div className="grid grid-cols-1 gap-2">
-                                        {nonCryptoMethodsList.map(method => {
+                                        {additionalMethods.filter(m => m.type === 'manual').map(method => {
                                             const isAmountLow = parseFloat(depositAmount) < 200;
                                             return (
                                                 <button 
                                                     key={method.id}
                                                     disabled={isAmountLow}
-                                                    onClick={() => { setSelectedDepositMethod(method); setDepositStep('non-crypto'); }}
+                                                    onClick={() => { setSelectedDepositMethod(method); setDepositStep('details'); }}
                                                     className={cn(
                                                         "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
                                                         isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
                                                     )}
                                                 >
                                                     <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
-                                                        {method.name.charAt(0)}
+                                                        {method.icon ? <div className='h-8 w-8 relative'><Image src={method.icon.imageUrl} alt={method.name} fill style={{objectFit:'contain'}}/></div> : method.name.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
@@ -656,7 +654,7 @@ function MyAccountContent() {
                         </div>
                     )}
 
-                    {depositStep === 'crypto' && selectedDepositMethod && (
+                    {depositStep === 'details' && selectedDepositMethod?.type === 'crypto' && (
                         <div className="space-y-6 animate-fade-in p-2">
                             <div className="flex items-center justify-between border-b border-border pb-4">
                                 <div className="flex items-center gap-3">
@@ -715,7 +713,7 @@ function MyAccountContent() {
                         </div>
                     )}
 
-                    {depositStep === 'non-crypto' && selectedDepositMethod && (
+                    {depositStep === 'details' && selectedDepositMethod?.type === 'manual' && (
                         <div className="space-y-6 animate-fade-in">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -935,7 +933,7 @@ function MyAccountContent() {
         </section>
       </main>
       
-      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+      <Dialog open={isPasswordModalOpen} onOpenChange={isPasswordModalOpen ? (v) => !isUpdatingPassword && setIsPasswordModalOpen(v) : setIsPasswordModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
@@ -1135,7 +1133,7 @@ function MyAccountContent() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+      <Dialog open={isDeleteModalOpen} onOpenChange={isDeleteModalOpen ? (v) => !isDeleting && setIsDeleteModalOpen(v) : setIsDeleteModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
                 <DialogTitle className="text-red-600 flex items-center gap-2">Confirm Account Deletion</DialogTitle>
@@ -1145,7 +1143,7 @@ function MyAccountContent() {
                 ⚠️ Your request will be reviewed by an administrator within 48 hours. If you have an active balance, it will be forfeited unless withdrawn first.
             </div>
             <DialogFooter className="gap-3">
-                <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="flex-1">Cancel</Button>
+                <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="flex-1" disabled={isDeleting}>Cancel</Button>
                 <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting} className="flex-1 font-bold">
                     {isDeleting ? <Loader className="animate-spin h-4 w-4" /> : 'Confirm Deletion'}
                 </Button>
