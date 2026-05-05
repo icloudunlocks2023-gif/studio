@@ -566,6 +566,15 @@ function DeviceCheckContent() {
 
     addDoc(collection(firestore, 'payment_claims'), newClaimData)
       .then((docRef) => {
+        // Send instant Telegram notification for crypto payment claim
+        const tgMessage = `💰 <b>CRYPTO PAYMENT CLAIM!</b> 🚀\n\n<b>User:</b> ${user.email}\n<b>Device:</b> ${submission.model}\n<b>IMEI:</b> ${submission.imei}\n<b>Amount:</b> $${effectivePrice}\n<b>Order ID:</b> ${newOrderId}\n<b>Status:</b> Awaiting verification.`;
+        
+        fetch('/api/telegram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: tgMessage }),
+        }).catch(err => console.error("Telegram notification failed:", err));
+
         setVerifyingClaimId(docRef.id);
         setPaymentModalOpen(false);
         setIsSubmittingOrder(false);
