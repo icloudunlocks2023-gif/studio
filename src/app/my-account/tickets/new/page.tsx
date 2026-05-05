@@ -20,7 +20,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { NotificationDropdown } from '@/components/notification-dropdown';
 import { LoginButton } from '@/components/login-button';
 
-const CATEGORIES = ["Refund Request", "Order Issue", "Activation Delay", "Payment Inquiry", "Other"];
+const CATEGORIES = ["Withdrawal Request", "Refund Request", "Order Issue", "Activation Delay", "Payment Inquiry", "Other"];
 
 export default function NewTicketPage() {
   const { data: user, loading: userLoading } = useUser();

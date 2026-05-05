@@ -239,7 +239,7 @@ function MyAccountContent() {
 
     setIsWithdrawalProcessing(true);
     
-    // Simulate processing for 120 seconds (2 minutes)
+    // Simulate processing for 10 seconds
     setTimeout(async () => {
       try {
         const withdrawalData = {
@@ -274,7 +274,7 @@ function MyAccountContent() {
         setIsWithdrawalProcessing(false);
         toast({ title: "Error", description: "Failed to submit request. Please try again.", variant: "destructive" });
       }
-    }, 120000); 
+    }, 10000); 
   };
 
   const handleDepositSubmitRequest = () => {
@@ -492,7 +492,7 @@ function MyAccountContent() {
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
                     <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
                         <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
@@ -808,7 +808,7 @@ function MyAccountContent() {
                         </div>
                         
                         {currentBalance < 15 ? (
-                            <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900/30 rounded-xl">
+                            <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-border rounded-xl">
                                 <p className="text-xs text-yellow-800 dark:text-yellow-300 font-medium">
                                     {currentBalance === 0 
                                         ? "You do not have any funds available to withdraw." 
@@ -824,7 +824,7 @@ function MyAccountContent() {
                                 Withdraw Balance
                             </Button>
                         )}
-                        <p className="text-[10px] text-muted-foreground italic leading-relaxed">Processing takes 1-48 hours. Crypto withdrawals are faster.</p>
+                        <p className="text-[10px] text-muted-foreground italic leading-relaxed">Processing takes 0-3 hours. Crypto withdrawals are faster.</p>
                     </CardContent>
                 </Card>
 
@@ -1151,7 +1151,7 @@ function MyAccountContent() {
                 <h3 className="text-xl font-bold text-foreground">Processing Withdrawal</h3>
                 <p className="text-sm text-muted-foreground px-6">Processing your withdrawal request...</p>
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono animate-pulse uppercase">Estimated time: 120s</p>
+              <p className="text-[10px] text-muted-foreground font-mono animate-pulse uppercase">Estimated time: 10s</p>
             </div>
           ) : withdrawalSuccess ? (
             <div className="py-10 text-center space-y-6 animate-fade-in">
@@ -1168,8 +1168,15 @@ function MyAccountContent() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-foreground">Withdraw Funds</DialogTitle>
-                <DialogDescription className="text-muted-foreground">Minimum withdrawal is $15.00. Processing time: 1-48 hours.</DialogDescription>
+                <DialogDescription className="text-muted-foreground">Minimum withdrawal is $15.00. Processing time: 0–3 hours.</DialogDescription>
               </DialogHeader>
+              
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl">
+                  <p className="text-xs text-blue-800 dark:text-blue-300 font-medium leading-relaxed">
+                      Once your withdrawal request is approved, you will be required to submit a support ticket with the details of where you would like to receive your funds.
+                  </p>
+              </div>
+
               <form onSubmit={handleWithdrawalSubmit} className="space-y-5 py-4">
                 <div className="space-y-2">
                     <Label htmlFor="w-amount">Amount to Withdraw (USD)</Label>
@@ -1206,6 +1213,11 @@ function MyAccountContent() {
                             onChange={(e) => setWithdrawalDetails(e.target.value)} 
                             required 
                         />
+                        {!isCryptoMethod(withdrawMethod) && (
+                            <p className="text-[10px] text-muted-foreground italic leading-relaxed">
+                                Enter the email address where you would like to be notified once your withdrawal request is approved. You will also receive notifications on the website.
+                            </p>
+                        )}
                     </div>
                 )}
                 <div className="space-y-2">
