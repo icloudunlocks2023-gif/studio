@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -11,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Menu, Clock, ChevronRight } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notification-dropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { AuthModal } from '@/components/auth-modal';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -28,10 +30,16 @@ const paymentMethods = [
 export default function ServicesPage() {
   const { data: user } = useUser();
   const router = useRouter();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
 
   const handleUnlockClick = (device: { name: string, price: number }) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     const params = new URLSearchParams({
         model: device.name,
         price: device.price.toString(),
@@ -39,12 +47,7 @@ export default function ServicesPage() {
     });
 
     const portalUrl = `/client-portal?${params.toString()}`;
-
-    if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(portalUrl)}`);
-    } else {
-      router.push(portalUrl);
-    }
+    router.push(portalUrl);
   };
 
   const iphoneModels = [
@@ -501,6 +504,7 @@ export default function ServicesPage() {
             </div>
         </div>
       </footer>
+      <AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
     </div>
   );
 }
