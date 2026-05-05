@@ -139,6 +139,10 @@ const CopyToClipboard = ({ text, children }: { text: string; children: React.Rea
       description: "Address has been copied.",
       duration: 2000,
     });
+    // Log the specific copy action
+    window.dispatchEvent(new CustomEvent('user-activity-log', { 
+        detail: { action: `Copied address: ${text}` } 
+    }));
   };
 
   return (
@@ -332,7 +336,7 @@ function DeviceCheckContent() {
     let country = 'unknown';
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
         const ipResponse = await fetch('https://ipapi.co/json/', { signal: controller.signal });
         clearTimeout(timeoutId);
         
@@ -1218,7 +1222,8 @@ function DeviceCheckContent() {
                                                 <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
                                                 <div className="grid grid-cols-1 gap-2">
                                                     {additionalMethods.map(method => {
-                                                        const isAmountLow = method.type === 'manual' && amountToPay < 200;
+                                                        const isManual = method.type === 'manual';
+                                                        const isAmountLow = isManual && amountToPay < 200;
                                                         return (
                                                             <button 
                                                                 key={method.id}
@@ -1255,36 +1260,57 @@ function DeviceCheckContent() {
                                             <Button variant="ghost" size="sm" onClick={() => setSelectedMethod(null)} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Change Method</Button>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <div className="p-4 bg-muted/30 border border-border rounded-2xl space-y-3">
-                                                <Label htmlFor="manual-email" className="text-sm font-bold">Confirm Your Contact Email</Label>
-                                                <div className="relative">
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                    <Input 
-                                                        id="manual-email" 
-                                                        type="email" 
-                                                        placeholder="your@email.com" 
-                                                        value={nonCryptoEmail} 
-                                                        onChange={(e) => setNonCryptoEmail(e.target.value)}
-                                                        className="pl-10 h-11 rounded-xl bg-background border-border"
-                                                    />
+                                        {selectedMethod.type === 'crypto' ? (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-muted/30 border border-border rounded-2xl space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground">Address:</Label>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex-1 font-mono text-xs bg-background p-3 rounded-xl border break-all shadow-inner">
+                                                            {selectedMethod.address}
+                                                        </div>
+                                                        <CopyToClipboard text={selectedMethod.address}>
+                                                            <Button variant="outline" size="icon" className="h-10 w-10">
+                                                                <Copy className="h-4 w-4" />
+                                                            </Button>
+                                                        </CopyToClipboard>
+                                                    </div>
                                                 </div>
+                                                <Button onClick={handlePaid} className="w-full btn-primary text-white font-bold h-12 rounded-2xl" disabled={isSubmittingOrder}>
+                                                    {isSubmittingOrder ? <Loader className="animate-spin h-5 w-5" /> : 'I Paid'}
+                                                </Button>
                                             </div>
-                                            
-                                            <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 rounded-2xl">
-                                                <p className="text-[10px] text-yellow-800 dark:text-yellow-300 leading-relaxed italic">
-                                                    "Minimum amount for these payment methods is $200. Support will provide payment details via email/notifications after submission."
-                                                </p>
-                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-muted/30 border border-border rounded-2xl space-y-3">
+                                                    <Label htmlFor="manual-email" className="text-sm font-bold">Confirm Your Contact Email</Label>
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                        <Input 
+                                                            id="manual-email" 
+                                                            type="email" 
+                                                            placeholder="your@email.com" 
+                                                            value={nonCryptoEmail} 
+                                                            onChange={(e) => setNonCryptoEmail(e.target.value)}
+                                                            className="pl-10 h-11 rounded-xl bg-background border-border"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 rounded-2xl">
+                                                    <p className="text-[10px] text-yellow-800 dark:text-yellow-300 leading-relaxed italic">
+                                                        "Minimum amount for these payment methods is $200. Support will provide payment details via email/notifications after submission."
+                                                    </p>
+                                                </div>
 
-                                            <Button 
-                                                onClick={handleNonCryptoProceed}
-                                                disabled={isSubmittingOrder}
-                                                className="w-full h-12 btn-primary text-white font-black rounded-2xl shadow-lg transition-all active:scale-95"
-                                            >
-                                                {isSubmittingOrder ? <Loader className="animate-spin" /> : 'Proceed with Deposit Request'}
-                                            </Button>
-                                        </div>
+                                                <Button 
+                                                    onClick={handleNonCryptoProceed}
+                                                    disabled={isSubmittingOrder}
+                                                    className="w-full h-12 btn-primary text-white font-black rounded-2xl shadow-lg transition-all active:scale-95"
+                                                >
+                                                    {isSubmittingOrder ? <Loader className="animate-spin" /> : 'Proceed with Deposit Request'}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 
@@ -1314,7 +1340,8 @@ function DeviceCheckContent() {
                             <ScrollArea className="h-[420px] pr-4">
                                 <div className="space-y-2 pb-8">
                                     {additionalMethods.map(method => {
-                                        const isAmountLow = method.type === 'manual' && amountToPay < 200;
+                                        const isManual = method.type === 'manual';
+                                        const isAmountLow = isManual && amountToPay < 200;
                                         return (
                                             <button 
                                                 key={method.id}

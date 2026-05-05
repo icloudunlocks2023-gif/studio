@@ -81,20 +81,22 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
         // Update the user's profile with the display name
         await updateProfile(user, { displayName });
 
-        // Get IP address with fallback and timeout
+        // Get accurate IP address and Country with fallback
         let ipAddress = 'unknown';
+        let country = 'unknown';
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-            const response = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
             clearTimeout(timeoutId);
             
             if (response.ok) {
               const data = await response.json();
               ipAddress = data.ip || 'unknown';
+              country = data.country_name || 'unknown';
             }
         } catch (e) {
-            console.warn("IP fetch failed during signup, using unknown fallback.");
+            console.warn("Geolocation fetch failed during signup, using defaults.");
         }
 
         const userRef = doc(firestore, 'users', user.uid);
@@ -105,13 +107,14 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
             lastLogin: serverTimestamp(),
             balance: 0,
             ipAddress: ipAddress,
+            country: country
         };
 
         const metricsRef = doc(firestore, 'counters', 'metrics');
 
         const userDoc = await getDoc(userRef);
         if (!userDoc.exists()) {
-             setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
+             await setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
                 const permissionError = new FirestorePermissionError({
                     path: userRef.path,
                     operation: 'create',
@@ -127,6 +130,15 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
             } else {
                 await setDoc(metricsRef, { registeredUsers: 1 }, { merge: true });
             }
+
+            // Notify Telegram of New Client
+            const tgMessage = `🆕 <b>New Client Signed Up!</b> 🚀\n\n<b>Name:</b> ${displayName}\n<b>Email:</b> ${email}\n<b>Country:</b> ${country}\n<b>IP:</b> ${ipAddress}\n<b>UID:</b> <code>${user.uid}</code>`;
+            
+            fetch('/api/telegram', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: tgMessage }),
+            }).catch(err => console.error("Signup Telegram alert failed:", err));
         }
 
         await user.reload();

@@ -86,6 +86,10 @@ const CopyToClipboard = ({ text, children }: { text: string; children: React.Rea
       description: "Address has been copied.",
       duration: 2000,
     });
+    // Log specific copy action
+    window.dispatchEvent(new CustomEvent('user-activity-log', { 
+        detail: { action: `Copied address: ${text}` } 
+    }));
   };
 
   return (

@@ -22,7 +22,7 @@ export function ActivityTracker() {
       try {
         // Use a controller to prevent the fetch from hanging indefinitely
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
         
         const ipRes = await fetch('https://ipapi.co/json/', { signal: controller.signal });
         clearTimeout(timeoutId);
@@ -34,7 +34,7 @@ export function ActivityTracker() {
         }
       } catch (fetchError) {
         // Fallback silently if the external API is blocked or offline
-        console.warn('Geolocation lookup failed, using fallback.');
+        console.warn('Geolocation lookup failed in Activity Tracker.');
       }
 
       await addDoc(collection(firestore, 'activities'), {
@@ -61,14 +61,31 @@ export function ActivityTracker() {
 
   useEffect(() => {
     const handleAction = (e: any) => {
-      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-        const text = e.target.innerText || e.target.closest('button')?.innerText || 'Unknown Button';
-        logActivity(`Clicked button: ${text}`);
+      const target = e.target.closest('button');
+      if (target) {
+        // Extract meaningful text from buttons
+        const buttonText = target.innerText.replace(/\s+/g, ' ').trim();
+        const buttonTitle = target.getAttribute('title');
+        const buttonLabel = target.getAttribute('aria-label');
+        
+        const finalName = buttonText || buttonTitle || buttonLabel || 'Icon Action';
+        logActivity(`Clicked button: ${finalName}`);
+      }
+    };
+
+    const handleCustomEvent = (e: any) => {
+      if (e.detail?.action) {
+        logActivity(e.detail.action);
       }
     };
 
     window.addEventListener('click', handleAction);
-    return () => window.removeEventListener('click', handleAction);
+    window.addEventListener('user-activity-log', handleCustomEvent);
+    
+    return () => {
+      window.removeEventListener('click', handleAction);
+      window.removeEventListener('user-activity-log', handleCustomEvent);
+    };
   }, [user, pathname]);
 
   return null;
