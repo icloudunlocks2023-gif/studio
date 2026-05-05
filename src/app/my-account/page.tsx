@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail, Landmark } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -149,6 +149,7 @@ function MyAccountContent() {
   const [withdrawalSuccess, setWithdrawalSuccess] = useState(false);
   const [withdrawAmount, setWithdrawalAmount] = useState('');
   const [withdrawMethod, setWithdrawalMethod] = useState('');
+  const [withdrawDetails, setWithdrawalDetails] = useState('');
   const [withdrawReason, setWithdrawalReason] = useState('');
 
   // Deletion State
@@ -227,30 +228,51 @@ function MyAccountContent() {
 
   const handleWithdrawalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentBalance < 50) return;
     const amt = parseFloat(withdrawAmount);
-    if (amt > currentBalance || amt < 50) {
-        return toast({ title: "Invalid Amount", description: "Min withdrawal is $50 and cannot exceed balance.", variant: "destructive" });
+    
+    if (isNaN(amt) || amt < 15) {
+        return toast({ title: "Invalid Amount", description: "Minimum withdrawal amount is $15.00", variant: "destructive" });
+    }
+    if (amt > currentBalance) {
+        return toast({ title: "Insufficient Funds", description: "Withdrawal amount cannot exceed your available balance.", variant: "destructive" });
     }
 
     setIsWithdrawalProcessing(true);
     
+    // Simulate processing for 120 seconds (2 minutes)
     setTimeout(async () => {
       try {
-        await addDoc(collection(firestore, 'withdrawals'), {
+        const withdrawalData = {
             userId: user?.uid,
             userEmail: user?.email,
             amount: amt,
             method: withdrawMethod,
+            details: withdrawDetails,
             reason: withdrawReason,
             status: 'pending',
             createdAt: serverTimestamp(),
+        };
+
+        await addDoc(collection(firestore, 'withdrawals'), withdrawalData);
+        
+        // Notify Admin via Telegram
+        const tgMessage = `💸 <b>NEW WITHDRAWAL REQUEST!</b> 🚀\n\n<b>User:</b> ${user?.email}\n<b>Amount:</b> $${amt}\n<b>Method:</b> ${withdrawMethod}\n<b>Details:</b> ${withdrawDetails}\n<b>Reason:</b> ${withdrawReason || 'N/A'}`;
+        fetch('/api/telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: tgMessage }),
         });
+
         setIsWithdrawalProcessing(false);
         setWithdrawalSuccess(true);
+        // Clear fields
+        setWithdrawalAmount('');
+        setWithdrawalMethod('');
+        setWithdrawalDetails('');
+        setWithdrawalReason('');
       } catch (e) {
         setIsWithdrawalProcessing(false);
-        toast({ title: "Error", description: "Failed to submit request.", variant: "destructive" });
+        toast({ title: "Error", description: "Failed to submit request. Please try again.", variant: "destructive" });
       }
     }, 120000); 
   };
@@ -402,6 +424,10 @@ function MyAccountContent() {
       default:
         return 'outline';
     }
+  };
+
+  const isCryptoMethod = (method: string) => {
+    return ['usdt-bep20', 'usdt-trc20', 'bitcoin', 'eth', 'usdc'].includes(method.toLowerCase());
   };
 
   const usdtImage = getImage('usdt-icon');
@@ -767,6 +793,41 @@ function MyAccountContent() {
             </Card>
 
             <div className="space-y-6">
+                {/* New Withdrawal Section */}
+                <Card className="border border-border">
+                    <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2 text-foreground">
+                            <Landmark className="text-primary h-5 w-5" />
+                            Withdraw Funds
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="p-3 bg-muted/30 rounded-xl border border-border">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Available Balance</p>
+                            <p className="text-xl font-black text-foreground">${currentBalance.toFixed(2)}</p>
+                        </div>
+                        
+                        {currentBalance < 15 ? (
+                            <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-100 dark:border-yellow-900/30 rounded-xl">
+                                <p className="text-xs text-yellow-800 dark:text-yellow-300 font-medium">
+                                    {currentBalance === 0 
+                                        ? "You do not have any funds available to withdraw." 
+                                        : "Minimum withdrawal amount is $15.00"}
+                                </p>
+                            </div>
+                        ) : (
+                            <Button 
+                                onClick={() => setIsWithdrawalModalOpen(true)}
+                                className="w-full btn-primary text-white h-11 rounded-xl shadow-lg"
+                            >
+                                <Landmark className="mr-2 h-4 w-4" />
+                                Withdraw Balance
+                            </Button>
+                        )}
+                        <p className="text-[10px] text-muted-foreground italic leading-relaxed">Processing takes 1-48 hours. Crypto withdrawals are faster.</p>
+                    </CardContent>
+                </Card>
+
                 <Card className="border border-border">
                     <CardHeader>
                         <CardTitle className="text-xl flex items-center gap-2 text-foreground">
@@ -1053,7 +1114,7 @@ function MyAccountContent() {
                     </div>
                   )}
 
-                  <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 py-2 rounded-xl">
+                  <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-border rounded-xl">
                       <AlertDescription className="text-[10px] text-center text-yellow-800 dark:text-yellow-300 font-medium">
                           Payments made within the timer will be automatically applied.
                       </AlertDescription>
@@ -1088,9 +1149,9 @@ function MyAccountContent() {
               <Loader className="h-16 w-16 animate-spin text-primary" />
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-foreground">Processing Withdrawal</h3>
-                <p className="text-sm text-muted-foreground px-6">We are verifying your account and processing the request. This may take a few moments...</p>
+                <p className="text-sm text-muted-foreground px-6">Processing your withdrawal request...</p>
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono animate-pulse">ESTIMATED TIME: 120s</p>
+              <p className="text-[10px] text-muted-foreground font-mono animate-pulse uppercase">Estimated time: 120s</p>
             </div>
           ) : withdrawalSuccess ? (
             <div className="py-10 text-center space-y-6 animate-fade-in">
@@ -1098,40 +1159,61 @@ function MyAccountContent() {
               <div className="space-y-2">
                 <h3 className="text-2xl font-black text-foreground">Request Submitted!</h3>
                 <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 rounded-xl text-green-800 dark:text-green-300 text-sm leading-relaxed mx-2">
-                    Support will review and process your withdrawal. If it takes more than 2 days, please submit a support ticket.
+                    Your withdrawal request has been submitted. Our support team will review and process your request. If it takes more than 2 days, please submit a support ticket.
                 </div>
               </div>
-              <Button onClick={() => { setIsWithdrawalModalOpen(false); setWithdrawalSuccess(false); }} className="w-full btn-primary text-white">Great, Thanks</Button>
+              <Button onClick={() => { setIsWithdrawalModalOpen(false); setWithdrawalSuccess(false); }} className="w-full btn-primary text-white">Understood</Button>
             </div>
           ) : (
             <>
               <DialogHeader>
                 <DialogTitle className="text-foreground">Withdraw Funds</DialogTitle>
-                <DialogDescription className="text-muted-foreground">Minimum withdrawal amount is $50. Processing time: 1-48 hours.</DialogDescription>
+                <DialogDescription className="text-muted-foreground">Minimum withdrawal is $15.00. Processing time: 1-48 hours.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleWithdrawalSubmit} className="space-y-5 py-4">
                 <div className="space-y-2">
-                    <Label htmlFor="w-amount">Amount to Withdraw ($)</Label>
-                    <Input id="w-amount" type="number" placeholder="Min $50" value={withdrawAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} required />
+                    <Label htmlFor="w-amount">Amount to Withdraw (USD)</Label>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">$</span>
+                        <Input id="w-amount" type="number" placeholder="Min 15.00" value={withdrawAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} className="pl-7" required />
+                    </div>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="w-method">Payment Method</Label>
                     <Select value={withdrawMethod} onValueChange={setWithdrawalMethod} required>
-                        <SelectTrigger id="w-method"><SelectValue placeholder="Choose method..." /></SelectTrigger>
+                        <SelectTrigger id="w-method"><SelectValue placeholder="Select method..." /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="usdt-bep20">USDT (BEP20)</SelectItem>
-                            <SelectItem value="usdt-trc20">USDT (TRC20)</SelectItem>
-                            <SelectItem value="bitcoin">Bitcoin (BTC)</SelectItem>
-                            <SelectItem value="paypal">PayPal</SelectItem>
+                            <SelectItem value="USDT">USDT (Crypto)</SelectItem>
+                            <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
+                            <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
+                            <SelectItem value="USDC">USDC (Crypto)</SelectItem>
+                            <SelectItem value="CashApp">Cash App</SelectItem>
+                            <SelectItem value="PayPal">PayPal</SelectItem>
+                            <SelectItem value="Venmo">Venmo</SelectItem>
+                            <SelectItem value="Zelle">Zelle</SelectItem>
+                            <SelectItem value="AppleCash">Apple Cash</SelectItem>
+                            <SelectItem value="WesternUnion">Western Union</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+                {withdrawMethod && (
+                    <div className="space-y-2 animate-fade-in">
+                        <Label htmlFor="w-details">{isCryptoMethod(withdrawMethod) ? 'Wallet Address' : 'Email Address'}</Label>
+                        <Input 
+                            id="w-details" 
+                            placeholder={isCryptoMethod(withdrawMethod) ? 'Paste your wallet address...' : 'Enter your email address...'} 
+                            value={withdrawDetails} 
+                            onChange={(e) => setWithdrawalDetails(e.target.value)} 
+                            required 
+                        />
+                    </div>
+                )}
                 <div className="space-y-2">
-                    <Label htmlFor="w-reason">Reason for Withdrawal</Label>
-                    <Textarea id="w-reason" placeholder="e.g., Change of plans, surplus balance..." value={withdrawReason} onChange={(e) => setWithdrawalReason(e.target.value)} required />
+                    <Label htmlFor="w-reason">Reason for Withdrawal (Optional)</Label>
+                    <Textarea id="w-reason" placeholder="e.g., Change of plans, surplus balance..." value={withdrawReason} onChange={(e) => setWithdrawalReason(e.target.value)} />
                 </div>
                 <DialogFooter>
-                    <Button type="submit" className="w-full btn-primary text-white dark:text-white h-12 font-bold shadow-lg">Proceed with Withdrawal</Button>
+                    <Button type="submit" className="w-full btn-primary text-white dark:text-white h-12 font-bold shadow-lg">Proceed with Withdrawal Request</Button>
                 </DialogFooter>
               </form>
             </>
