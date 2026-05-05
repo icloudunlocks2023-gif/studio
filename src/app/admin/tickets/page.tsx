@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, MessageSquare, Clock, Filter } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Clock, Filter, Search } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { where } from 'firebase/firestore';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Input } from '@/components/ui/input';
 
 interface SupportTicket {
   id: string;
@@ -60,7 +62,7 @@ export default function AdminTicketsPage() {
   };
 
   if (userLoading || !user || !isAdmin) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-background text-foreground">Loading...</div>;
   }
 
   const sortedTickets = tickets?.sort((a, b) => {
@@ -70,7 +72,7 @@ export default function AdminTicketsPage() {
   });
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-12">
+    <div className="bg-background text-foreground min-h-screen pb-12 transition-colors duration-300">
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -78,14 +80,15 @@ export default function AdminTicketsPage() {
               <Image src="https://i.postimg.cc/9MCd4HJx/icloud-unlocks-logo.png" alt="iCloud Unlocks Logo" width={90} height={24} />
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/admin" className="text-sm font-medium hover:text-blue-600 transition-colors">Admin Dashboard</Link>
+              <Link href="/admin" className="text-sm font-medium hover:text-primary transition-colors">Admin Dashboard</Link>
+              <ThemeToggle />
             </div>
           </div>
         </div>
       </nav>
 
       <main className="max-w-7xl mx-auto pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
             <Link href="/admin">
               <Button variant="outline" size="icon">
@@ -94,81 +97,101 @@ export default function AdminTicketsPage() {
             </Link>
             <h1 className="text-3xl font-bold">Support Ticket Management</h1>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border">
             <Clock className="h-4 w-4" />
-            Last updated: {format(new Date(), 'pp')}
+            Last Sync: {format(new Date(), 'pp')}
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="bg-gray-50/50 border-b">
-            <div className="flex justify-between items-center">
+        <Card className="border-border shadow-xl overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <CardTitle className="text-lg flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-blue-600" />
+                    <MessageSquare className="h-5 w-5 text-primary" />
                     All Tickets ({tickets?.length || 0})
                 </CardTitle>
-                <Button variant="ghost" size="sm" className="text-gray-500">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter
-                </Button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search tickets..." className="pl-9 bg-background h-9" />
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground h-9">
+                        <Filter className="h-4 w-4 mr-2" />
+                        Filter
+                    </Button>
+                </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             {ticketsLoading ? (
-              <div className="p-8 text-center">Loading tickets...</div>
+              <div className="p-12 text-center text-muted-foreground">
+                <Loader className="animate-spin h-8 w-8 mx-auto mb-2 text-primary" />
+                Loading tickets...
+              </div>
             ) : sortedTickets && sortedTickets.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Ticket ID</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Related Order</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedTickets.map(ticket => (
-                    <TableRow key={ticket.id} className={ticket.status === 'open' ? 'bg-blue-50/30' : ''}>
-                      <TableCell className="text-xs">{ticket.createdAt?.toDate ? format(ticket.createdAt.toDate(), 'MMM dd, p') : 'N/A'}</TableCell>
-                      <TableCell className="font-mono text-xs uppercase">{ticket.id.slice(0, 8)}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                            <span className="font-medium">{ticket.userName}</span>
-                            <span className="text-[10px] text-gray-500">{ticket.userEmail}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {ticket.orderId ? (
-                            <Badge variant="outline" className="font-mono text-xs">
-                                {ticket.orderId}
-                            </Badge>
-                        ) : (
-                            <span className="text-gray-400 text-xs">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-xs">{ticket.category}</TableCell>
-                      <TableCell className="font-medium text-xs">{ticket.subject}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(ticket.status)}>
-                          {ticket.status.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Link href={`/admin/tickets/${ticket.id}`}>
-                          <Button size="sm" className="btn-primary text-white">Manage</Button>
-                        </Link>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader className="bg-muted/50">
+                    <TableRow className="border-border">
+                        <TableHead className="text-foreground">Submitted</TableHead>
+                        <TableHead className="text-foreground">Ticket ID</TableHead>
+                        <TableHead className="text-foreground">Client</TableHead>
+                        <TableHead className="text-foreground">Related Order</TableHead>
+                        <TableHead className="text-foreground">Category</TableHead>
+                        <TableHead className="text-foreground">Subject</TableHead>
+                        <TableHead className="text-foreground">Status</TableHead>
+                        <TableHead className="text-right text-foreground">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                    </TableHeader>
+                    <TableBody>
+                    {sortedTickets.map(ticket => (
+                        <TableRow key={ticket.id} className={cn("border-border hover:bg-muted/30 transition-colors", ticket.status === 'open' ? 'bg-primary/5' : '')}>
+                        <TableCell className="text-xs text-muted-foreground">
+                            {ticket.createdAt?.toDate ? format(ticket.createdAt.toDate(), 'MMM dd, p') : 'N/A'}
+                        </TableCell>
+                        <TableCell className="font-mono text-[10px] uppercase font-bold text-primary">
+                            {ticket.id.slice(0, 8)}
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex flex-col">
+                                <span className="font-bold text-sm text-foreground">{ticket.userName}</span>
+                                <span className="text-[10px] text-muted-foreground">{ticket.userEmail}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            {ticket.orderId ? (
+                                <Badge variant="outline" className="font-mono text-[10px] bg-background">
+                                    {ticket.orderId}
+                                </Badge>
+                            ) : (
+                                <span className="text-muted-foreground/30 text-xs">-</span>
+                            )}
+                        </TableCell>
+                        <TableCell className="text-xs font-medium uppercase text-muted-foreground">
+                            {ticket.category}
+                        </TableCell>
+                        <TableCell className="font-medium text-xs max-w-[200px] truncate text-foreground">
+                            {ticket.subject}
+                        </TableCell>
+                        <TableCell>
+                            <Badge variant={getStatusVariant(ticket.status)} className="text-[9px] uppercase font-bold">
+                            {ticket.status.replace('_', ' ')}
+                            </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                            <Link href={`/admin/tickets/${ticket.id}`}>
+                            <Button size="sm" className="btn-primary text-white text-xs h-8">Manage</Button>
+                            </Link>
+                        </TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+              </div>
             ) : (
-              <div className="p-12 text-center text-gray-500">
-                No support tickets found in the system.
+              <div className="p-20 text-center text-muted-foreground border-t border-border">
+                <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-10" />
+                <p className="font-medium">No support tickets found in the system.</p>
               </div>
             )}
           </CardContent>
