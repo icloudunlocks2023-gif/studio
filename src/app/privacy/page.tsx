@@ -9,6 +9,8 @@ import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { NotificationDropdown } from '@/components/notification-dropdown';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -31,7 +33,7 @@ export default function PrivacyPolicyPage() {
 
 
   return (
-    <div className="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
       <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -41,17 +43,20 @@ export default function PrivacyPolicyPage() {
               </Link>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-              <Link href="/services" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</Link>
+              <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Services</Link>
               {user && (
-                <Link href="/my-account" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Account</Link>
+                <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">My Account</Link>
               )}
               {isAdmin && (
-                <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin</Link>
+                <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
               )}
+              {user && <NotificationDropdown />}
+              <ThemeToggle />
               <LoginButton />
             </div>
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -63,13 +68,13 @@ export default function PrivacyPolicyPage() {
                     <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
-                    <Link href="/" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
                     {user && (
-                      <Link href="/my-account" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
+                      <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
                     {isAdmin && (
-                      <Link href="/admin" className="text-gray-700 hover:text-gray-900 py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
+                      <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Admin</Link>
                     )}
                     <div className='pt-4'>
                       <LoginButton />
@@ -83,24 +88,24 @@ export default function PrivacyPolicyPage() {
       </nav>
 
       <main className="max-w-4xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex-grow">
-        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-lg">
-          <h1 className="text-4xl font-bold text-center mb-8">Privacy Policy – iCloud Unlocks</h1>
+        <div className="bg-card p-8 md:p-12 rounded-2xl shadow-lg border border-border">
+          <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Privacy Policy – iCloud Unlocks</h1>
           
-          <div className="space-y-6 text-lg text-gray-700">
+          <div className="space-y-6 text-lg text-muted-foreground">
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Introduction</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Introduction</h2>
               <p>At iCloud Unlocks, we are committed to respecting and protecting your privacy. This policy describes the type of information we collect and how we manage and safeguard it.</p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Information We Collect</h2>
-              <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-800">Personal Information</h3>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Information We Collect</h2>
+              <h3 className="text-xl font-semibold mt-4 mb-2 text-foreground/90">Personal Information</h3>
               <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Name, email, phone number</li>
                 <li>Device identifiers such as IMEI, serial number, and model</li>
                 <li>Payment-related information (we do not store full payment details)</li>
               </ul>
-              <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-800">Non-Personal Information</h3>
+              <h3 className="text-xl font-semibold mt-4 mb-2 text-foreground/90">Non-Personal Information</h3>
               <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Website usage data</li>
                 <li>IP address, browser type, operating system</li>
@@ -108,7 +113,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">How Your Information Is Used</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">How Your Information Is Used</h2>
               <p>We use your information to:</p>
               <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Deliver and improve our unlocking services</li>
@@ -120,7 +125,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Sharing of Information</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Sharing of Information</h2>
               <p>We do not sell or trade your information. We may share limited data with:</p>
               <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Trusted service partners that assist in service operations</li>
@@ -129,12 +134,12 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Security Measures</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Security Measures</h2>
               <p>We use industry-standard practices to protect your data. However, no online system is 100% secure, and we cannot guarantee absolute protection.</p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Your Rights</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Your Rights</h2>
               <p>You may request:</p>
               <ul className="list-disc list-inside space-y-1 pl-4">
                 <li>Copies of your personal data</li>
@@ -145,15 +150,15 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Changes to Policy</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Changes to Policy</h2>
               <p>This Privacy Policy may be updated periodically. New versions will be posted with an updated date.</p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3 text-gray-900">Contact Information</h2>
+              <h2 className="text-2xl font-semibold mb-3 text-foreground">Contact Information</h2>
               <p>For privacy-related inquiries:</p>
               <ul className="list-disc list-inside space-y-2 pl-4">
-                <li><span className="font-semibold">Telegram:</span> <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">@iCloudUnlocks_2023</a></li>
+                <li><span className="font-semibold">Telegram:</span> <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@iCloudUnlocks_2023</a></li>
               </ul>
             </section>
 
@@ -162,7 +167,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </main>
 
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
