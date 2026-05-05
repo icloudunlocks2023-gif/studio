@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -81,22 +82,30 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
         // Update the user's profile with the display name
         await updateProfile(user, { displayName });
 
-        // Get accurate IP address and Country with fallback
-        let ipAddress = 'unknown';
-        let country = 'unknown';
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
-            const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            if (response.ok) {
-              const data = await response.json();
-              ipAddress = data.ip || 'unknown';
-              country = data.country_name || 'unknown';
+        // Get accurate IP address and Country with caching
+        let ipAddress = localStorage.getItem('detected_ip') || 'unknown';
+        let country = localStorage.getItem('detected_country') || 'unknown';
+        
+        if (ipAddress === 'unknown') {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    ipAddress = data.ip || 'unknown';
+                    country = data.country_name || 'unknown';
+                    
+                    if (ipAddress !== 'unknown') {
+                        localStorage.setItem('detected_ip', ipAddress);
+                        localStorage.setItem('detected_country', country);
+                    }
+                }
+            } catch (e) {
+                console.warn("Geolocation fetch failed during signup, using defaults.");
             }
-        } catch (e) {
-            console.warn("Geolocation fetch failed during signup, using defaults.");
         }
 
         const userRef = doc(firestore, 'users', user.uid);

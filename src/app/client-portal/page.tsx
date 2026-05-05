@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
@@ -55,6 +56,8 @@ interface Submission {
 interface UserProfile {
     id: string;
     balance?: number;
+    ipAddress?: string;
+    country?: string;
 }
 
 interface BannedUser {
@@ -332,21 +335,32 @@ function DeviceCheckContent() {
 
     setIsSearching(true);
 
-    let clientIp = 'unknown';
-    let country = 'unknown';
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
-        const ipResponse = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-        clearTimeout(timeoutId);
-        
-        if (ipResponse.ok) {
-          const ipData = await ipResponse.json();
-          clientIp = ipData.ip || 'unknown';
-          country = ipData.country_name || 'unknown';
+    // Prioritize stored IP/Country for consistency
+    let clientIp = userProfile?.ipAddress || localStorage.getItem('detected_ip') || 'unknown';
+    let country = userProfile?.country || localStorage.getItem('detected_country') || 'unknown';
+
+    // Only fetch if not already captured or cached
+    if (clientIp === 'unknown') {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const ipResponse = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (ipResponse.ok) {
+              const ipData = await ipResponse.json();
+              clientIp = ipData.ip || 'unknown';
+              country = ipData.country_name || 'unknown';
+              
+              // Persist locally for future requests in this session or revisits
+              if (clientIp !== 'unknown') {
+                  localStorage.setItem('detected_ip', clientIp);
+                  localStorage.setItem('detected_country', country);
+              }
+            }
+        } catch (e) {
+            console.warn("IP/Country fetch failed during submission, using fallback.");
         }
-    } catch (e) {
-        console.warn("IP/Country fetch failed during submission, proceeding with fallback.");
     }
 
     const tgMessage = `🚨 <b>Device Check Attempt!</b> 🚀\n\n<b>Model:</b> ${model}\n<b>IMEI/Serial:</b> ${trimmedImei || '<i>(empty)</i>'}\n<b>User ID:</b> ${user.uid}\n<b>IP:</b> ${clientIp}\n<b>Country:</b> ${country}\n<b>Format Status:</b> ${isImeiValid || isSerialValid ? 'Format OK' : 'Invalid Format'}`;
@@ -1377,7 +1391,7 @@ function DeviceCheckContent() {
             {(!selectedMethod || selectedMethod.type === 'crypto') && (
                 <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
                     <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                    <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
+                    <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
                         {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
                     </Button>
                 </DialogFooter>
