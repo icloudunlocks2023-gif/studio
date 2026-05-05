@@ -545,7 +545,7 @@ function MyAccountContent() {
             </Card>
             <Card className="bg-card border-l-4 border-l-red-500 shadow-sm border border-border">
                 <CardContent className="p-6 flex items-center gap-4">
-                    <div className="p-3 bg-red-50 dark:bg-red-950 rounded-2xl text-red-600"><XCircle className="h-6 w-6" /></div>
+                    <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-2xl text-red-600"><XCircle className="h-6 w-6" /></div>
                     <div><p className="text-xs font-bold text-muted-foreground uppercase">Declined</p><p className="text-2xl font-black text-foreground">{stats.declined}</p></div>
                 </CardContent>
             </Card>
@@ -628,7 +628,7 @@ function MyAccountContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
-                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-24 scrollbar-thin">
+                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-40 scrollbar-thin">
                                         <div className="grid grid-cols-1 gap-2">
                                             {additionalMethods.filter(m => m.type === 'manual').map(method => {
                                                 const isAmountLow = parseFloat(depositAmount) < 200;
