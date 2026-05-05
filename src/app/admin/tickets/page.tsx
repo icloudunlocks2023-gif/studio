@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { where } from 'firebase/firestore';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface SupportTicket {
   id: string;

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -24,7 +23,7 @@ interface Notification {
 }
 
 export default function UserNotificationsPage() {
-  const { data: user, loading: userLoading } = userUser();
+  const { data: user, loading: userLoading } = useUser();
   const router = useRouter();
 
   const { data: notifications, loading: notificationsLoading } = useCollection<Notification>('notifications', {
