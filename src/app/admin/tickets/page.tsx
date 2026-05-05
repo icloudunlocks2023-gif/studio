@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useCollection } from '@/firebase';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,15 @@ interface SupportTicket {
 }
 
 const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
+
+function ClientSyncTime() {
+  const [time, setTime] = useState<string | null>(null);
+  useEffect(() => {
+    setTime(format(new Date(), 'pp'));
+  }, []);
+  if (!time) return <span className="opacity-0">...</span>;
+  return <span>Last Sync: {time}</span>;
+}
 
 export default function AdminTicketsPage() {
   const { data: user, loading: userLoading } = useUser();
@@ -100,14 +109,14 @@ export default function AdminTicketsPage() {
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border">
             <Clock className="h-4 w-4" />
-            Last Sync: {format(new Date(), 'pp')}
+            <ClientSyncTime />
           </div>
         </div>
 
         <Card className="border-border shadow-xl overflow-hidden">
           <CardHeader className="bg-muted/30 border-b">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2 text-foreground">
                     <MessageSquare className="h-5 w-5 text-primary" />
                     All Tickets ({tickets?.length || 0})
                 </CardTitle>

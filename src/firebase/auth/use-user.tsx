@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -83,10 +82,15 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
         await updateProfile(user, { displayName });
 
         // Get accurate IP address and Country with caching
-        let ipAddress = localStorage.getItem('detected_ip') || 'unknown';
-        let country = localStorage.getItem('detected_country') || 'unknown';
+        let ipAddress = 'unknown';
+        let country = 'unknown';
         
-        if (ipAddress === 'unknown') {
+        if (typeof window !== 'undefined') {
+            ipAddress = localStorage.getItem('detected_ip') || 'unknown';
+            country = localStorage.getItem('detected_country') || 'unknown';
+        }
+        
+        if (ipAddress === 'unknown' && typeof window !== 'undefined') {
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 4000);
@@ -104,7 +108,7 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
                     }
                 }
             } catch (e) {
-                console.warn("Geolocation fetch failed during signup, using defaults.");
+                console.warn("Geolocation fetch failed during signup.");
             }
         }
 
@@ -121,34 +125,37 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
 
         const metricsRef = doc(firestore, 'counters', 'metrics');
 
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-             await setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
-                const permissionError = new FirestorePermissionError({
-                    path: userRef.path,
-                    operation: 'create',
-                    requestResourceData: userData,
+        // Check and create profile in non-blocking way
+        getDoc(userRef).then(userDoc => {
+            if (!userDoc.exists()) {
+                setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
+                    const permissionError = new FirestorePermissionError({
+                        path: userRef.path,
+                        operation: 'create',
+                        requestResourceData: userData,
+                    });
+                    errorEmitter.emit('permission-error', permissionError);
                 });
-                errorEmitter.emit('permission-error', permissionError);
-            });
-            
-            const metricsDoc = await getDoc(metricsRef);
-            if (metricsDoc.exists()) {
-                const currentCount = metricsDoc.data().registeredUsers || 0;
-                await setDoc(metricsRef, { registeredUsers: currentCount + 1 }, { merge: true });
-            } else {
-                await setDoc(metricsRef, { registeredUsers: 1 }, { merge: true });
-            }
+                
+                getDoc(metricsRef).then(metricsDoc => {
+                    if (metricsDoc.exists()) {
+                        const currentCount = metricsDoc.data().registeredUsers || 0;
+                        setDoc(metricsRef, { registeredUsers: currentCount + 1 }, { merge: true });
+                    } else {
+                        setDoc(metricsRef, { registeredUsers: 1 }, { merge: true });
+                    }
+                });
 
-            // Notify Telegram of New Client
-            const tgMessage = `🆕 <b>New Client Signed Up!</b> 🚀\n\n<b>Name:</b> ${displayName}\n<b>Email:</b> ${email}\n<b>Country:</b> ${country}\n<b>IP:</b> ${ipAddress}\n<b>UID:</b> <code>${user.uid}</code>`;
-            
-            fetch('/api/telegram', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: tgMessage }),
-            }).catch(err => console.error("Signup Telegram alert failed:", err));
-        }
+                // Notify Telegram of New Client
+                const tgMessage = `🆕 <b>New Client Signed Up!</b> 🚀\n\n<b>Name:</b> ${displayName}\n<b>Email:</b> ${email}\n<b>Country:</b> ${country}\n<b>IP:</b> ${ipAddress}\n<b>UID:</b> <code>${user.uid}</code>`;
+                
+                fetch('/api/telegram', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: tgMessage }),
+                }).catch(err => console.error("Signup Telegram alert failed:", err));
+            }
+        });
 
         await user.reload();
         return result;
