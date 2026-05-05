@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Loader, LogIn, UserPlus } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
 
 interface AuthModalProps {
   open: boolean;
@@ -51,7 +51,17 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
         toast({ title: "Welcome back!", description: "You have successfully logged in." });
       }
     } catch (error: any) {
-      toast({ title: "Login Failed", description: "Incorrect details. Please try again.", variant: "destructive" });
+      let message = "Incorrect details. Please try again.";
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          message = "Invalid email or password.";
+        } else if (error.code === 'auth/too-many-requests') {
+          message = "Too many failed attempts. Please try again later.";
+        } else if (error.code === 'auth/user-disabled') {
+          message = "This account has been disabled.";
+        }
+      }
+      toast({ title: "Login Failed", description: message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +77,19 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
         toast({ title: "Account Created", description: "Welcome to iCloud Unlocks!" });
       }
     } catch (error: any) {
-      toast({ title: "Registration Failed", description: error.message || "Could not create account.", variant: "destructive" });
+      let message = "Could not create account.";
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/email-already-in-use') {
+          message = "This email is already registered. Please try logging in instead.";
+        } else if (error.code === 'auth/invalid-email') {
+          message = "Please enter a valid email address.";
+        } else if (error.code === 'auth/weak-password') {
+          message = "Password should be at least 6 characters long.";
+        } else if (error.code === 'auth/operation-not-allowed') {
+          message = "Sign up is currently disabled.";
+        }
+      }
+      toast({ title: "Registration Failed", description: message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
