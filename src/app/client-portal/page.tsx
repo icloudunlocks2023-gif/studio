@@ -1220,30 +1220,32 @@ function DeviceCheckContent() {
                                         {showOtherPayments && (
                                             <div className="lg:hidden mt-1 animate-fade-in">
                                                 <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
-                                                <div className="grid grid-cols-1 gap-2">
-                                                    {additionalMethods.map(method => {
-                                                        const isManual = method.type === 'manual';
-                                                        const isAmountLow = isManual && amountToPay < 200;
-                                                        return (
-                                                            <button 
-                                                                key={method.id}
-                                                                disabled={isAmountLow}
-                                                                onClick={() => { setSelectedMethod(method); }}
-                                                                className={cn(
-                                                                    "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
-                                                                    isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
-                                                                )}
-                                                            >
-                                                                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground overflow-hidden">
-                                                                    {method.icon ? <Image src={method.icon.imageUrl} alt={method.name} width={40} height={40} /> : method.name.charAt(0)}
-                                                                </div>
-                                                                <div className="flex flex-col">
-                                                                    <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
-                                                                    {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
-                                                                </div>
-                                                            </button>
-                                                        );
-                                                    })}
+                                                <div className="max-h-[300px] overflow-y-auto pr-2 pb-4 scrollbar-thin">
+                                                    <div className="grid grid-cols-1 gap-2">
+                                                        {additionalMethods.map(method => {
+                                                            const isManual = method.type === 'manual';
+                                                            const isAmountLow = isManual && amountToPay < 200;
+                                                            return (
+                                                                <button 
+                                                                    key={method.id}
+                                                                    disabled={isAmountLow}
+                                                                    onClick={() => { setSelectedMethod(method); }}
+                                                                    className={cn(
+                                                                        "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
+                                                                        isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
+                                                                    )}
+                                                                >
+                                                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground overflow-hidden">
+                                                                        {method.icon ? <Image src={method.icon.imageUrl} alt={method.name} width={40} height={40} /> : method.name.charAt(0)}
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
+                                                                        {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
+                                                                    </div>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}

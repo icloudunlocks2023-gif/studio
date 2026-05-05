@@ -628,30 +628,32 @@ function MyAccountContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {additionalMethods.filter(m => m.type === 'manual').map(method => {
-                                            const isAmountLow = parseFloat(depositAmount) < 200;
-                                            return (
-                                                <button 
-                                                    key={method.id}
-                                                    disabled={isAmountLow}
-                                                    onClick={() => { setSelectedDepositMethod(method); setDepositStep('details'); }}
-                                                    className={cn(
-                                                        "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
-                                                        isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
-                                                    )}
-                                                >
-                                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
-                                                        {method.icon ? <div className='h-8 w-8 relative'><Image src={method.icon.imageUrl} alt={method.name} fill style={{objectFit:'contain'}}/></div> : method.name.charAt(0)}
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
-                                                        {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
-                                                    </div>
-                                                    {!isAmountLow && <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />}
-                                                </button>
-                                            );
-                                        })}
+                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-4 scrollbar-thin">
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {additionalMethods.filter(m => m.type === 'manual').map(method => {
+                                                const isAmountLow = parseFloat(depositAmount) < 200;
+                                                return (
+                                                    <button 
+                                                        key={method.id}
+                                                        disabled={isAmountLow}
+                                                        onClick={() => { setSelectedDepositMethod(method); setDepositStep('details'); }}
+                                                        className={cn(
+                                                            "flex items-center gap-3 p-4 rounded-xl border transition-all text-left relative",
+                                                            isAmountLow ? "bg-muted/50 border-border opacity-60 cursor-not-allowed" : "bg-card border-border hover:border-primary hover:bg-primary/5 group"
+                                                        )}
+                                                    >
+                                                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs text-muted-foreground">
+                                                            {method.icon ? <div className='h-8 w-8 relative'><Image src={method.icon.imageUrl} alt={method.name} fill style={{objectFit:'contain'}}/></div> : method.name.charAt(0)}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className={cn("font-bold text-sm text-foreground", !isAmountLow && "group-hover:text-primary")}>{method.name}</span>
+                                                            {isAmountLow && <span className="text-[9px] text-red-500 font-bold uppercase mt-0.5">Min: $200</span>}
+                                                        </div>
+                                                        {!isAmountLow && <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
