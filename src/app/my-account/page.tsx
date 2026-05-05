@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -628,7 +628,7 @@ function MyAccountContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
-                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-4 scrollbar-thin">
+                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-24 scrollbar-thin">
                                         <div className="grid grid-cols-1 gap-2">
                                             {additionalMethods.filter(m => m.type === 'manual').map(method => {
                                                 const isAmountLow = parseFloat(depositAmount) < 200;

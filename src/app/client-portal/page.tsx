@@ -1168,7 +1168,7 @@ function DeviceCheckContent() {
                  {submission && <div className="text-xs bg-muted p-2 rounded-md text-muted-foreground mt-1"><p><strong>Model:</strong> {submission.model} | <strong>IMEI/Serial:</strong> {submission.imei}</p></div>}
             </DialogHeader>
              <ScrollArea className="flex-1 px-5">
-                <div className={cn("grid grid-cols-1 gap-4 pt-1 pb-4", showOtherPayments && "lg:grid-cols-2 lg:gap-8")}>
+                <div className={cn("grid grid-cols-1 gap-4 pt-1 pb-10", showOtherPayments && "lg:grid-cols-2 lg:gap-8")}>
                     <div className="space-y-3 animate-fade-in">
                         <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5 mt-2">
                             <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
@@ -1220,9 +1220,10 @@ function DeviceCheckContent() {
                                         {showOtherPayments && (
                                             <div className="lg:hidden mt-1 animate-fade-in">
                                                 <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
-                                                <div className="max-h-[300px] overflow-y-auto pr-2 pb-4 scrollbar-thin">
+                                                <div className="max-h-[300px] overflow-y-auto pr-2 pb-24 scrollbar-thin">
                                                     <div className="grid grid-cols-1 gap-2">
                                                         {additionalMethods.map(method => {
+                                                            const isCrypto = method.type === 'crypto';
                                                             const isManual = method.type === 'manual';
                                                             const isAmountLow = isManual && amountToPay < 200;
                                                             return (
@@ -1340,7 +1341,7 @@ function DeviceCheckContent() {
                         <div className="hidden lg:flex flex-col space-y-3 animate-fade-in border-l border-border pl-8">
                             <h4 className="font-black text-xs text-muted-foreground uppercase tracking-widest mb-2">Other Payment Methods</h4>
                             <ScrollArea className="h-[420px] pr-4">
-                                <div className="space-y-2 pb-8">
+                                <div className="space-y-2 pb-24">
                                     {additionalMethods.map(method => {
                                         const isManual = method.type === 'manual';
                                         const isAmountLow = isManual && amountToPay < 200;
