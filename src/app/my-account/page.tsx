@@ -79,7 +79,7 @@ interface Counters {
 
 const CopyToClipboard = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const { toast } = useToast();
-  const handleCopy = () => {
+  handleCopy = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied to clipboard!",
@@ -492,7 +492,7 @@ function MyAccountContent() {
                   </SheetHeader>
                   <div className="flex flex-col gap-4 p-4">
                     <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Home</Link>
-                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">Services</Link>
+                    <Link href="/services" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors ring-1 ring-inset ring-primary">Services</Link>
                     {user && (
                         <Link href="/my-account" className="text-gray-700 dark:text-gray-300 hover:text-primary py-2 rounded-md text-base font-medium transition-colors">My Account</Link>
                     )}
@@ -654,7 +654,7 @@ function MyAccountContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
-                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-40 scrollbar-thin">
+                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-60 scrollbar-thin">
                                         <div className="grid grid-cols-1 gap-2">
                                             {additionalMethods.filter(m => m.type === 'manual').map(method => {
                                                 const isAmountLow = parseFloat(depositAmount) < 200;
@@ -1119,6 +1119,11 @@ function MyAccountContent() {
                           Payments made within the timer will be automatically applied.
                       </AlertDescription>
                   </Alert>
+                  
+                  {/* Added spacer to ensure Western Union and Apple Cash are fully scrollable */}
+                  <div className="space-y-2 pb-60">
+                    {/* Additional Methods will be rendered here if necessary, adding the padding to their common container if they were here */}
+                  </div>
               </div>
             </ScrollArea>
             <div className="px-5 py-3 bg-red-50 dark:bg-red-950/20 border-t border-red-100 dark:border-red-900/30">
