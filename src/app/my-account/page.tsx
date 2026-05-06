@@ -654,7 +654,7 @@ function MyAccountContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1">Other Options</p>
-                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-80 scrollbar-thin">
+                                    <div className="max-h-[350px] overflow-y-auto pr-2 pb-60 scrollbar-thin">
                                         <div className="grid grid-cols-1 gap-2">
                                             {additionalMethods.filter(m => m.type === 'manual').map(method => {
                                                 const isAmountLow = parseFloat(depositAmount) < 200;
@@ -1048,7 +1048,7 @@ function MyAccountContent() {
                 </DialogDescription>
             </DialogHeader>
             <ScrollArea className="flex-1 px-5">
-              <div className="space-y-4 pt-1 pb-80">
+              <div className="space-y-4 pt-1 pb-60">
                   <div className="text-xs bg-muted p-3 rounded-xl text-muted-foreground space-y-1 mt-2">
                       <p className="font-semibold text-foreground">Unlocking {ordersForBulkPay.length} devices:</p>
                       <ul className="list-disc list-inside text-xs leading-tight">

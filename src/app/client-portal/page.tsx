@@ -1242,7 +1242,7 @@ function DeviceCheckContent() {
                                         {showOtherPayments && (
                                             <div className="lg:hidden mt-1 animate-fade-in">
                                                 <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider mb-2">Other Options</h4>
-                                                <div className="max-h-[300px] overflow-y-auto pr-2 pb-80 scrollbar-thin">
+                                                <div className="max-h-[300px] overflow-y-auto pr-2 pb-60 scrollbar-thin">
                                                     <div className="grid grid-cols-1 gap-2">
                                                         {additionalMethods.map(method => {
                                                             const isCrypto = method.type === 'crypto';
@@ -1363,7 +1363,7 @@ function DeviceCheckContent() {
                         <div className="hidden lg:flex flex-col space-y-3 animate-fade-in border-l border-border pl-8">
                             <h4 className="font-black text-xs text-muted-foreground uppercase tracking-widest mb-2">Other Payment Methods</h4>
                             <ScrollArea className="h-[420px] pr-4">
-                                <div className="space-y-2 pb-80">
+                                <div className="space-y-2 pb-60">
                                     {additionalMethods.map(method => {
                                         const isManual = method.type === 'manual';
                                         const isAmountLow = isManual && amountToPay < 200;
