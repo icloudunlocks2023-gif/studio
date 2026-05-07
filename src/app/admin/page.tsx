@@ -304,23 +304,45 @@ function AdminDashboard() {
     });
   };
 
-  const handleBanIp = (ip: string) => {
+  const handleBanIp = (ip: string, userId: string) => {
     if (!ip || ip === 'unknown') return;
     const ipId = ip.replace(/\./g, '_');
     const ipRef = doc(firestore, 'banned_ips', ipId);
-    setDoc(ipRef, {
+    const ipData = {
         ip: ip,
         createdAt: serverTimestamp(),
-    }).then(() => {
-        toast({ title: "IP Banned", description: `${ip} has been blacklisted.` });
-    }).catch(async (serverError) => {
+    };
+
+    setDoc(ipRef, ipData).catch(async (serverError) => {
         const permissionError = new FirestorePermissionError({
             path: ipRef.path,
             operation: 'create',
-            requestResourceData: { ip, createdAt: '...' },
+            requestResourceData: ipData,
         });
         errorEmitter.emit('permission-error', permissionError);
     });
+
+    if (userId) {
+        const userBanRef = doc(firestore, 'banned_users', userId);
+        const userBanData = {
+            userId: userId,
+            createdAt: serverTimestamp(),
+        };
+        setDoc(userBanRef, userBanData)
+            .then(() => {
+                toast({ title: "Restrictions Applied", description: "IP and User ID have been blacklisted." });
+            })
+            .catch(async (serverError) => {
+                const permissionError = new FirestorePermissionError({
+                    path: userBanRef.path,
+                    operation: 'create',
+                    requestResourceData: userBanData,
+                });
+                errorEmitter.emit('permission-error', permissionError);
+            });
+    } else {
+        toast({ title: "IP Banned", description: `${ip} has been blacklisted.` });
+    }
   };
 
   const handleDelete = (submissionId: string) => {
@@ -724,7 +746,7 @@ function AdminDashboard() {
                         <div className='flex items-center gap-2 flex-wrap'>
                             <Button onClick={() => handleSendFeedback(sub.id)} className="btn-primary text-white flex-1">Send Feedback</Button>
                             {sub.ipAddress && (
-                                <Button variant="outline" size="icon" title="Ban IP Address" onClick={() => handleBanIp(sub.ipAddress!)} className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950">
+                                <Button variant="outline" size="icon" title="Ban IP Address & User" onClick={() => handleBanIp(sub.ipAddress!, sub.userId)} className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950">
                                     <ShieldAlert className="h-4 w-4" />
                                 </Button>
                             )}
