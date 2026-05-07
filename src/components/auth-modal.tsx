@@ -52,15 +52,16 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
       }
     } catch (error: any) {
       let message = "Incorrect details. Please try again.";
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-          message = "Invalid email or password.";
-        } else if (error.code === 'auth/too-many-requests') {
-          message = "Too many failed attempts. Please try again later.";
-        } else if (error.code === 'auth/user-disabled') {
-          message = "This account has been disabled.";
-        }
+      const errorCode = error?.code || error?.message;
+
+      if (errorCode?.includes('auth/user-not-found') || errorCode?.includes('auth/wrong-password') || errorCode?.includes('auth/invalid-credential')) {
+        message = "Invalid email or password.";
+      } else if (errorCode?.includes('auth/too-many-requests')) {
+        message = "Too many failed attempts. Please try again later.";
+      } else if (errorCode?.includes('auth/user-disabled')) {
+        message = "This account has been disabled.";
       }
+      
       toast({ title: "Login Failed", description: message, variant: "destructive" });
     } finally {
       setIsLoading(false);
@@ -78,17 +79,18 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
       }
     } catch (error: any) {
       let message = "Could not create account.";
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/email-already-in-use') {
-          message = "This email is already registered. Please try logging in instead.";
-        } else if (error.code === 'auth/invalid-email') {
-          message = "Please enter a valid email address.";
-        } else if (error.code === 'auth/weak-password') {
-          message = "Password should be at least 6 characters long.";
-        } else if (error.code === 'auth/operation-not-allowed') {
-          message = "Sign up is currently disabled.";
-        }
+      const errorCode = error?.code || error?.message;
+
+      if (errorCode?.includes('auth/email-already-in-use')) {
+        message = "This email is already registered. Please try logging in instead.";
+      } else if (errorCode?.includes('auth/invalid-email')) {
+        message = "Please enter a valid email address.";
+      } else if (errorCode?.includes('auth/weak-password')) {
+        message = "Password should be at least 6 characters long.";
+      } else if (errorCode?.includes('auth/operation-not-allowed')) {
+        message = "Sign up is currently disabled.";
       }
+      
       toast({ title: "Registration Failed", description: message, variant: "destructive" });
     } finally {
       setIsLoading(false);
