@@ -663,8 +663,8 @@ function DeviceCheckContent() {
   const additionalMethods = [
     { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qxk6lezz8qna2zqc5p9kzluyqg0tnnc9n2yf2s5', type: 'crypto', icon: getImage('bitcoin-icon') },
     { id: 'usdt-trc20', name: 'USDT (TRC20)', address: 'TXcf9y4fmH2dU4SD7psf4v4PmDUbiEz9yB', type: 'crypto', icon: getImage('usdt-trc20-icon') },
-    { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto', icon: getImage('usdc-icon') },
-    { id: 'eth', name: 'Ethereum (ETH)', address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto', icon: getImage('eth-icon') },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0x14f7B2e7EaB06Af1Adab71d05d80649EBcb65692', type: 'crypto', icon: getImage('usdc-icon') },
+    { id: 'eth', name: 'Ethereum (ETH)', address: '0x14f7B2e7EaB06Af1Adab71d05d80649EBcb65692', type: 'crypto', icon: getImage('eth-icon') },
     { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
     { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
     { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
