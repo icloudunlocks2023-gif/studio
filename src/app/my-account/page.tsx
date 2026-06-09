@@ -1298,7 +1298,7 @@ function MyAccountContent() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Telegram Channel
                             </a>
