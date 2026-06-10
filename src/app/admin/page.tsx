@@ -33,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -569,19 +569,19 @@ function AdminDashboard() {
                       </CardContent>
                       <CardFooter className="flex flex-col items-stretch gap-4">
                           <Button onClick={handleUpdateMetrics} className="btn-primary text-white w-full">Save All Settings</Button>
-                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                               <Link href="/admin/activities" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-border">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1">
                                   <Activity className="h-3 w-3" /> Activities
                                 </Button>
                               </Link>
                               <Link href="/admin/notifications" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-border">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1">
                                   <Bell className="h-3 w-3" /> Broadcast
                                 </Button>
                               </Link>
                               <Link href="/admin/tickets" className="w-full">
-                                <Button variant="outline" className="relative w-full text-xs gap-1 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">
+                                <Button variant="outline" className="relative w-full text-[10px] gap-1 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 px-1">
                                   <MessageSquare className="h-3 w-3" /> Tickets
                                   {hasOpenTickets && (
                                     <span className="absolute -top-1 -right-1 flex h-2 w-2">
@@ -592,10 +592,13 @@ function AdminDashboard() {
                                 </Button>
                               </Link>
                               <Link href="/admin/users" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-border"><Users className="h-3 w-3" />Users</Button>
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1"><Users className="h-3 w-3" />Users</Button>
                               </Link>
                               <Link href="/admin/banned" className="w-full">
-                                <Button variant="outline" className="w-full text-xs gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"><UserX className="h-3 w-3" />Banned</Button>
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 px-1"><UserX className="h-3 w-3" />Banned</Button>
+                              </Link>
+                              <Link href="/admin/reviews" className="w-full">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-primary text-primary hover:bg-primary hover:text-white px-1"><Star className="h-3 w-3" />Reviews</Button>
                               </Link>
                           </div>
                       </CardFooter>

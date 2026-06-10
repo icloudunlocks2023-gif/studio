@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Clock, Users, LockOpen, Menu, Mail } from 'lucide-react';
+import { Clock, Users, LockOpen, Menu, Mail, History } from 'lucide-react';
 import { LoginButton } from '@/components/login-button';
 import { useUser, useDoc } from '@/firebase';
 import Image from 'next/image';
@@ -418,8 +418,13 @@ export default function IcloudUnlocksPage() {
             <h2 className="text-4xl font-bold text-foreground mb-4">Customer Reviews</h2>
             <p className="text-xl text-muted-foreground">Trusted by thousands of customers worldwide</p>
           </div>
-          <div className="text-center mb-16">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
             <Button onClick={handleAddReviewClick} className="btn-primary text-white">Add review</Button>
+            <Link href="/reviews">
+                <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary hover:text-white">
+                    <History className="h-4 w-4" /> Reviews & Past Work
+                </Button>
+            </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
