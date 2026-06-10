@@ -23,6 +23,7 @@ import { ArrowLeft, Menu, Trash2, UserX, ShieldAlert } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 interface BannedUser {
   id: string;
@@ -36,6 +37,8 @@ interface BannedIP {
   createdAt: { toDate: () => Date };
 }
 
+const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
+
 function BannedDashboard() {
   const { data: user, loading: userLoading } = useUser();
   const { firestore } = useFirebase();
@@ -48,7 +51,7 @@ function BannedDashboard() {
   const [userIdInput, setUserIdInput] = useState('');
   const [ipInput, setIpInput] = useState('');
 
-  const isAdmin = user?.email === 'iunlockapple01@gmail.com';
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   useEffect(() => {
     if (userLoading) return;
@@ -101,26 +104,26 @@ function BannedDashboard() {
   };
 
   const removeBannedIp = (id: string) => {
-    deleteDoc(doc(firestore, 'banned_ips', id)).then(() => toast({ title: "IP whitelist restored" }));
+    deleteDoc(doc(firestore, 'banned_ips', id)).then(() => toast({ title: "IP blacklist removed" }));
   };
 
-  if (userLoading || !user || !isAdmin) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (userLoading || !user || !isAdmin) return <div className="flex justify-center items-center h-screen bg-background">Loading...</div>;
 
   return (
-    <div className="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
        <nav className="glass-effect fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2"><Image src="https://i.postimg.cc/9MCd4HJx/icloud-unlocks-logo.png" alt="iCloud Unlocks Logo" width={90} height={24} /></Link>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin Dashboard</Link>
+              <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Admin Dashboard</Link>
               <LoginButton />
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="flex-grow max-w-4xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full">
+      <main className="flex-grow max-w-5xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex items-center gap-4 mb-10">
             <Link href="/admin"><Button variant="outline" size="icon"><ArrowLeft /></Button></Link>
             <h1 className="text-4xl font-bold">Blacklist Management</h1>
@@ -133,48 +136,56 @@ function BannedDashboard() {
             </TabsList>
 
             <TabsContent value="users">
-                <Card className="mb-8">
+                <Card className="mb-8 border border-border">
                     <CardHeader><CardTitle>Ban a User by ID</CardTitle></CardHeader>
                     <CardContent className="flex gap-2">
-                        <Input value={userIdInput} onChange={(e) => setUserIdInput(e.target.value)} placeholder="Enter User ID to ban" />
+                        <Input value={userIdInput} onChange={(e) => setUserIdInput(e.target.value)} placeholder="Enter User ID to ban" className="bg-background" />
                         <Button onClick={handleAddBannedUser} className="btn-primary text-white">Ban User</Button>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="border border-border">
                     <Table>
-                        <TableHeader><TableRow><TableHead>User ID</TableHead><TableHead>Date Added</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+                        <TableHeader><TableRow className="border-border"><TableHead>User ID</TableHead><TableHead>Date Added</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
                         <TableBody>
                         {!bannedUsersLoading && bannedUsers?.map(b => (
-                            <TableRow key={b.id}>
-                                <TableCell className="font-mono text-xs">{b.userId}</TableCell>
-                                <TableCell>{b.createdAt?.toDate().toLocaleDateString() || 'N/A'}</TableCell>
+                            <TableRow key={b.id} className="border-border hover:bg-muted/50 transition-colors">
+                                <TableCell className="font-mono text-xs text-foreground">{b.userId}</TableCell>
+                                <TableCell className="text-muted-foreground">{b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                                <TableCell><Badge variant="destructive" className="uppercase text-[10px]">Banned</Badge></TableCell>
                                 <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => removeBannedUser(b.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
                             </TableRow>
                         ))}
+                        {bannedUsers?.length === 0 && !bannedUsersLoading && (
+                            <TableRow><TableCell colSpan={4} className="text-center py-10 text-muted-foreground italic">No banned users found.</TableCell></TableRow>
+                        )}
                         </TableBody>
                     </Table>
                 </Card>
             </TabsContent>
 
             <TabsContent value="ips">
-                <Card className="mb-8">
+                <Card className="mb-8 border border-border">
                     <CardHeader><CardTitle>Ban an IP Address</CardTitle></CardHeader>
                     <CardContent className="flex gap-2">
-                        <Input value={ipInput} onChange={(e) => setIpInput(e.target.value)} placeholder="Enter IP address to ban" />
+                        <Input value={ipInput} onChange={(e) => setIpInput(e.target.value)} placeholder="Enter IP address to ban" className="bg-background" />
                         <Button onClick={handleAddBannedIp} className="btn-primary text-white">Ban IP</Button>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="border border-border">
                     <Table>
-                        <TableHeader><TableRow><TableHead>IP Address</TableHead><TableHead>Date Added</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+                        <TableHeader><TableRow className="border-border"><TableHead>IP Address</TableHead><TableHead>Date Added</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
                         <TableBody>
                         {!bannedIpsLoading && bannedIps?.map(b => (
-                            <TableRow key={b.id}>
-                                <TableCell className="font-mono text-xs">{b.ip}</TableCell>
-                                <TableCell>{b.createdAt?.toDate().toLocaleDateString() || 'N/A'}</TableCell>
+                            <TableRow key={b.id} className="border-border hover:bg-muted/50 transition-colors">
+                                <TableCell className="font-mono text-xs text-blue-600 dark:text-blue-400">{b.ip}</TableCell>
+                                <TableCell className="text-muted-foreground">{b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
+                                <TableCell><Badge variant="destructive" className="uppercase text-[10px]">Restricted</Badge></TableCell>
                                 <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => removeBannedIp(b.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
                             </TableRow>
                         ))}
+                         {bannedIps?.length === 0 && !bannedIpsLoading && (
+                            <TableRow><TableCell colSpan={4} className="text-center py-10 text-muted-foreground italic">No blacklisted IPs found.</TableCell></TableRow>
+                        )}
                         </TableBody>
                     </Table>
                 </Card>

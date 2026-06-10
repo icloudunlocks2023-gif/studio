@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -32,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -454,7 +455,7 @@ function AdminDashboard() {
     return allUsers?.find(u => u.id === userId);
   };
 
-  if (userLoading || !user || !isAdmin) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (userLoading || !user || !isAdmin) return <div className="flex justify-center items-center h-screen bg-background">Loading...</div>;
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -546,7 +547,7 @@ function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
               <div className="mb-12 space-y-6">
-                  <Card className="border border-border">
+                  <Card className="border border-border shadow-sm">
                       <CardHeader><CardTitle className="flex items-center gap-2 text-foreground"><span>Site Settings & Metrics</span></CardTitle></CardHeader>
                       <CardContent className="space-y-6">
                           {countersLoading ? <p className="text-muted-foreground">Loading settings...</p> : (
@@ -561,14 +562,14 @@ function AdminDashboard() {
                                       <Switch id="server-status" checked={isServerOnline} onCheckedChange={handleToggleServer} />
                                   </div>
                                   <div className='grid gap-4 sm:grid-cols-2'>
-                                      <div className='grid gap-2'><Label htmlFor="registeredUsers" className="text-foreground">Registered Users</Label><Input id="registeredUsers" type="number" value={registeredUsers} onChange={(e) => setRegisteredUsers(Number(e.target.value))} /></div>
-                                      <div className='grid gap-2'><Label htmlFor="unlockedDevices" className="text-foreground">Unlocked Devices</Label><Input id="unlockedDevices" type="number" value={unlockedDevices} onChange={(e) => setUnlockedDevices(Number(e.target.value))} /></div>
+                                      <div className='grid gap-2'><Label htmlFor="registeredUsers" className="text-foreground">Registered Users</Label><Input id="registeredUsers" type="number" value={registeredUsers} onChange={(e) => setRegisteredUsers(Number(e.target.value))} className="bg-background" /></div>
+                                      <div className='grid gap-2'><Label htmlFor="unlockedDevices" className="text-foreground">Unlocked Devices</Label><Input id="unlockedDevices" type="number" value={unlockedDevices} onChange={(e) => setUnlockedDevices(Number(e.target.value))} className="bg-background" /></div>
                                   </div>
                               </>)}
                       </CardContent>
                       <CardFooter className="flex flex-col items-stretch gap-4">
                           <Button onClick={handleUpdateMetrics} className="btn-primary text-white w-full">Save All Settings</Button>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                               <Link href="/admin/activities" className="w-full">
                                 <Button variant="outline" className="w-full text-xs gap-1 border-border">
                                   <Activity className="h-3 w-3" /> Activities
@@ -576,7 +577,7 @@ function AdminDashboard() {
                               </Link>
                               <Link href="/admin/notifications" className="w-full">
                                 <Button variant="outline" className="w-full text-xs gap-1 border-border">
-                                  <Bell className="h-3 w-3" /> Notifications
+                                  <Bell className="h-3 w-3" /> Broadcast
                                 </Button>
                               </Link>
                               <Link href="/admin/tickets" className="w-full">
@@ -593,11 +594,14 @@ function AdminDashboard() {
                               <Link href="/admin/users" className="w-full">
                                 <Button variant="outline" className="w-full text-xs gap-1 border-border"><Users className="h-3 w-3" />Users</Button>
                               </Link>
+                              <Link href="/admin/banned" className="w-full">
+                                <Button variant="outline" className="w-full text-xs gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"><UserX className="h-3 w-3" />Banned</Button>
+                              </Link>
                           </div>
                       </CardFooter>
                   </Card>
 
-                  <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/10 dark:bg-blue-950/10 border border-border">
+                  <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/10 dark:bg-blue-950/10 border border-border shadow-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                         <Wallet className="h-5 w-5" />
@@ -613,7 +617,7 @@ function AdminDashboard() {
                             placeholder="Paste new address..." 
                             value={usdtAddress} 
                             onChange={(e) => setUsdtAddress(e.target.value)} 
-                            className="font-mono text-xs"
+                            className="font-mono text-xs bg-background"
                           />
                           <Button onClick={handleUpdateMetrics} className="gap-2">
                             <Save className="h-4 w-4" /> Update
@@ -626,10 +630,10 @@ function AdminDashboard() {
               </div>
 
               <h1 className="text-4xl font-bold text-center mb-10 text-foreground">Submissions</h1>
-              {submissionsLoading ? <p className="text-muted-foreground">Loading submissions...</p> : sortedSubmissions.length === 0 ? <p className='text-center text-muted-foreground'>None found.</p> : (
+              {submissionsLoading ? <p className="text-muted-foreground text-center">Loading submissions...</p> : sortedSubmissions.length === 0 ? <p className='text-center text-muted-foreground'>None found.</p> : (
                 <div className="space-y-6">
                   {sortedSubmissions.map(sub => (
-                    <Card key={sub.id} className={`bg-card border-border ${sub.status === 'waiting' || sub.status === 'device_found' ? 'border-2 border-primary' : 'border'}`}>
+                    <Card key={sub.id} className={`bg-card border-border ${sub.status === 'waiting' || sub.status === 'device_found' ? 'border-2 border-primary shadow-md' : 'border'}`}>
                       <CardHeader><CardTitle className='flex justify-between items-center text-foreground'><span>{sub.model}</span><Badge variant={sub.status === 'waiting' ? 'default' : 'secondary'} className={sub.status === 'waiting' || sub.status === 'device_found' ? 'animate-pulse' : ''}>{sub.status.replace('_', ' ')}</Badge></CardTitle></CardHeader>
                       <CardContent className="space-y-1">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-4">
@@ -667,7 +671,7 @@ function AdminDashboard() {
                             </div>
                             <div className="space-y-1">
                                 <label className="block text-sm font-medium text-foreground mb-1">Update Feedback Message:</label>
-                                <Textarea value={feedbackValues[sub.id] || sub.feedback?.filter(l => !l.startsWith('FIND_MY_') && !l.startsWith('TIMESTAMP:') && !l.includes('Chimaera Device Policy')).join('\n') || ''} onChange={(e) => handleFeedbackChange(sub.id, e.target.value)} className="font-mono text-sm" placeholder="Type message to send to client..." />
+                                <Textarea value={feedbackValues[sub.id] || sub.feedback?.filter(l => !l.startsWith('FIND_MY_') && !l.startsWith('TIMESTAMP:') && !l.includes('Chimaera Device Policy')).join('\n') || ''} onChange={(e) => handleFeedbackChange(sub.id, e.target.value)} className="font-mono text-sm bg-background" placeholder="Type message to send to client..." />
                             </div>
                         </div>
                       </CardContent>
@@ -682,9 +686,9 @@ function AdminDashboard() {
                                   <SelectContent>
                                       <SelectItem value="eligible">Eligible for Unlock</SelectItem>
                                       <SelectItem value="not_supported">Not Supported for Unlock</SelectItem>
-                                      <SelectItem value="feedback">Select the above device model and check again</SelectItem>
+                                      <SelectItem value="feedback">Select device model and re-check</SelectItem>
                                       <SelectItem value="find_my_off">Find My: OFF</SelectItem>
-                                      <SelectItem value="chimaera">Chimaera Device Policy & Blacklist (Blocked by Apple)</SelectItem>
+                                      <SelectItem value="chimaera">Chimaera Device Policy (Apple Block)</SelectItem>
                                       <SelectItem value="banned">Ban Member</SelectItem>
                                   </SelectContent>
                               </Select>
@@ -692,7 +696,7 @@ function AdminDashboard() {
                            <div className="space-y-2">
                              <Label className="text-[10px] uppercase font-bold text-muted-foreground">iCloud Status</Label>
                               <Select onValueChange={(value: 'clean' | 'lost') => handleIcloudStatusChange(sub.id, value)}>
-                                  <SelectTrigger className="bg-background"><SelectValue placeholder="Status (Clean/Lost)" /></SelectTrigger>
+                                  <SelectTrigger className="bg-background"><SelectValue placeholder="Clean/Lost" /></SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="clean">Clean</SelectItem>
                                       <SelectItem value="lost">Lost</SelectItem>
@@ -746,11 +750,11 @@ function AdminDashboard() {
                         <div className='flex items-center gap-2 flex-wrap'>
                             <Button onClick={() => handleSendFeedback(sub.id)} className="btn-primary text-white flex-1">Send Feedback</Button>
                             {sub.ipAddress && (
-                                <Button variant="outline" size="icon" title="Ban IP Address & User" onClick={() => handleBanIp(sub.ipAddress!, sub.userId)} className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950">
+                                <Button variant="outline" size="icon" title="Ban IP Address & User" onClick={() => handleBanIp(sub.ipAddress!, sub.userId)} className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950 shadow-sm">
                                     <ShieldAlert className="h-4 w-4" />
                                 </Button>
                             )}
-                            <Button onClick={() => handleDelete(sub.id)} variant="destructive">Delete</Button>
+                            <Button onClick={() => handleDelete(sub.id)} variant="destructive" className="shadow-sm">Delete</Button>
                         </div>
                       </CardFooter>
                     </Card>))}
@@ -758,13 +762,13 @@ function AdminDashboard() {
           </div>
           <div>
               <h1 className="text-4xl font-bold text-center mb-10 text-foreground">Client Orders</h1>
-              {ordersLoading ? <p className="text-muted-foreground">Loading orders...</p> : orders?.length === 0 ? <p className='text-center text-muted-foreground'>No orders found.</p> : (
-                  <Card className="border border-border">
+              {ordersLoading ? <p className="text-muted-foreground text-center">Loading orders...</p> : orders?.length === 0 ? <p className='text-center text-muted-foreground'>No orders found.</p> : (
+                  <Card className="border border-border shadow-sm">
                       <Table>
                           <TableHeader className="bg-muted/50"><TableRow className="border-border"><TableHead className="text-foreground">Date</TableHead><TableHead className="text-foreground">Order ID</TableHead><TableHead className="text-foreground">Model</TableHead><TableHead className="text-foreground">IMEI</TableHead><TableHead className="text-foreground">Status</TableHead><TableHead className="text-foreground text-right">Actions</TableHead></TableRow></TableHeader>
                           <TableBody>
                           {orders?.map(order => (
-                              <TableRow key={order.id} className="border-border">
+                              <TableRow key={order.id} className="border-border hover:bg-muted/30">
                                   <TableCell className="text-muted-foreground">{order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</TableCell>
                                   <TableCell className="font-mono text-xs text-foreground font-bold">{order.orderId}</TableCell>
                                   <TableCell className="text-foreground">{order.model}</TableCell>

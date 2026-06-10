@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Clock, Users, LockOpen, Menu } from 'lucide-react';
+import { Clock, Users, LockOpen, Menu, Mail } from 'lucide-react';
 import { LoginButton } from '@/components/login-button';
 import { useUser, useDoc } from '@/firebase';
 import Image from 'next/image';
@@ -221,6 +222,7 @@ export default function IcloudUnlocksPage() {
   const isAdmin = user?.email === ADMIN_EMAIL;
   const { toast } = useToast();
   const whatsappIcon = getImage('whatsapp-icon');
+  const telegramIcon = getImage('telegram-icon');
 
 
   const { data: counters, loading: countersLoading } = useDoc<Counters>('counters', 'metrics');
@@ -461,7 +463,7 @@ export default function IcloudUnlocksPage() {
           <div className="max-w-lg mx-auto">
               <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Get in Touch</h3>
               <div className="grid sm:grid-cols-2 gap-6">
-                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors border-border">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                      {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={28} height={28} />}
                   </div>
@@ -470,7 +472,7 @@ export default function IcloudUnlocksPage() {
                     <p className="text-blue-600">Chat with us</p>
                   </div>
                 </a>
-                <div className="flex items-center p-4 rounded-lg border bg-card">
+                <div className="flex items-center p-4 rounded-lg border bg-card border-border">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                     <Clock className="text-white" />
                   </div>
@@ -511,26 +513,26 @@ export default function IcloudUnlocksPage() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Telegram Channel
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
+                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Support 1
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/iUnlock_Apple" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
+                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Support 2
                             </a>
                         </li>
                         <li className='block'>
                             <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-                                <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
+                                {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
                         </li>
@@ -538,6 +540,12 @@ export default function IcloudUnlocksPage() {
                            <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
+                            </a>
+                        </li>
+                        <li className='block'>
+                           <a href="mailto:icloudunlocks2023@gmail.com" className="inline-flex items-center hover:text-white">
+                                <Mail className="mr-2 h-4 w-4" />
+                                Email Support
                             </a>
                         </li>
                     </ul>

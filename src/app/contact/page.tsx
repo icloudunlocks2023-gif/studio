@@ -37,7 +37,7 @@ export default function ContactPage() {
       icon: telegramIcon,
       title: 'Telegram Channel', 
       value: 'Official Announcements', 
-      link: 'https://t.me/iUnlock_Apple1',
+      link: 'https://t.me/iCloudUnlocks2023',
     },
     { 
       icon: telegramIcon, 
@@ -62,6 +62,12 @@ export default function ContactPage() {
       title: 'WhatsApp',
       value: 'Alternative Contact',
       link: 'https://wa.me/message/P2IXLAG23I23P1'
+    },
+    {
+      lucideIcon: Mail,
+      title: 'Email Support',
+      value: 'icloudunlocks2023@gmail.com',
+      link: 'mailto:icloudunlocks2023@gmail.com'
     }
   ];
 
@@ -144,6 +150,11 @@ export default function ContactPage() {
                     {method.icon && (
                         <Image src={method.icon.imageUrl} alt={`${method.title} icon`} width={40} height={40} className="mr-4" />
                     )}
+                    {method.lucideIcon && (
+                        <div className="mr-4 p-2 bg-primary/10 rounded-lg text-primary">
+                            <method.lucideIcon size={24} />
+                        </div>
+                    )}
                     <div>
                         <p className="font-semibold text-lg text-foreground">{method.title}</p>
                         <p className="text-muted-foreground">{method.value}</p>
@@ -183,7 +194,7 @@ export default function ContactPage() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Telegram Channel
                             </a>
@@ -210,6 +221,12 @@ export default function ContactPage() {
                            <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
+                            </a>
+                        </li>
+                        <li className='block'>
+                           <a href="mailto:icloudunlocks2023@gmail.com" className="inline-flex items-center hover:text-white">
+                                <Mail className="mr-2 h-4 w-4" />
+                                Email Support
                             </a>
                         </li>
                     </ul>

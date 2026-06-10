@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "user": {
@@ -134,6 +135,22 @@
         "status": { "type": "string", "enum": ["pending", "processed", "rejected"] },
         "createdAt": { "type": "string", "format": "date-time" }
       }
+    },
+    "banned_user": {
+      "title": "Banned User",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "banned_ip": {
+      "title": "Banned IP",
+      "type": "object",
+      "properties": {
+        "ip": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -159,6 +176,14 @@
     "/withdrawals/{requestId}": {
       "schema": { "$ref": "#/backend/entities/withdrawal" },
       "description": "User withdrawal requests"
+    },
+    "/banned_users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/banned_user" },
+      "description": "Blacklisted user IDs"
+    },
+    "/banned_ips/{ipId}": {
+      "schema": { "$ref": "#/backend/entities/banned_ip" },
+      "description": "Blacklisted IP addresses"
     }
   }
 }
