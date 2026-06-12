@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LoginButton } from '@/components/login-button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Clock, ChevronRight } from 'lucide-react';
+import { Menu, Clock, ChevronRight, AlertTriangle, Wifi } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notification-dropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthModal } from '@/components/auth-modal';
@@ -179,6 +179,12 @@ export default function ServicesPage() {
     { name: 'iPad Mini 7th Gen (A17 Pro, 2024)', price: 95, lostPrice: 85 },
   ];
 
+  const ipadWifiOnlyModels = ipadModels.map(model => ({
+    ...model,
+    price: model.price + 15,
+    lostPrice: model.lostPrice + 15
+  }));
+
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
 
@@ -250,7 +256,7 @@ export default function ServicesPage() {
           <p className="mt-4 text-lg text-muted-foreground">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
         </section>
 
-        <section className="py-12 px-4">
+        <section className="py-12 px-4 space-y-20">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
                     <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPhone Unlock Prices</h2>
@@ -361,7 +367,7 @@ export default function ServicesPage() {
                 </div>
                 
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPad Unlock Prices</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPad Unlock Prices (Standard)</h2>
                      <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
@@ -383,6 +389,65 @@ export default function ServicesPage() {
                                     size="sm" 
                                     variant="outline" 
                                     className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold" 
+                                    onClick={() => handleUnlockClick(device)}
+                                  >
+                                    Check & Unlock
+                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                  </Button>
+                                </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-card p-8 rounded-3xl shadow-2xl border-2 border-primary/20 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5">
+                      <Wifi size={120} className="text-primary" />
+                    </div>
+                    
+                    <div className="mb-8 p-6 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl">
+                        <div className="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
+                            <AlertTriangle size={32} />
+                            <h2 className="text-2xl font-black uppercase tracking-tight">Important Notice</h2>
+                        </div>
+                        <div className="space-y-4 text-sm sm:text-base text-red-900 dark:text-red-200 leading-relaxed">
+                            <p>This service is strictly for <strong>Wi-Fi Only iPads</strong>. Please make sure your device is a Wi-Fi model before placing an order.</p>
+                            <p>A Wi-Fi Only iPad does <strong>not</strong> have a SIM card slot. If your iPad has a SIM card slot, it is a <strong>Cellular Model</strong> and should NOT be submitted under this service.</p>
+                            <p className="font-bold underline">Please note that if a Cellular iPad is submitted and an order is placed through this Wi-Fi Only service, the device may be successfully registered, but the activation process will fail due to Cellular Model restrictions. In such cases, the funds used for the order may be lost and cannot be recovered.</p>
+                            <p>For Cellular iPads, customers should use the existing standard unlock services available on the website.</p>
+                            <p className="italic">If the customer is unsure whether the device is Wi-Fi Only or Cellular, they should contact support before placing an order.</p>
+                        </div>
+                    </div>
+
+                    <h2 className="text-3xl font-black text-foreground mb-6 flex items-center gap-3">
+                        <Wifi className="text-primary" />
+                        iPad Wi-Fi Only Instant FMI OFF Service
+                    </h2>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                            <tr className="border-b border-border">
+                                <th className="p-4 text-foreground font-bold">Wi-Fi Only Model</th>
+                                <th className="p-4 text-foreground font-bold">Price (Clean)</th>
+                                <th className="p-4 text-foreground font-bold">Price (Lost)</th>
+                                <th className="p-4"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {ipadWifiOnlyModels.map(device => (
+                                <tr key={`wifi-${device.name}`} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-4 text-card-foreground font-medium">{device.name} (Wi-Fi Only)</td>
+                                <td className="p-4 text-card-foreground font-bold text-primary">${device.price}</td>
+                                <td className="p-4 text-card-foreground font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-4 text-right">
+                                  <Button 
+                                    size="sm" 
+                                    className="btn-primary text-white font-bold shadow-lg" 
                                     onClick={() => handleUnlockClick(device)}
                                   >
                                     Check & Unlock
@@ -457,7 +522,7 @@ export default function ServicesPage() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Telegram Channel
                             </a>
