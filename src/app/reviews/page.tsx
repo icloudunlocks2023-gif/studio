@@ -170,14 +170,11 @@ export default function ReviewsPage() {
       <Dialog open={!!selectedGallery} onOpenChange={(open) => !open && setSelectedGallery(null)}>
         <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-none">
             <div className="relative w-full h-full flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b border-border/50">
+                <div className="flex items-center justify-between p-4 border-b border-border/50 pr-14">
                     <div>
                         <DialogTitle className="text-xl font-black">{selectedGallery?.title}</DialogTitle>
                         <DialogDescription className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Image Gallery</DialogDescription>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setSelectedGallery(null)} className="rounded-full">
-                        <X className="h-5 w-5" />
-                    </Button>
                 </div>
                 
                 <div className="flex-1 relative flex items-center justify-center p-4 sm:p-12">
