@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useCollection, useUser } from '@/firebase';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 
 interface PastWork {
@@ -38,7 +39,15 @@ export default function ReviewsPage() {
   const constraints = useMemo(() => [orderBy('completionDate', 'desc')], []);
   const { data: reviews, loading } = useCollection<PastWork>('past_work', { constraints });
 
-  const [selectedGallery, setSelectedGallery] = useState<{ urls: string[], title: string } | null>(null);
+  const [selectedGallery, setSelectedGallery] = useState<{ urls: string[], title: string, startIndex: number } | null>(null);
+  const [api, setApi] = useState<CarouselApi>();
+
+  // Synchronize the carousel to the clicked index when the modal opens
+  useEffect(() => {
+    if (!api || selectedGallery === null) return;
+    
+    api.scrollTo(selectedGallery.startIndex, true);
+  }, [api, selectedGallery]);
 
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen transition-colors duration-300">
@@ -114,7 +123,7 @@ export default function ReviewsPage() {
                                         <div 
                                           key={idx} 
                                           className="relative aspect-[4/3] rounded-xl overflow-hidden border border-border bg-muted/30 group cursor-pointer"
-                                          onClick={() => setSelectedGallery({ urls: work.imageUrls, title: work.title })}
+                                          onClick={() => setSelectedGallery({ urls: work.imageUrls, title: work.title, startIndex: idx })}
                                         >
                                             <Image 
                                                 src={url} 
@@ -173,7 +182,7 @@ export default function ReviewsPage() {
                 
                 <div className="flex-1 relative flex items-center justify-center p-4 sm:p-12">
                     {selectedGallery && (
-                        <Carousel className="w-full h-full max-w-5xl">
+                        <Carousel setApi={setApi} className="w-full h-full max-w-5xl">
                             <CarouselContent className="h-full">
                                 {selectedGallery.urls.map((url, index) => (
                                     <CarouselItem key={index} className="h-full flex items-center justify-center">
