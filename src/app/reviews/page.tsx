@@ -37,7 +37,15 @@ export default function ReviewsPage() {
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
 
   const constraints = useMemo(() => [orderBy('completionDate', 'desc')], []);
-  const { data: reviews, loading } = useCollection<PastWork>('past_work', { constraints });
+  const { data: reviewsData, loading } = useCollection<PastWork>('past_work', { constraints });
+
+  // Ensure descending sort by date (latest first)
+  const sortedReviews = useMemo(() => {
+    if (!reviewsData) return [];
+    return [...reviewsData].sort((a, b) => {
+        return new Date(b.completionDate).getTime() - new Date(a.completionDate).getTime();
+    });
+  }, [reviewsData]);
 
   const [selectedGallery, setSelectedGallery] = useState<{ urls: string[], title: string, startIndex: number } | null>(null);
   const [api, setApi] = useState<CarouselApi>();
@@ -103,9 +111,9 @@ export default function ReviewsPage() {
                 <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                 <p className="text-muted-foreground font-medium">Loading our work history...</p>
             </div>
-        ) : reviews && reviews.length > 0 ? (
+        ) : sortedReviews && sortedReviews.length > 0 ? (
             <div className="grid gap-12">
-                {reviews.map((work) => (
+                {sortedReviews.map((work) => (
                     <Card key={work.id} className="overflow-hidden border border-border shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in">
                         <div className="grid lg:grid-cols-12 gap-0">
                             <div className="lg:col-span-8 p-6 sm:p-8 space-y-6">
