@@ -437,10 +437,10 @@ function MyAccountContent() {
 
   const additionalMethods = [
     { id: 'usdt-bep20', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress, type: 'crypto' },
-    { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qxk6lezz8qna2zqc5p9kzluyqg0tnnc9n2yf2s5', type: 'crypto' },
-    { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TXcf9y4fmH2dU4SD7psf4v4PmDUbiEz9yB', type: 'crypto' },
-    { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto' },
-    { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0xE976F1c7b06411e21b0F67f33116af92CB1dcABA', type: 'crypto' },
+    { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qzrxlnds0lrx7txvxg0fhyqctjvztfdjw3uf8lr', type: 'crypto' },
+    { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TCRCzCURBYfZB459umToj54nXftEKU1G9q', type: 'crypto' },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
+    { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
     { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
     { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
     { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
@@ -1298,7 +1298,7 @@ function MyAccountContent() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Telegram Channel
                             </a>
