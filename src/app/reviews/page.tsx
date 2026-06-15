@@ -92,7 +92,7 @@ export default function ReviewsPage() {
                 <Button variant="outline" size="icon" className="rounded-full"><ArrowLeft className="h-4 w-4" /></Button>
             </Link>
             <div>
-                <h1 className="text-4xl font-black tracking-tight">Reviews & Past Work</h1>
+                <h1 className="text-4xl font-black tracking-tight">Past Work & Verified Results</h1>
                 <p className="text-muted-foreground mt-1">Real proof of our professional Apple device unlocking services.</p>
             </div>
           </div>

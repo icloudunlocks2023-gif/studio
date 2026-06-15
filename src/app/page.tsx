@@ -418,11 +418,11 @@ export default function IcloudUnlocksPage() {
             <h2 className="text-4xl font-bold text-foreground mb-4">Customer Reviews</h2>
             <p className="text-xl text-muted-foreground">Trusted by thousands of customers worldwide</p>
           </div>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-            <Button onClick={handleAddReviewClick} className="btn-primary text-white">Add review</Button>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
+            <Button onClick={handleAddReviewClick} className="btn-primary text-white h-11 px-8 rounded-xl font-bold shadow-lg">Add review</Button>
             <Link href="/reviews">
-                <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary hover:text-white">
-                    <History className="h-4 w-4" /> Reviews & Past Work
+                <Button variant="outline" className="gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white h-11 px-8 rounded-xl font-bold shadow-md transition-all">
+                    <History className="h-5 w-5" /> Past Work & Verified Results
                 </Button>
             </Link>
           </div>
