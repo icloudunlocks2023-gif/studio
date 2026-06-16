@@ -150,38 +150,6 @@ export default function LiveProcessingPage() {
     }
   }, [orders, isAdmin, firestore]);
 
-  // Auto-generation logic
-  useEffect(() => {
-    if (!ordersLoading && orders && orders.length === 0 && isAdmin) {
-      generateInitialBatch();
-    }
-  }, [orders, ordersLoading, isAdmin]);
-
-  const generateInitialBatch = async () => {
-    const batchSize = Math.floor(Math.random() * 8) + 4; // 4-12 orders
-    const now = new Date();
-    
-    for (let i = 0; i < batchSize; i++) {
-      const hourOffset = Math.floor(Math.random() * 24);
-      const minOffset = Math.floor(Math.random() * 60);
-      const createdAt = new Date(now.getTime() - (hourOffset * 3600000 + minOffset * 60000));
-      
-      const category = pickCategory();
-      const modelList = MODELS[category as keyof typeof MODELS];
-      const model = modelList[Math.floor(Math.random() * modelList.length)];
-      const imei = generateIdentifier(category);
-      const orderId = generateOrderId();
-
-      await addDoc(collection(firestore, 'processing_orders'), {
-        orderId,
-        imei,
-        category,
-        model,
-        createdAt: Timestamp.fromDate(createdAt)
-      });
-    }
-  };
-
   const pickCategory = () => {
     const rand = Math.random();
     if (rand < 0.5) return 'iPhone'; // 50% iPhone
@@ -206,6 +174,30 @@ export default function LiveProcessingPage() {
     }
 
     return generateAppleSerial();
+  };
+
+  const handleGenerateSingleOrder = async () => {
+    setIsSubmitting(true);
+    try {
+      const category = pickCategory();
+      const modelList = MODELS[category as keyof typeof MODELS];
+      const model = modelList[Math.floor(Math.random() * modelList.length)];
+      const imei = generateIdentifier(category);
+      const orderId = generateOrderId();
+
+      await addDoc(collection(firestore, 'processing_orders'), {
+        orderId,
+        imei,
+        category,
+        model,
+        createdAt: serverTimestamp()
+      });
+      toast({ title: "Order Generated", description: `Added a new ${model} to processing stream.` });
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to generate order.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateProgress = (createdAt: any) => {
@@ -301,6 +293,10 @@ export default function LiveProcessingPage() {
                   }}>
                     <Plus className="h-4 w-4 mr-2" /> Add Manual Order
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleGenerateSingleOrder} disabled={isSubmitting}>
+                    {isSubmitting ? <Loader className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                    Generate Realistic Order
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -315,7 +311,7 @@ export default function LiveProcessingPage() {
               <MonitorPlay className="h-8 w-8 text-primary" />
               Live Processing Orders
             </h1>
-            <p className="text-muted-foreground text-sm">Monitor ongoing registrations and recently completed FMI OFF processing activity.</p>
+            <p className="text-muted-foreground text-sm">Monitor ongoing iCloud Unlock registrations and recently completed FMI OFF processing activity.</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border">
             <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -394,7 +390,7 @@ export default function LiveProcessingPage() {
             ) : (
               <div className="p-20 text-center text-muted-foreground border-t border-border">
                 <RefreshCw className="h-16 w-16 mx-auto mb-4 opacity-10" />
-                <p className="font-medium">No processing data found. Simulation initializing...</p>
+                <p className="font-medium">No processing data found. Use the menu above to generate orders.</p>
               </div>
             )}
           </CardContent>
