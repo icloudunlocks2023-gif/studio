@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -43,7 +42,9 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
   
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   
   // Login States
   const [loginEmail, setLoginEmail] = useState('');
@@ -53,7 +54,6 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
-  const [regDisplayName, setRegDisplayName] = useState('');
   const [regUsername, setRegUsername] = useState('');
   const [regCountry, setRegCountry] = useState('');
   const [regWhatsapp, setRegWhatsapp] = useState('');
@@ -100,13 +100,14 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
     if (regPassword !== regConfirmPassword) {
         return toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
     }
-    if (!regCountry || !regAccountType || !regOwnership) {
+    if (!regCountry || !regAccountType || !regOwnership || !regUsername) {
         return toast({ title: "Error", description: "Please fill all required fields.", variant: "destructive" });
     }
 
     setIsLoading(true);
     try {
-      const userCredential = await signUpWithEmail(auth, firestore, regEmail, regPassword, regDisplayName, {
+      // Use regUsername as the display name since regDisplayName was removed
+      const userCredential = await signUpWithEmail(auth, firestore, regEmail, regPassword, regUsername, {
           username: regUsername,
           country: regCountry,
           whatsappNumber: regWhatsapp,
@@ -161,13 +162,13 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
                   <Input id="login-email" type="email" placeholder="m@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="login-password">Password</Label>
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-xs text-muted-foreground hover:text-primary">
-                      {showPassword ? "Hide" : "Show"}
+                  <Label htmlFor="login-password">Password</Label>
+                  <div className="relative">
+                    <Input id="login-password" type={showLoginPassword ? 'text' : 'password'} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required className="pr-10" />
+                    <button type="button" onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary">
+                      {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  <Input id="login-password" type={showPassword ? 'text' : 'password'} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
                 </div>
                 <Button type="submit" className="w-full btn-primary text-white font-bold h-11" disabled={isLoading}>
                   {isLoading ? <Loader className="animate-spin h-5 w-5" /> : "Sign In"}
@@ -177,15 +178,9 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
 
             <TabsContent value="register">
               <form onSubmit={handleRegister} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-name">Full Name</Label>
-                      <Input id="reg-name" placeholder="John Doe" value={regDisplayName} onChange={(e) => setRegDisplayName(e.target.value)} required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-user">Username</Label>
-                      <Input id="reg-user" placeholder="johndoe123" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-user">Username</Label>
+                  <Input id="reg-user" placeholder="johndoe123" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required />
                 </div>
 
                 <div className="space-y-2">
@@ -196,11 +191,21 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="reg-password">Password</Label>
-                      <Input id="reg-password" type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
+                      <div className="relative">
+                        <Input id="reg-password" type={showRegPassword ? 'text' : 'password'} value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required className="pr-10" />
+                        <button type="button" onClick={() => setShowRegPassword(!showRegPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary">
+                          {showRegPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-confirm">Confirm Password</Label>
-                      <Input id="reg-confirm" type="password" value={regConfirmPassword} onChange={(e) => setRegConfirmPassword(e.target.value)} required />
+                      <div className="relative">
+                        <Input id="reg-confirm" type={showRegConfirmPassword ? 'text' : 'password'} value={regConfirmPassword} onChange={(e) => setRegConfirmPassword(e.target.value)} required className="pr-10" />
+                        <button type="button" onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary">
+                          {showRegConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                 </div>
 

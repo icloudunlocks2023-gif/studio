@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail, Landmark } from 'lucide-react';
+import { Copy, RefreshCw, AlertCircle, Loader, MessageSquare, Ticket, ChevronRight, CheckCircle2, Menu, Wallet, Info, Trash2, XCircle, BarChart3, Clock, User, Key, Percent, ArrowLeft, Mail, Landmark, Eye, EyeOff } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -160,6 +160,7 @@ function MyAccountContent() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -536,7 +537,7 @@ function MyAccountContent() {
           </CardHeader>
           <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-1">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Display Name</p>
               <p className="text-lg font-semibold text-foreground">{userProfile?.displayName || 'N/A'}</p>
             </div>
             <div className="space-y-1">
@@ -1012,13 +1013,19 @@ function MyAccountContent() {
           <div className="py-4 space-y-4">
              <div className="space-y-2">
                 <Label htmlFor="new-password">New Password</Label>
-                <Input 
-                  id="new-password" 
-                  type="password" 
-                  placeholder="Min 6 characters..." 
-                  value={newPassword} 
-                  onChange={(e) => setNewPassword(e.target.value)} 
-                />
+                <div className="relative">
+                  <Input 
+                    id="new-password" 
+                    type={showNewPassword ? 'text' : 'password'} 
+                    placeholder="Min 6 characters..." 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    className="pr-10"
+                  />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary">
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
              </div>
              <p className="text-[10px] text-muted-foreground italic">For security, you may be asked to log in again after updating your password.</p>
           </div>
