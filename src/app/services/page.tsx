@@ -251,13 +251,27 @@ export default function ServicesPage() {
       </nav>
 
       <main className="pt-16 flex-grow">
-        <section className="text-center py-12 px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground">Permanent iCloud Unlock (FMI OFF)</h1>
-          <p className="mt-4 text-lg text-muted-foreground">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
+        <section className="text-center py-12 px-4 max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Permanent iCloud Unlock (FMI OFF)</h1>
+          <p className="text-lg text-muted-foreground mb-8">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
+          
+          <div className="bg-card border border-border p-6 rounded-2xl shadow-sm space-y-6 text-left md:text-center">
+            <p className="text-xl font-bold text-green-600 dark:text-green-400 flex items-center justify-center gap-2">
+              ✅ Checking the unlock success rate is completely free.
+            </p>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Simply click the <strong className="text-foreground">"Check & Unlock"</strong> button and submit your device's <strong className="text-foreground">IMEI</strong> or <strong className="text-foreground">Serial Number</strong>. The system will instantly check the unlock success rate and let you know whether the device is supported before you proceed with an order.
+              </p>
+              <p className="font-semibold text-foreground">
+                This helps you make an informed decision and avoid paying for devices with low unlock success rates.
+              </p>
+            </div>
+          </div>
         </section>
 
         <section className="py-12 px-4 space-y-20">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="max-w-7xl auto grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
                     <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPhone Unlock Prices</h2>
                     <div className="overflow-x-auto">
