@@ -15,6 +15,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthModal } from '@/components/auth-modal';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 
 interface UserProfile {
   id: string;
