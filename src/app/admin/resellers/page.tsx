@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirebase, useCollection } from '@/firebase';
-import { doc, updateDoc, where } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -110,7 +110,7 @@ export default function ResellersPage() {
                 <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                        placeholder="Search by name, email, ID..." 
+                        placeholder="Search users..." 
                         className="pl-10" 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}

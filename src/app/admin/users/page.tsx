@@ -143,7 +143,7 @@ function UserManagementDashboard() {
         </div>
 
         {usersLoading ? (
-            <div className="flex justify-center py-20"><Loader className="animate-spin h-8 w-8 text-primary" /></div>
+            <div className="flex justify-center py-20"><Search className="animate-spin h-8 w-8 text-primary" /></div>
         ) : filteredUsers.length === 0 ? (
             <Card className="p-20 text-center text-muted-foreground italic border-dashed">No users found.</Card>
         ) : (
@@ -152,7 +152,7 @@ function UserManagementDashboard() {
                     <TableHeader className="bg-muted/50">
                         <TableRow>
                             <TableHead>User Details</TableHead>
-                            <TableHead>Network</TableHead>
+                            <TableHead>Network & WhatsApp</TableHead>
                             <TableHead>Account Info</TableHead>
                             <TableHead>Balance Management</TableHead>
                         </TableRow>
@@ -174,7 +174,7 @@ function UserManagementDashboard() {
                                         <span className="font-mono">{u.ipAddress || '0.0.0.0'}</span>
                                     </div>
                                     <div className="text-[10px] font-bold text-green-600">
-                                        WhatsApp: {u.whatsappNumber || 'Nil'}
+                                        WhatsApp: {u.whatsappNumber && u.whatsappNumber !== '' ? u.whatsappNumber : 'Nil'}
                                     </div>
                                 </div>
                             </TableCell>
