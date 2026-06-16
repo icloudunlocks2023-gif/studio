@@ -4,15 +4,24 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { PlaceHolderImages, getImage } from '@/lib/placeholder-images';
 import Image from 'next/image';
-import { useUser } from '@/firebase';
+import { useUser, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LoginButton } from '@/components/login-button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Clock, ChevronRight, AlertTriangle, Wifi } from 'lucide-react';
+import { Menu, Clock, ChevronRight, AlertTriangle, Wifi, ShieldCheck, Percent, Zap, MessageSquare } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notification-dropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthModal } from '@/components/auth-modal';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+
+interface UserProfile {
+  id: string;
+  accountType?: string;
+  isReseller?: boolean;
+  resellerPricingActive?: boolean;
+}
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -29,10 +38,20 @@ const paymentMethods = [
 
 export default function ServicesPage() {
   const { data: user } = useUser();
+  const { data: profile } = useDoc<UserProfile>('users', user?.uid || ' ');
   const router = useRouter();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
+  const isResellerActive = profile?.resellerPricingActive === true;
+  const isProfessionalUser = ['Reseller', 'Technician', 'Repair Shop / Business'].includes(profile?.accountType || '');
+
+  const calculatePrice = (basePrice: number) => {
+    if (isResellerActive) {
+      return Math.floor(basePrice * 0.85); // 15% discount
+    }
+    return basePrice;
+  };
 
   const handleUnlockClick = (device: { name: string, price: number }) => {
     if (!user) {
@@ -40,9 +59,11 @@ export default function ServicesPage() {
       return;
     }
 
+    const priceToUse = calculatePrice(device.price);
+
     const params = new URLSearchParams({
         model: device.name,
-        price: device.price.toString(),
+        price: priceToUse.toString(),
         image: 'https://i.postimg.cc/9M6QghRY/icloud-unlocks.png',
     });
 
@@ -251,6 +272,24 @@ export default function ServicesPage() {
       </nav>
 
       <main className="pt-16 flex-grow">
+        {/* Reseller Banner / Notice */}
+        {isResellerActive && (
+          <div className="bg-primary/10 border-b border-primary/20 py-3 px-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <span className="text-sm font-black text-primary tracking-widest uppercase">Reseller Pricing Active — 15% Discount Applied Sitewide</span>
+            </div>
+          </div>
+        )}
+
+        {!isResellerActive && isProfessionalUser && (
+          <div className="bg-blue-50 dark:bg-blue-950/20 border-b border-blue-100 dark:border-blue-900/30 py-4 px-4 text-center">
+            <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+              Looking for reseller pricing? Contact <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Support</a> for reseller rates and bulk service discounts.
+            </p>
+          </div>
+        )}
+
         <section className="text-center py-12 px-4 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Permanent iCloud Unlock (FMI OFF)</h1>
           <p className="text-lg text-muted-foreground mb-8">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
@@ -273,7 +312,10 @@ export default function ServicesPage() {
         <section className="py-12 px-4 space-y-20 flex flex-col items-center">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPhone Unlock Prices</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        📱 iPhone Unlock Prices
+                        {isResellerActive && <Badge className="bg-green-500 hover:bg-green-600">-15%</Badge>}
+                    </h2>
                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
@@ -288,8 +330,8 @@ export default function ServicesPage() {
                             {iphoneModels.map(device => (
                                 <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${calculatePrice(device.price)}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${calculatePrice(device.lostPrice)}</td>
                                 <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
@@ -308,7 +350,10 @@ export default function ServicesPage() {
                 </div>
 
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">💻 MacBook Unlock Prices</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        💻 MacBook Unlock Prices
+                        {isResellerActive && <Badge className="bg-green-500 hover:bg-green-600">-15%</Badge>}
+                    </h2>
                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
@@ -323,8 +368,8 @@ export default function ServicesPage() {
                             {macbookModels.map(device => (
                                 <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${calculatePrice(device.price)}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${calculatePrice(device.lostPrice)}</td>
                                 <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
@@ -343,7 +388,10 @@ export default function ServicesPage() {
                 </div>
 
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">⌚ Apple Watch Unlock Prices</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        ⌚ Apple Watch Unlock Prices
+                        {isResellerActive && <Badge className="bg-green-500 hover:bg-green-600">-15%</Badge>}
+                    </h2>
                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
@@ -358,8 +406,8 @@ export default function ServicesPage() {
                             {watchModels.map(device => (
                                 <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${calculatePrice(device.price)}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${calculatePrice(device.lostPrice)}</td>
                                 <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
@@ -378,7 +426,10 @@ export default function ServicesPage() {
                 </div>
                 
                 <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
-                    <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPad Unlock Prices (Standard)</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        📱 iPad Unlock Prices (Standard)
+                        {isResellerActive && <Badge className="bg-green-500 hover:bg-green-600">-15%</Badge>}
+                    </h2>
                      <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
@@ -393,8 +444,8 @@ export default function ServicesPage() {
                             {ipadModels.map(device => (
                                 <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
-                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${calculatePrice(device.price)}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${calculatePrice(device.lostPrice)}</td>
                                 <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
@@ -436,6 +487,7 @@ export default function ServicesPage() {
                     <h2 className="text-3xl font-black text-foreground mb-6 flex items-center gap-3">
                         <Wifi className="text-primary" />
                         iPad Wi-Fi Only Instant FMI OFF Service
+                        {isResellerActive && <Badge className="bg-green-500 ml-2">-15%</Badge>}
                     </h2>
 
                     <div className="overflow-x-auto">
@@ -452,8 +504,8 @@ export default function ServicesPage() {
                             {ipadWifiOnlyModels.map(device => (
                                 <tr key={`wifi-${device.name}`} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-4 text-card-foreground font-medium">{device.name} (Wi-Fi Only)</td>
-                                <td className="p-4 text-card-foreground font-bold text-primary">${device.price}</td>
-                                <td className="p-4 text-card-foreground font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-4 text-card-foreground font-bold text-primary">${calculatePrice(device.price)}</td>
+                                <td className="p-4 text-card-foreground font-bold text-red-500">${calculatePrice(device.lostPrice)}</td>
                                 <td className="p-4 text-right">
                                   <Button 
                                     size="sm" 
@@ -471,6 +523,39 @@ export default function ServicesPage() {
                     </div>
                 </div>
             </div>
+        </section>
+
+        {/* Benefits Section for Professionals */}
+        <section className="py-20 bg-muted/30 border-t border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold mb-4">Professional Reseller Benefits</h2>
+              <p className="text-muted-foreground">Unlock higher margins with our professional program.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="p-6 space-y-4 border-primary/10 shadow-sm">
+                <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <Percent className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-lg">Guaranteed 15% Off</h3>
+                <p className="text-sm text-muted-foreground">Get a flat 15% discount on all retail prices automatically applied to your account.</p>
+              </Card>
+              <Card className="p-6 space-y-4 border-primary/10 shadow-sm">
+                <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-lg">Priority Processing</h3>
+                <p className="text-sm text-muted-foreground">Reseller orders are prioritized in our server queues for even faster turnarounds.</p>
+              </Card>
+              <Card className="p-6 space-y-4 border-primary/10 shadow-sm">
+                <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <MessageSquare className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-lg">Dedicated Support</h3>
+                <p className="text-sm text-muted-foreground">Access our technical team directly via WhatsApp for any complex unlock queries.</p>
+              </Card>
+            </div>
+          </div>
         </section>
 
         <section id="contact" className="py-20 bg-background">
