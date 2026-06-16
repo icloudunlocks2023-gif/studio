@@ -44,10 +44,31 @@ interface ProcessingOrder {
 const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
 
 const MODELS = {
-  iPhone: ['iPhone 11', 'iPhone 11 Pro Max', 'iPhone 12', 'iPhone 12 Pro Max', 'iPhone 13', 'iPhone 13 Pro Max', 'iPhone 14', 'iPhone 14 Pro Max', 'iPhone 15', 'iPhone 15 Pro Max', 'iPhone 16 Pro Max'],
-  MacBook: ['MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3', 'MacBook Pro 13-inch', 'MacBook Pro 14-inch', 'MacBook Pro 16-inch'],
-  iPad: ['iPad 9th Generation', 'iPad 10th Generation', 'iPad Air 4', 'iPad Air 5', 'iPad Pro 11-inch', 'iPad Pro 12.9-inch'],
-  'Apple Watch': ['Apple Watch Series 6', 'Apple Watch Series 7', 'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch Ultra'],
+  iPhone: [
+    'iPhone X', 'iPhone XR', 'iPhone XS', 'iPhone XS Max', 'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max',
+    'iPhone SE (2020)', 'iPhone 12 Mini', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max', 'iPhone 13 Mini',
+    'iPhone 13', 'iPhone 13 Pro', 'iPhone 13 Pro Max', 'iPhone SE (2022)', 'iPhone 14', 'iPhone 14 Plus',
+    'iPhone 14 Pro', 'iPhone 14 Pro Max', 'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
+    'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max'
+  ],
+  iPad: [
+    'iPad 6th Generation', 'iPad 7th Generation', 'iPad 8th Generation', 'iPad 9th Generation', 'iPad 10th Generation',
+    'iPad Air 3', 'iPad Air 4', 'iPad Air 5', 'iPad Air M2', 'iPad Mini 5', 'iPad Mini 6', 'iPad Mini 7',
+    'iPad Pro 10.5"', 'iPad Pro 11" (1st Gen)', 'iPad Pro 11" (2nd Gen)', 'iPad Pro 11" (3rd Gen)',
+    'iPad Pro 11" (4th Gen)', 'iPad Pro 12.9" (3rd Gen)', 'iPad Pro 12.9" (4th Gen)', 'iPad Pro 12.9" (5th Gen)',
+    'iPad Pro 12.9" (6th Gen)'
+  ],
+  'Apple Watch': [
+    'Apple Watch Series 3', 'Apple Watch Series 4', 'Apple Watch Series 5', 'Apple Watch Series 6',
+    'Apple Watch Series 7', 'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch SE',
+    'Apple Watch SE 2', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
+  ],
+  MacBook: [
+    'MacBook Air 2018', 'MacBook Air 2020 Intel', 'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3',
+    'MacBook Pro 13" Intel', 'MacBook Pro 13" M1', 'MacBook Pro 14" M1 Pro', 'MacBook Pro 14" M2 Pro',
+    'MacBook Pro 14" M3 Pro', 'MacBook Pro 16" M1 Max', 'MacBook Pro 16" M2 Max', 'MacBook Pro 16" M3 Max',
+    'MacBook 12"'
+  ],
 };
 
 export default function LiveProcessingPage() {
@@ -101,7 +122,7 @@ export default function LiveProcessingPage() {
       const category = pickCategory();
       const modelList = MODELS[category as keyof typeof MODELS];
       const model = modelList[Math.floor(Math.random() * modelList.length)];
-      const imei = generateIMEI();
+      const imei = generateIdentifier(category);
 
       await addDoc(collection(firestore, 'processing_orders'), {
         imei,
@@ -120,15 +141,25 @@ export default function LiveProcessingPage() {
     return 'Apple Watch';
   };
 
-  const generateIMEI = () => {
+  const generateIdentifier = (category: string) => {
+    // MacBooks and Watches ONLY have serial numbers
+    if (category === 'MacBook' || category === 'Apple Watch') {
+        return generateAppleSerial();
+    }
+
+    // iPhone and iPad can have either IMEI or Serial
     const isSerial = Math.random() > 0.5;
     if (isSerial) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      const len = Math.floor(Math.random() * 3) + 9; // 9-11 chars
-      return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      return generateAppleSerial();
     } else {
       return '35' + Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join('');
     }
+  };
+
+  const generateAppleSerial = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const len = Math.floor(Math.random() * 3) + 9; // 9-11 chars
+    return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   };
 
   const calculateProgress = (createdAt: any) => {
@@ -213,7 +244,11 @@ export default function LiveProcessingPage() {
                   <DropdownMenuItem onClick={() => setIsIMEIIMEIHidden(!isIMEIHidden)}>
                     {isIMEIHidden ? "Show Identifiers" : "Hide Identifiers"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsAddModalOpen(true)}>
+                  <DropdownMenuItem onClick={() => { 
+                    setIsAddModalOpen(true);
+                    setManualCategory('iPhone');
+                    setManualModel(MODELS['iPhone'][0]);
+                  }}>
                     <Plus className="h-4 w-4 mr-2" /> Add Manual Order
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -320,11 +355,14 @@ export default function LiveProcessingPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="manual-imei">IMEI or Serial Number</Label>
-              <Input id="manual-imei" value={manualImei} onChange={(e) => setManualImei(e.target.value)} placeholder="35xxxxxxxxxxxxx" />
+              <Input id="manual-imei" value={manualImei} onChange={(e) => setManualImei(e.target.value)} placeholder="35xxxxxxxxxxxxx or Serial" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="manual-category">Device Category</Label>
-              <Select value={manualCategory} onValueChange={(val) => { setManualCategory(val); setManualModel(MODELS[val as keyof typeof MODELS][0]); }}>
+              <Select value={manualCategory} onValueChange={(val) => { 
+                setManualCategory(val); 
+                setManualModel(MODELS[val as keyof typeof MODELS][0]); 
+              }}>
                 <SelectTrigger id="manual-category">
                   <SelectValue />
                 </SelectTrigger>
