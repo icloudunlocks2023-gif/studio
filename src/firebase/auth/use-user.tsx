@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -73,7 +74,20 @@ export async function signInWithEmail(auth: Auth, email:string, password:string)
     }
 }
 
-export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: string, password: string, displayName: string): Promise<UserCredential | null> {
+export async function signUpWithEmail(
+    auth: Auth, 
+    firestore: Firestore, 
+    email: string, 
+    password: string, 
+    displayName: string,
+    extraData: {
+        username: string;
+        country: string;
+        whatsappNumber: string;
+        accountType: string;
+        deviceOwnership: string;
+    }
+): Promise<UserCredential | null> {
     try {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
@@ -81,81 +95,59 @@ export async function signUpWithEmail(auth: Auth, firestore: Firestore, email: s
         // Update the user's profile with the display name
         await updateProfile(user, { displayName });
 
-        // Get accurate IP address and Country with caching
+        // Get accurate IP address for session
         let ipAddress = 'unknown';
-        let country = 'unknown';
-        
         if (typeof window !== 'undefined') {
             ipAddress = localStorage.getItem('detected_ip') || 'unknown';
-            country = localStorage.getItem('detected_country') || 'unknown';
-        }
-        
-        if (ipAddress === 'unknown' && typeof window !== 'undefined') {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
-                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-                clearTimeout(timeoutId);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    ipAddress = data.ip || 'unknown';
-                    country = data.country_name || 'unknown';
-                    
-                    if (ipAddress !== 'unknown') {
-                        localStorage.setItem('detected_ip', ipAddress);
-                        localStorage.setItem('detected_country', country);
-                    }
-                }
-            } catch (e) {
-                console.warn("Geolocation fetch failed during signup.");
-            }
         }
 
         const userRef = doc(firestore, 'users', user.uid);
         const userData = {
             displayName: displayName,
+            username: extraData.username,
             email: user.email,
             photoURL: user.photoURL,
             lastLogin: serverTimestamp(),
             balance: 0,
             ipAddress: ipAddress,
-            country: country
+            country: extraData.country,
+            whatsappNumber: extraData.whatsappNumber || '',
+            accountType: extraData.accountType,
+            deviceOwnership: extraData.deviceOwnership,
+            isReseller: false,
+            resellerPricingActive: false,
+            createdAt: serverTimestamp()
         };
 
         const metricsRef = doc(firestore, 'counters', 'metrics');
 
-        // Check and create profile in non-blocking way
-        getDoc(userRef).then(userDoc => {
-            if (!userDoc.exists()) {
-                setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
-                    const permissionError = new FirestorePermissionError({
-                        path: userRef.path,
-                        operation: 'create',
-                        requestResourceData: userData,
-                    });
-                    errorEmitter.emit('permission-error', permissionError);
-                });
-                
-                getDoc(metricsRef).then(metricsDoc => {
-                    if (metricsDoc.exists()) {
-                        const currentCount = metricsDoc.data().registeredUsers || 0;
-                        setDoc(metricsRef, { registeredUsers: currentCount + 1 }, { merge: true });
-                    } else {
-                        setDoc(metricsRef, { registeredUsers: 1 }, { merge: true });
-                    }
-                });
-
-                // Notify Telegram of New Client
-                const tgMessage = `🆕 <b>New Client Signed Up!</b> 🚀\n\n<b>Name:</b> ${displayName}\n<b>Email:</b> ${email}\n<b>Country:</b> ${country}\n<b>IP:</b> ${ipAddress}\n<b>UID:</b> <code>${user.uid}</code>`;
-                
-                fetch('/api/telegram', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: tgMessage }),
-                }).catch(err => console.error("Signup Telegram alert failed:", err));
+        // Create profile in non-blocking way
+        setDoc(userRef, userData, { merge: true }).catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userRef.path,
+                operation: 'create',
+                requestResourceData: userData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
+        
+        getDoc(metricsRef).then(metricsDoc => {
+            if (metricsDoc.exists()) {
+                const currentCount = metricsDoc.data().registeredUsers || 0;
+                setDoc(metricsRef, { registeredUsers: currentCount + 1 }, { merge: true });
+            } else {
+                setDoc(metricsRef, { registeredUsers: 1 }, { merge: true });
             }
         });
+
+        // Notify Telegram of New Client
+        const tgMessage = `🆕 <b>New Client Signed Up!</b> 🚀\n\n<b>Name:</b> ${displayName}\n<b>Email:</b> ${email}\n<b>Country:</b> ${extraData.country}\n<b>Type:</b> ${extraData.accountType}\n<b>UID:</b> <code>${user.uid}</code>`;
+        
+        fetch('/api/telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: tgMessage }),
+        }).catch(err => console.error("Signup Telegram alert failed:", err));
 
         await user.reload();
         return result;

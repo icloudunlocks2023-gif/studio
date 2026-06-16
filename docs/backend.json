@@ -10,6 +10,9 @@
           "type": "string",
           "description": "The user's display name"
         },
+        "username": {
+          "type": "string"
+        },
         "email": {
           "type": "string",
           "description": "The user's email address"
@@ -33,6 +36,23 @@
         },
         "country": {
           "type": "string"
+        },
+        "whatsappNumber": {
+          "type": "string"
+        },
+        "accountType": {
+          "type": "string",
+          "enum": ["Personal User", "Technician", "Repair Shop / Business", "Reseller"]
+        },
+        "deviceOwnership": {
+          "type": "string",
+          "enum": ["My Personal Devices", "Customer Devices"]
+        },
+        "isReseller": {
+          "type": "boolean"
+        },
+        "resellerPricingActive": {
+          "type": "boolean"
         }
       },
       "required": ["displayName", "email"]

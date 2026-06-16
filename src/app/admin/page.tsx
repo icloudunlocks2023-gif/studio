@@ -33,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX, Star, MonitorPlay } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX, Star, MonitorPlay, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -593,6 +593,9 @@ function AdminDashboard() {
                               </Link>
                               <Link href="/admin/users" className="w-full">
                                 <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1"><Users className="h-3 w-3" />Users</Button>
+                              </Link>
+                              <Link href="/admin/resellers" className="w-full">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1 text-blue-600"><UserCheck className="h-3 w-3" />Resellers</Button>
                               </Link>
                               <Link href="/admin/banned" className="w-full">
                                 <Button variant="outline" className="w-full text-[10px] gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 px-1"><UserX className="h-3 w-3" />Banned</Button>
