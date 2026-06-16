@@ -33,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX, Star } from 'lucide-react';
+import { Ban, Menu, Users, Server, ServerOff, MessageSquare, CheckCircle, XCircle, Clock, ShieldAlert, Activity, Bell, MapPin, Wallet, Save, UserX, Star, MonitorPlay } from 'lucide-react';
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -569,7 +569,7 @@ function AdminDashboard() {
                       </CardContent>
                       <CardFooter className="flex flex-col items-stretch gap-4">
                           <Button onClick={handleUpdateMetrics} className="btn-primary text-white w-full">Save All Settings</Button>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                               <Link href="/admin/activities" className="w-full">
                                 <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1">
                                   <Activity className="h-3 w-3" /> Activities
@@ -599,6 +599,11 @@ function AdminDashboard() {
                               </Link>
                               <Link href="/admin/reviews" className="w-full">
                                 <Button variant="outline" className="w-full text-[10px] gap-1 border-primary text-primary hover:bg-primary hover:text-white px-1"><Star className="h-3 w-3" />Reviews</Button>
+                              </Link>
+                              <Link href="/admin/processing" className="w-full">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-orange-200 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950 px-1">
+                                  <MonitorPlay className="h-3 w-3" /> Live
+                                </Button>
                               </Link>
                           </div>
                       </CardFooter>

@@ -164,6 +164,18 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "description", "completionDate", "imageUrls"]
+    },
+    "processing_order": {
+      "title": "Processing Order",
+      "description": "A simulated order for the live processing dashboard",
+      "type": "object",
+      "properties": {
+        "imei": { "type": "string" },
+        "category": { "type": "string", "enum": ["iPhone", "MacBook", "iPad", "Apple Watch"] },
+        "model": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["imei", "category", "model", "createdAt"]
     }
   },
   "auth": {
@@ -201,6 +213,10 @@
     "/past_work/{workId}": {
       "schema": { "$ref": "#/backend/entities/past_work" },
       "description": "Gallery of successful unlocks and reviews"
+    },
+    "/processing_orders/{orderId}": {
+      "schema": { "$ref": "#/backend/entities/processing_order" },
+      "description": "Simulated activity for the live processing dashboard"
     }
   }
 }
