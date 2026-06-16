@@ -170,12 +170,13 @@
       "description": "A simulated order for the live processing dashboard",
       "type": "object",
       "properties": {
+        "orderId": { "type": "string" },
         "imei": { "type": "string" },
         "category": { "type": "string", "enum": ["iPhone", "MacBook", "iPad", "Apple Watch"] },
         "model": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["imei", "category", "model", "createdAt"]
+      "required": ["orderId", "imei", "category", "model", "createdAt"]
     }
   },
   "auth": {

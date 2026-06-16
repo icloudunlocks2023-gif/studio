@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ProcessingOrder {
   id: string;
+  orderId: string;
   imei: string;
   category: string;
   model: string;
@@ -71,6 +72,12 @@ const MODELS = {
   ],
 };
 
+const generateOrderId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const rand = Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `ORD-${rand}`;
+};
+
 export default function LiveProcessingPage() {
   const { data: user, loading: userLoading } = useUser();
   const { firestore } = useFirebase();
@@ -82,6 +89,7 @@ export default function LiveProcessingPage() {
   const [currentTime, setCurrentTime] = useState(Date.now());
   
   // Form states for manual addition
+  const [manualOrderId, setManualOrderId] = useState('');
   const [manualImei, setManualImei] = useState('');
   const [manualCategory, setManualCategory] = useState('iPhone');
   const [manualModel, setManualModel] = useState('');
@@ -123,8 +131,10 @@ export default function LiveProcessingPage() {
       const modelList = MODELS[category as keyof typeof MODELS];
       const model = modelList[Math.floor(Math.random() * modelList.length)];
       const imei = generateIdentifier(category);
+      const orderId = generateOrderId();
 
       await addDoc(collection(firestore, 'processing_orders'), {
+        orderId,
         imei,
         category,
         model,
@@ -206,6 +216,7 @@ export default function LiveProcessingPage() {
     setIsSubmitting(true);
     try {
       await addDoc(collection(firestore, 'processing_orders'), {
+        orderId: manualOrderId.trim() || generateOrderId(),
         imei: manualImei.trim(),
         category: manualCategory,
         model: manualModel,
@@ -213,6 +224,7 @@ export default function LiveProcessingPage() {
       });
       toast({ title: "Order Added Successfully" });
       setIsAddModalOpen(false);
+      setManualOrderId('');
       setManualImei('');
       setManualModel('');
     } catch (e) {
@@ -285,6 +297,7 @@ export default function LiveProcessingPage() {
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow className="border-border">
+                      <TableHead className="text-foreground font-bold">Order ID</TableHead>
                       <TableHead className="text-foreground font-bold">Submission Time</TableHead>
                       <TableHead className="text-foreground font-bold">IMEI / Serial</TableHead>
                       <TableHead className="text-foreground font-bold">Device Info</TableHead>
@@ -297,6 +310,9 @@ export default function LiveProcessingPage() {
                       const { progress, status } = calculateProgress(order.createdAt);
                       return (
                         <TableRow key={order.id} className="border-border hover:bg-muted/20 transition-colors">
+                          <TableCell className="font-mono text-xs font-bold text-blue-600">
+                            {order.orderId || 'N/A'}
+                          </TableCell>
                           <TableCell className="text-xs text-muted-foreground font-medium">
                             {order.createdAt?.toDate ? format(order.createdAt.toDate(), 'HH:mm (MMM dd)') : 'Just now'}
                           </TableCell>
@@ -353,6 +369,10 @@ export default function LiveProcessingPage() {
             <DialogTitle>Add Manual Processing Order</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="manual-order-id">Order ID (Optional)</Label>
+              <Input id="manual-order-id" value={manualOrderId} onChange={(e) => setManualOrderId(e.target.value)} placeholder="ORD-XXXXX" />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="manual-imei">IMEI or Serial Number</Label>
               <Input id="manual-imei" value={manualImei} onChange={(e) => setManualImei(e.target.value)} placeholder="35xxxxxxxxxxxxx or Serial" />
