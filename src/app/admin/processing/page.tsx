@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -48,28 +47,40 @@ const ADMIN_EMAIL = 'iunlockapple01@gmail.com';
 const MODELS = {
   iPhone: [
     'iPhone X', 'iPhone XR', 'iPhone XS', 'iPhone XS Max', 'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max',
-    'iPhone SE (2020)', 'iPhone 12 Mini', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max', 'iPhone 13 Mini',
-    'iPhone 13', 'iPhone 13 Pro', 'iPhone 13 Pro Max', 'iPhone SE (2022)', 'iPhone 14', 'iPhone 14 Plus',
+    'iPhone SE (2020)', 'iPhone SE (2022)', 'iPhone 12 Mini', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max', 
+    'iPhone 13 Mini', 'iPhone 13', 'iPhone 13 Pro', 'iPhone 13 Pro Max', 'iPhone 14', 'iPhone 14 Plus',
     'iPhone 14 Pro', 'iPhone 14 Pro Max', 'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
-    'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max'
+    'iPhone 16', 'iPhone 16e', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max', 'iPhone 17', 
+    'iPhone 17 Air', 'iPhone 17 Pro', 'iPhone 17 Pro Max'
   ],
   iPad: [
-    'iPad 6th Generation', 'iPad 7th Generation', 'iPad 8th Generation', 'iPad 9th Generation', 'iPad 10th Generation',
-    'iPad Air 3', 'iPad Air 4', 'iPad Air 5', 'iPad Air M2', 'iPad Mini 5', 'iPad Mini 6', 'iPad Mini 7',
-    'iPad Pro 10.5"', 'iPad Pro 11" (1st Gen)', 'iPad Pro 11" (2nd Gen)', 'iPad Pro 11" (3rd Gen)',
-    'iPad Pro 11" (4th Gen)', 'iPad Pro 12.9" (3rd Gen)', 'iPad Pro 12.9" (4th Gen)', 'iPad Pro 12.9" (5th Gen)',
-    'iPad Pro 12.9" (6th Gen)'
+    'iPad 5th Gen (2017)', 'iPad 6th Gen (2018)', 'iPad 7th Gen (2019)', 'iPad 8th Gen (2020)', 'iPad 9th Gen (2021)', 
+    'iPad 10th Gen (2022)', 'iPad 11th Gen (2025)', 'iPad Air 3rd Gen (2019)', 'iPad Air 4th Gen (2020)', 
+    'iPad Air 5th Gen (2022)', 'iPad Air 6th Gen 11" (M2)', 'iPad Air 6th Gen 13" (M2)', 'iPad Air 7th Gen 11" (M3)', 
+    'iPad Air 7th Gen 13" (M3)', 'iPad Pro 10.5" (2017)', 'iPad Pro 12.9" 2nd Gen (2017)', 'iPad Pro 11" 1st Gen (2018)', 
+    'iPad Pro 12.9" 3rd Gen (2018)', 'iPad Pro 11" 2nd Gen (2020)', 'iPad Pro 12.9" 4th Gen (2020)', 
+    'iPad Pro 11" 3rd Gen (M1, 2021)', 'iPad Pro 12.9" 5th Gen (M1, 2021)', 'iPad Pro 11" 4th Gen (M2, 2022)', 
+    'iPad Pro 12.9" 6th Gen (M2, 2022)', 'iPad Pro 11" (M4, 2024)', 'iPad Pro 13" (M4, 2024)', 'iPad Pro 11" (M5, 2025)', 
+    'iPad Pro 13" (M5, 2025)', 'iPad Mini 5th Gen (2019)', 'iPad Mini 6th Gen (2021)', 'iPad Mini 7th Gen (A17 Pro, 2024)'
   ],
   'Apple Watch': [
-    'Apple Watch Series 3', 'Apple Watch Series 4', 'Apple Watch Series 5', 'Apple Watch Series 6',
-    'Apple Watch Series 7', 'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch SE',
-    'Apple Watch SE 2', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
+    'Apple Watch Series 2', 'Apple Watch Series 3', 'Apple Watch Series 4', 'Apple Watch Series 5', 
+    'Apple Watch Series 6', 'Apple Watch Series 7 (2021)', 'Apple Watch Series 8 (2022)', 'Apple Watch Series 9 (2023)', 
+    'Apple Watch Series 10 (2024)', 'Apple Watch Series 11 (2025)', 'Apple Watch SE 1st Gen (2020)', 
+    'Apple Watch SE 2nd Gen (2022)', 'Apple Watch SE 3rd Gen (2025)', 'Apple Watch Ultra 1 (2022)', 
+    'Apple Watch Ultra 2 (2023)', 'Apple Watch Ultra 3 (2025)'
   ],
   MacBook: [
-    'MacBook Air 2018', 'MacBook Air 2020 Intel', 'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3',
-    'MacBook Pro 13" Intel', 'MacBook Pro 13" M1', 'MacBook Pro 14" M1 Pro', 'MacBook Pro 14" M2 Pro',
-    'MacBook Pro 14" M3 Pro', 'MacBook Pro 16" M1 Max', 'MacBook Pro 16" M2 Max', 'MacBook Pro 16" M3 Max',
-    'MacBook 12"'
+    'MacBook 2016', 'MacBook 2017', 'MacBook Air 2017', 'MacBook Air 2018', 'MacBook Air 2019', 'MacBook Air (Intel) 2020', 
+    'MacBook Air M1 2020', 'MacBook Air M2 13" 2022', 'MacBook Air M2 15" 2023', 'MacBook Air M3 13" 2024', 
+    'MacBook Air M3 15" 2024', 'MacBook Air M4 13" 2025', 'MacBook Air M4 15" 2025', 'MacBook Pro 13" 2016', 
+    'MacBook Pro 15" 2016', 'MacBook Pro 13" 2017', 'MacBook Pro 15" 2017', 'MacBook Pro 13" 2018', 
+    'MacBook Pro 15" 2018', 'MacBook Pro 13" 2019', 'MacBook Pro 15" 2019', 'MacBook Pro 16" (Intel) 2019', 
+    'MacBook Pro 13" (Intel) 2020', 'MacBook Pro M1 13" 2020', 'MacBook Pro M1 Pro/Max 14" 2021', 
+    'MacBook Pro M1 Pro/Max 16" 2021', 'MacBook Pro M2 13" 2022', 'MacBook Pro M2 Pro/Max 14" 2023', 
+    'MacBook Pro M2 Pro/Max 16" 2023', 'MacBook Pro M3 14" 2023', 'MacBook Pro M3 Pro/Max 14" 2023', 
+    'MacBook Pro M3 Pro/Max 16" 2023', 'MacBook Pro M4 14" 2024', 'MacBook Pro M4 Pro/Max 14" 2024', 
+    'MacBook Pro M4 Pro/Max 16" 2024', 'MacBook Pro M5 14" 2025'
   ],
 };
 
