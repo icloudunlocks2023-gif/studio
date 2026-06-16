@@ -255,7 +255,7 @@ export default function ServicesPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Permanent iCloud Unlock (FMI OFF)</h1>
           <p className="text-lg text-muted-foreground mb-8">Works for <strong>Clean</strong>, <strong>Lost with Info</strong>, and <strong>Lost without Info</strong> devices.</p>
           
-          <div className="bg-card border border-border p-6 rounded-2xl shadow-sm space-y-6 text-left md:text-center">
+          <div className="bg-card border border-border p-6 rounded-2xl shadow-sm space-y-6 text-center">
             <p className="text-xl font-bold text-green-600 dark:text-green-400 flex items-center justify-center gap-2">
               ✅ Checking the unlock success rate is completely free.
             </p>
@@ -270,35 +270,34 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="py-12 px-4 space-y-20">
-            <div className="max-w-7xl auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+        <section className="py-12 px-4 space-y-20 flex flex-col items-center">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
                     <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPhone Unlock Prices</h2>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
                             <tr className="border-b border-border">
-                                <th className="p-2 text-foreground">Model</th>
-                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
-                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
+                                <th className="p-2 text-foreground text-sm">Model</th>
+                                <th className="p-2 text-foreground text-sm">Price (Clean)</th>
+                                <th className="p-2 text-foreground text-sm">Price (Lost)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {iphoneModels.map(device => (
-                                <tr key={device.name} className="border-b border-border">
-                                <td className="p-2 text-card-foreground">{device.name}</td>
-                                <td className="p-2 text-card-foreground">${device.price}</td>
-                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
-                                <td className="p-2">
+                                <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
                                     variant="outline" 
-                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold" 
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold h-8 text-[11px] px-3" 
                                     onClick={() => handleUnlockClick(device)}
                                   >
                                     Check & Unlock
-                                    <ChevronRight className="ml-1 h-4 w-4" />
                                   </Button>
                                 </td>
                                 </tr>
@@ -308,33 +307,32 @@ export default function ServicesPage() {
                     </div>
                 </div>
 
-                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
                     <h2 className="text-2xl font-bold text-foreground mb-4">💻 MacBook Unlock Prices</h2>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
                             <tr className="border-b border-border">
-                                <th className="p-2 text-foreground">Model</th>
-                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
-                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
+                                <th className="p-2 text-foreground text-sm">Model</th>
+                                <th className="p-2 text-foreground text-sm">Price (Clean)</th>
+                                <th className="p-2 text-foreground text-sm">Price (Lost)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {macbookModels.map(device => (
-                                <tr key={device.name} className="border-b border-border">
-                                <td className="p-2 text-card-foreground">{device.name}</td>
-                                <td className="p-2 text-card-foreground">${device.price}</td>
-                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
-                                <td className="p-2">
+                                <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
                                     variant="outline" 
-                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold" 
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold h-8 text-[11px] px-3" 
                                     onClick={() => handleUnlockClick(device)}
                                   >
                                     Check & Unlock
-                                    <ChevronRight className="ml-1 h-4 w-4" />
                                   </Button>
                                 </td>
                                 </tr>
@@ -344,33 +342,32 @@ export default function ServicesPage() {
                     </div>
                 </div>
 
-                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
                     <h2 className="text-2xl font-bold text-foreground mb-4">⌚ Apple Watch Unlock Prices</h2>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
                             <tr className="border-b border-border">
-                                <th className="p-2 text-foreground">Model</th>
-                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
-                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
+                                <th className="p-2 text-foreground text-sm">Model</th>
+                                <th className="p-2 text-foreground text-sm">Price (Clean)</th>
+                                <th className="p-2 text-foreground text-sm">Price (Lost)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {watchModels.map(device => (
-                                <tr key={device.name} className="border-b border-border">
-                                <td className="p-2 text-card-foreground">{device.name}</td>
-                                <td className="p-2 text-card-foreground">${device.price}</td>
-                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
-                                <td className="p-2">
+                                <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
                                     variant="outline" 
-                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold" 
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold h-8 text-[11px] px-3" 
                                     onClick={() => handleUnlockClick(device)}
                                   >
                                     Check & Unlock
-                                    <ChevronRight className="ml-1 h-4 w-4" />
                                   </Button>
                                 </td>
                                 </tr>
@@ -380,33 +377,32 @@ export default function ServicesPage() {
                     </div>
                 </div>
                 
-                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border">
+                <div className="bg-card p-6 rounded-2xl shadow-lg border border-border flex flex-col">
                     <h2 className="text-2xl font-bold text-foreground mb-4">📱 iPad Unlock Prices (Standard)</h2>
-                     <div className="overflow-x-auto">
+                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left">
                             <thead>
                             <tr className="border-b border-border">
-                                <th className="p-2 text-foreground">Model</th>
-                                <th className="p-2 text-foreground">Price (Clean iCloud Status)</th>
-                                <th className="p-2 text-foreground">Price (Lost iCloud Status)</th>
+                                <th className="p-2 text-foreground text-sm">Model</th>
+                                <th className="p-2 text-foreground text-sm">Price (Clean)</th>
+                                <th className="p-2 text-foreground text-sm">Price (Lost)</th>
                                 <th className="p-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {ipadModels.map(device => (
-                                <tr key={device.name} className="border-b border-border">
-                                <td className="p-2 text-card-foreground">{device.name}</td>
-                                <td className="p-2 text-card-foreground">${device.price}</td>
-                                <td className="p-2 text-card-foreground">${device.lostPrice}</td>
-                                <td className="p-2">
+                                <tr key={device.name} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-2 text-card-foreground text-sm font-medium">{device.name}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-primary">${device.price}</td>
+                                <td className="p-2 text-card-foreground text-sm font-bold text-red-500">${device.lostPrice}</td>
+                                <td className="p-2 text-right">
                                   <Button 
                                     size="sm" 
                                     variant="outline" 
-                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold" 
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-semibold h-8 text-[11px] px-3" 
                                     onClick={() => handleUnlockClick(device)}
                                   >
                                     Check & Unlock
-                                    <ChevronRight className="ml-1 h-4 w-4" />
                                   </Button>
                                 </td>
                                 </tr>
@@ -417,7 +413,7 @@ export default function ServicesPage() {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto w-full">
                 <div className="bg-card p-8 rounded-3xl shadow-2xl border-2 border-primary/20 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-5">
                       <Wifi size={120} className="text-primary" />
