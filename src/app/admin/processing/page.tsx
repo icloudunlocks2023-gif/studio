@@ -4,7 +4,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirebase, useCollection } from '@/firebase';
-import { collection, addDoc, serverTimestamp, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ProcessingOrder {
   id: string;
-  orderId: string;
+  orderId?: string;
   imei: string;
   category: string;
   model: string;
@@ -98,7 +99,7 @@ export default function LiveProcessingPage() {
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   const { data: orders, loading: ordersLoading } = useCollection<ProcessingOrder>('processing_orders', {
-    constraints: [orderBy('createdAt', 'desc'), limit(50)]
+    constraints: [orderBy('createdAt', 'desc'), limit(100)]
   });
 
   useEffect(() => {
@@ -110,6 +111,26 @@ export default function LiveProcessingPage() {
     const timer = setInterval(() => setCurrentTime(Date.now()), 10000);
     return () => clearInterval(timer);
   }, []);
+
+  // Data maintenance: Assign Order IDs to existing entries that have "N/A" (empty field)
+  useEffect(() => {
+    if (orders && orders.length > 0 && isAdmin) {
+      const repairMissingIds = async () => {
+        for (const order of orders) {
+          if (!order.orderId) {
+            try {
+              await updateDoc(doc(firestore, 'processing_orders', order.id), {
+                orderId: generateOrderId()
+              });
+            } catch (err) {
+              console.error("Failed to repair missing ID for order:", order.id);
+            }
+          }
+        }
+      };
+      repairMissingIds();
+    }
+  }, [orders, isAdmin, firestore]);
 
   // Auto-generation logic
   useEffect(() => {
@@ -293,16 +314,16 @@ export default function LiveProcessingPage() {
                 Initializing live stream...
               </div>
             ) : orders && orders.length > 0 ? (
-              <div className="overflow-x-auto">
+              <ScrollArea className="h-[600px] w-full">
                 <Table>
-                  <TableHeader className="bg-muted/50">
+                  <TableHeader className="bg-muted/80 backdrop-blur-md sticky top-0 z-10">
                     <TableRow className="border-border">
-                      <TableHead className="text-foreground font-bold">Order ID</TableHead>
-                      <TableHead className="text-foreground font-bold">Submission Time</TableHead>
-                      <TableHead className="text-foreground font-bold">IMEI / Serial</TableHead>
-                      <TableHead className="text-foreground font-bold">Device Info</TableHead>
-                      <TableHead className="text-foreground font-bold">Status</TableHead>
-                      <TableHead className="text-foreground font-bold w-[250px]">Processing Progress</TableHead>
+                      <TableHead className="text-foreground font-bold bg-muted/80">Order ID</TableHead>
+                      <TableHead className="text-foreground font-bold bg-muted/80">Submission Time</TableHead>
+                      <TableHead className="text-foreground font-bold bg-muted/80">IMEI / Serial</TableHead>
+                      <TableHead className="text-foreground font-bold bg-muted/80">Device Info</TableHead>
+                      <TableHead className="text-foreground font-bold bg-muted/80">Status</TableHead>
+                      <TableHead className="text-foreground font-bold w-[250px] bg-muted/80">Processing Progress</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -311,7 +332,7 @@ export default function LiveProcessingPage() {
                       return (
                         <TableRow key={order.id} className="border-border hover:bg-muted/20 transition-colors">
                           <TableCell className="font-mono text-xs font-bold text-blue-600">
-                            {order.orderId || 'N/A'}
+                            {order.orderId || 'Assigning...'}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground font-medium">
                             {order.createdAt?.toDate ? format(order.createdAt.toDate(), 'HH:mm (MMM dd)') : 'Just now'}
@@ -352,7 +373,7 @@ export default function LiveProcessingPage() {
                     })}
                   </TableBody>
                 </Table>
-              </div>
+              </ScrollArea>
             ) : (
               <div className="p-20 text-center text-muted-foreground border-t border-border">
                 <RefreshCw className="h-16 w-16 mx-auto mb-4 opacity-10" />
