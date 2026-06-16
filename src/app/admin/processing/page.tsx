@@ -79,6 +79,24 @@ const generateOrderId = () => {
   return `ORD-${rand}`;
 };
 
+const APPLE_SERIAL_PREFIXES = ['C02', 'C17', 'FVF', 'F2L', 'FH7', 'G99', 'DMP'];
+const IMEI_PREFIXES = ['35', '356', '357', '358'];
+
+const generateAppleIMEI = () => {
+  const prefix = IMEI_PREFIXES[Math.floor(Math.random() * IMEI_PREFIXES.length)];
+  const remainingLen = 15 - prefix.length;
+  const suffix = Array.from({ length: remainingLen }, () => Math.floor(Math.random() * 10)).join('');
+  return prefix + suffix;
+};
+
+const generateAppleSerial = () => {
+  const prefix = APPLE_SERIAL_PREFIXES[Math.floor(Math.random() * APPLE_SERIAL_PREFIXES.length)];
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789'; // No I, O
+  const remainingLen = 12 - prefix.length;
+  const suffix = Array.from({ length: remainingLen }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return prefix + suffix;
+};
+
 export default function LiveProcessingPage() {
   const { data: user, loading: userLoading } = useUser();
   const { firestore } = useFirebase();
@@ -166,31 +184,28 @@ export default function LiveProcessingPage() {
 
   const pickCategory = () => {
     const rand = Math.random();
-    if (rand < 0.5) return 'iPhone';
-    if (rand < 0.75) return 'MacBook';
-    if (rand < 0.9) return 'iPad';
-    return 'Apple Watch';
+    if (rand < 0.5) return 'iPhone'; // 50% iPhone
+    if (rand < 0.75) return 'MacBook'; // 25% MacBook
+    if (rand < 0.9) return 'iPad'; // 15% iPad
+    return 'Apple Watch'; // 10% Watch
   };
 
   const generateIdentifier = (category: string) => {
-    // MacBooks and Watches ONLY have serial numbers
     if (category === 'MacBook' || category === 'Apple Watch') {
-        return generateAppleSerial();
-    }
-
-    // iPhone and iPad can have either IMEI or Serial
-    const isSerial = Math.random() > 0.5;
-    if (isSerial) {
       return generateAppleSerial();
-    } else {
-      return '35' + Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join('');
     }
-  };
 
-  const generateAppleSerial = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const len = Math.floor(Math.random() * 3) + 9; // 9-11 chars
-    return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    if (category === 'iPhone') {
+      // 80% IMEI, 20% Serial
+      return Math.random() < 0.8 ? generateAppleIMEI() : generateAppleSerial();
+    }
+
+    if (category === 'iPad') {
+      // 70% Serial (covering Wi-Fi models and some cellular), 30% IMEI
+      return Math.random() < 0.7 ? generateAppleSerial() : generateAppleIMEI();
+    }
+
+    return generateAppleSerial();
   };
 
   const calculateProgress = (createdAt: any) => {
@@ -227,9 +242,11 @@ export default function LiveProcessingPage() {
 
   const formatIMEI = (val: string) => {
     if (!isIMEIHidden) return val;
-    if (val.length < 7) return val;
-    const start = Math.floor((val.length - 5) / 2);
-    return val.substring(0, start) + '*****' + val.substring(start + 5);
+    if (val.length < 8) return val;
+    const maskLen = 5;
+    const startLen = Math.floor((val.length - maskLen) / 2);
+    const endPos = startLen + maskLen;
+    return val.substring(0, startLen) + '*****' + val.substring(endPos);
   };
 
   const handleAddManual = async () => {
