@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -85,7 +84,6 @@ export async function signUpWithEmail(
         country: string;
         whatsappNumber: string;
         accountType: string;
-        deviceOwnership: string;
     }
 ): Promise<UserCredential | null> {
     try {
@@ -113,7 +111,6 @@ export async function signUpWithEmail(
             country: extraData.country,
             whatsappNumber: extraData.whatsappNumber || '',
             accountType: extraData.accountType,
-            deviceOwnership: extraData.deviceOwnership,
             isReseller: false,
             resellerPricingActive: false,
             createdAt: serverTimestamp()

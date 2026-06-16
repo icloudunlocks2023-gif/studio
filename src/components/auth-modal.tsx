@@ -58,7 +58,6 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
   const [regCountry, setRegCountry] = useState('');
   const [regWhatsapp, setRegWhatsapp] = useState('');
   const [regAccountType, setRegAccountType] = useState('');
-  const [regOwnership, setRegOwnership] = useState('');
 
   useEffect(() => {
       if (regCountry) {
@@ -100,19 +99,17 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
     if (regPassword !== regConfirmPassword) {
         return toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
     }
-    if (!regCountry || !regAccountType || !regOwnership || !regUsername) {
+    if (!regCountry || !regAccountType || !regUsername) {
         return toast({ title: "Error", description: "Please fill all required fields.", variant: "destructive" });
     }
 
     setIsLoading(true);
     try {
-      // Use regUsername as the display name since regDisplayName was removed
       const userCredential = await signUpWithEmail(auth, firestore, regEmail, regPassword, regUsername, {
           username: regUsername,
           country: regCountry,
           whatsappNumber: regWhatsapp,
-          accountType: regAccountType,
-          deviceOwnership: regOwnership
+          accountType: regAccountType
       });
       if (userCredential) {
         onOpenChange(false);
@@ -234,17 +231,6 @@ export function AuthModal({ open, onOpenChange, defaultTab = 'login' }: AuthModa
                         <SelectItem value="Technician">Technician</SelectItem>
                         <SelectItem value="Repair Shop / Business">Repair Shop / Business</SelectItem>
                         <SelectItem value="Reseller">Reseller</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>The devices I unlock are mostly:</Label>
-                  <Select onValueChange={setRegOwnership} value={regOwnership}>
-                    <SelectTrigger><SelectValue placeholder="Select Device Ownership" /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="My Personal Devices">My Personal Devices</SelectItem>
-                        <SelectItem value="Customer Devices">Customer Devices</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
