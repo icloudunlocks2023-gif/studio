@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser, useFirebase, useCollection } from '@/firebase';
-import { collection, addDoc, updateDoc, doc, serverTimestamp, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -26,7 +26,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, EyeOff, Plus, ArrowLeft, RefreshCw, Loader, MonitorPlay } from 'lucide-react';
+import { Eye, EyeOff, Plus, RefreshCw, Loader, MonitorPlay } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -127,8 +127,10 @@ export default function LiveProcessingPage() {
 
   const isAdmin = user?.email === ADMIN_EMAIL;
 
+  const constraints = useMemo(() => [orderBy('createdAt', 'desc'), limit(100)], []);
+
   const { data: orders, loading: ordersLoading } = useCollection<ProcessingOrder>('processing_orders', {
-    constraints: [orderBy('createdAt', 'desc'), limit(100)]
+    constraints: constraints
   });
 
   useEffect(() => {
@@ -140,26 +142,6 @@ export default function LiveProcessingPage() {
     const timer = setInterval(() => setCurrentTime(Date.now()), 10000);
     return () => clearInterval(timer);
   }, []);
-
-  // Data maintenance: Assign Order IDs to existing entries that have "N/A" (empty field)
-  useEffect(() => {
-    if (orders && orders.length > 0 && isAdmin) {
-      const repairMissingIds = async () => {
-        for (const order of orders) {
-          if (!order.orderId) {
-            try {
-              await updateDoc(doc(firestore, 'processing_orders', order.id), {
-                orderId: generateOrderId()
-              });
-            } catch (err) {
-              console.error("Failed to repair missing ID for order:", order.id);
-            }
-          }
-        }
-      };
-      repairMissingIds();
-    }
-  }, [orders, isAdmin, firestore]);
 
   const pickCategory = () => {
     const rand = Math.random();
