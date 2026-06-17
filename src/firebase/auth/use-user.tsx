@@ -90,7 +90,7 @@ export async function signUpWithEmail(
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
 
-        // Update the user's profile with the display name
+        // Update the user's profile with the display name (using username as displayName)
         await updateProfile(user, { displayName });
 
         // Get accurate IP address for session

@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "user": {
@@ -43,10 +42,6 @@
         "accountType": {
           "type": "string",
           "enum": ["Personal User", "Technician", "Repair Shop / Business", "Reseller"]
-        },
-        "deviceOwnership": {
-          "type": "string",
-          "enum": ["My Personal Devices", "Customer Devices"]
         },
         "isReseller": {
           "type": "boolean"
