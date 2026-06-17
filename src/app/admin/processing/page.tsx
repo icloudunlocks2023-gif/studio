@@ -322,7 +322,7 @@ export default function LiveProcessingPage() {
               <MonitorPlay className="h-8 w-8 text-primary" />
               Live Processing Orders
             </h1>
-            <p className="text-muted-foreground text-sm">Monitor ongoing iCloud Unlock registrations and recently completed FMI OFF processing activity.</p>
+            <p className="text-muted-foreground text-sm">Monitor ongoing iCloud unlock registrations and recently completed FMI OFF processing activity.</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border">
             <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
