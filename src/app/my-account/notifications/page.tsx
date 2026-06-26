@@ -26,8 +26,11 @@ export default function UserNotificationsPage() {
   const { data: user, loading: userLoading } = useUser();
   const router = useRouter();
 
+  // Memoize constraints to prevent infinite loop of listener restarts
+  const constraints = useMemo(() => [orderBy('createdAt', 'desc')], []);
+
   const { data: notifications, loading: notificationsLoading } = useCollection<Notification>('notifications', {
-    constraints: [orderBy('createdAt', 'desc')]
+    constraints: constraints
   });
 
   const filteredNotifications = useMemo(() => {

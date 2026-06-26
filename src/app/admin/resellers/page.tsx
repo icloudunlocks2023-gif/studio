@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -59,7 +58,6 @@ export default function ResellersPage() {
             u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             u.id.toLowerCase().includes(searchTerm.toLowerCase());
         
-        // Show users who are ALREADY resellers OR eligible to be one
         const isEligible = ELIGIBLE_TYPES.includes(u.accountType || '');
         return (u.isReseller || isEligible) && matchesType && matchesSearch;
     });
