@@ -264,10 +264,11 @@ function AdminDashboard() {
             return toast({ title: "Input Required", description: "Enter feedback.", variant: "destructive" });
         }
 
-        // Proactively split reports that use symbols or "Key: Value" patterns without newlines
-        // We inject newlines before common report delimiters and potential keys to ensure vertical display
-        const reportSeparators = /[◆●■|·🔒ℹ️⚠️✅❌]/g;
-        const keyPatterns = /([A-Z][a-z]+(\s[A-Z][a-z]+)?:\s)/g;
+        // Proactively split reports into clean lines by identifying headers and labels
+        // 1. Identify section headers (Symbols followed by text)
+        // 2. Identify key labels (Title case text followed by colon)
+        const reportSeparators = /([◆●■|·🔒ℹ️⚠️✅❌📅📱🔐])/g;
+        const keyPatterns = /([A-Z][A-Za-z0-9\s]+:\s)/g;
 
         const processedText = baseText
             .replace(reportSeparators, (match) => `\n${match}`)
@@ -587,7 +588,7 @@ function AdminDashboard() {
                                 </Button>
                               </Link>
                               <Link href="/admin/notifications" className="w-full">
-                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1">
+                                <Button variant="outline" className="w-full text-[10px] gap-1 border-border px-1" title="Broadcast System Notifications">
                                   <Bell className="h-3 w-3" /> Broadcast
                                 </Button>
                               </Link>

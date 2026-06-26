@@ -155,6 +155,44 @@ const CopyToClipboard = ({ text, children }: { text: string; children: React.Rea
   );
 };
 
+// Helper to format individual feedback lines based on symbols and Key: Value patterns
+function StructuredFeedbackLine({ line }: { line: string }) {
+    // 1. Identify section headers (Start with emojis or specific report symbols)
+    if (/^[◆🔒📅🔐📱]/.test(line)) {
+        return (
+            <div className="mt-6 first:mt-2 mb-3 font-black text-foreground flex items-center gap-2 text-base sm:text-lg border-b border-border/50 pb-1">
+                {line}
+            </div>
+        );
+    }
+
+    // 2. Identify Data Fields (Contains ": " and looks like a Label: Value pair)
+    if (line.includes(': ')) {
+        const [label, ...valueParts] = line.split(': ');
+        const value = valueParts.join(': ');
+        
+        // Ensure even labels without bullet points get them for consistency with the image
+        const cleanLabel = label.replace(/^[○•\-]\s*/, '').trim();
+
+        return (
+            <div className="flex items-start gap-3 text-sm sm:text-[15px] py-1 pl-1">
+                <span className="text-muted-foreground/40 shrink-0 font-bold leading-relaxed">○</span>
+                <div className="flex flex-wrap items-baseline gap-x-2">
+                    <span className="font-bold text-foreground shrink-0">{cleanLabel}:</span>
+                    <span className="text-muted-foreground font-medium">{value}</span>
+                </div>
+            </div>
+        );
+    }
+
+    // 3. Fallback for standard descriptive text (like Apple definitions or long paragraphs)
+    return (
+        <div className="text-[13px] text-muted-foreground/80 pl-8 leading-relaxed italic mt-2 mb-4 max-w-2xl">
+            {line}
+        </div>
+    );
+}
+
 function DeviceCheckContent() {
   const { data: user, loading: userLoading } = useUser();
   const { firestore, auth } = useFirebase();
@@ -807,17 +845,14 @@ function DeviceCheckContent() {
         const chimaeraHeading = "Chimaera Device Policy & Blacklist (Blocked by Apple)";
         const isChimaera = submission.status === 'chimaera' || feedbackData.lines.includes(chimaeraHeading);
 
-        const feedbackText = feedbackData.lines
+        const feedbackLines = feedbackData.lines
             .filter(line => !specialStatusLines.includes(line) && line !== chimaeraHeading)
             .map(line => line
                 .replace(/undefined/gi, '')
                 .replace(/\(undefined\)/gi, '')
                 .replace(/(iPhone)(\d+)/gi, '$1 $2')
-            )
-            .join('\n');
+            );
         
-        const shouldAnimate = !isCachedCheck && (submission.status === 'eligible' || submission.status === 'chimaera');
-
         const getEstimatedTime = (rate: number) => {
           if (rate >= 98) return "Usually completed in less than 24 hours.";
           if (rate >= 75) return "This process may take up to 2 days.";
@@ -826,16 +861,16 @@ function DeviceCheckContent() {
         };
         
         return (
-            <div className="w-full text-left p-4 space-y-4">
-              <div className="space-y-2">
+            <div className="w-full text-left p-4 sm:p-6 space-y-6">
+              <div className="space-y-1">
                 {submission.icloudStatus && (
-                   <div className={cn("p-2 px-3 rounded-md font-mono text-sm border flex items-center gap-2 animate-fade-in mb-2", submission.icloudStatus === 'clean' ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300")}>
-                      <span className="font-bold uppercase">iCloud Status: {submission.icloudStatus}</span>
+                   <div className={cn("p-2 px-3 rounded-md font-mono text-sm border flex items-center gap-2 animate-fade-in mb-4 w-fit", submission.icloudStatus === 'clean' ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300")}>
+                      <span className="font-bold uppercase tracking-tight">iCloud Status: {submission.icloudStatus}</span>
                    </div>
                 )}
 
                 {isChimaera && (
-                  <div className="p-3 px-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300 font-bold text-sm sm:text-base animate-fade-in shadow-sm flex items-center gap-2 mb-2">
+                  <div className="p-3 px-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300 font-bold text-sm sm:text-base animate-fade-in shadow-sm flex items-center gap-2 mb-4">
                     <AlertTriangle className="h-5 w-5 flex-shrink-0" />
                     <span>{chimaeraHeading}</span>
                   </div>
@@ -844,50 +879,43 @@ function DeviceCheckContent() {
                 {specialStatusLines.map((line, index) => {
                   if (line === 'FIND_MY_ON_STATUS') {
                     return (
-                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in">
-                        <span className="text-foreground">Find My:</span>
-                        <span className="bg-red-500 text-white font-bold px-2 py-0.5 rounded-md text-xs">ON</span>
+                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in mb-4 w-fit">
+                        <span className="text-foreground font-bold">Find My:</span>
+                        <span className="bg-red-500 text-white font-black px-2 py-0.5 rounded-md text-xs">ON</span>
                       </div>
                     )
                   }
                   if (line === 'FIND_MY_OFF_STATUS') {
                     return (
-                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in">
-                        <span className="text-foreground">Find My:</span>
-                        <span className="bg-green-500 text-white font-bold px-2 py-0.5 rounded-md text-xs">OFF</span>
+                      <div key={`special-${index}`} className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono flex items-center gap-2 animate-fade-in mb-4 w-fit">
+                        <span className="text-foreground font-bold">Find My:</span>
+                        <span className="bg-green-500 text-white font-black px-2 py-0.5 rounded-md text-xs">OFF</span>
                       </div>
                     )
                   }
                   return null;
                 })}
 
-                {feedbackText && (
-                  shouldAnimate ? (
-                    <TypingAnimation 
-                        text={feedbackText} 
-                        duration={5000} 
-                        className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono text-foreground"
-                    />
-                  ) : (
-                    <div className="p-2 px-3 rounded-md bg-card border border-border text-sm font-mono whitespace-pre-wrap animate-fade-in text-foreground">
-                      {feedbackText}
-                    </div>
-                  )
-                )}
+                {/* Structured Report Content */}
+                <div className="space-y-1 animate-fade-in">
+                    {feedbackLines.map((line, idx) => (
+                        <StructuredFeedbackLine key={idx} line={line} />
+                    ))}
+                </div>
               </div>
 
               {(submission.status === 'eligible' || submission.status === 'chimaera') && submission.successRate && (
-                <div className="mt-6 space-y-6 animate-fade-in">
+                <div className="mt-8 pt-6 border-t border-border space-y-6 animate-fade-in">
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wide">
+                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
                       <span className={cn(submission.successRate >= 75 ? "text-green-600" : "text-red-600")}>
-                        Unlock Success Rate
+                        Unlock Success Probability
                       </span>
                       <span className={cn(submission.successRate >= 75 ? "text-green-600" : "text-red-600")}>
                         {submission.successRate}%
                       </span>
                     </div>
-                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden border border-border/50">
                       <div 
                         className={cn("h-full transition-all duration-1000", submission.successRate >= 75 ? "bg-green-500" : "bg-red-500")}
                         style={{ width: `${submission.successRate}%` }}
@@ -899,7 +927,7 @@ function DeviceCheckContent() {
                     <p className="text-[13px] font-bold text-foreground">
                       Estimated processing time: {getEstimatedTime(submission.successRate)}
                     </p>
-                    <div className="flex gap-2 bg-muted/30 p-3 rounded-xl border border-border">
+                    <div className="flex gap-2 bg-muted/30 p-4 rounded-2xl border border-border">
                       <Info className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
                       <p className="text-[11px] text-muted-foreground leading-relaxed italic">
                         Unlock processing time depends on server response, device verification stages, and Apple activation server synchronization. In most cases it is completed within the estimated time, but delays can occasionally occur due to server traffic or additional verification checks.
@@ -908,11 +936,11 @@ function DeviceCheckContent() {
                   </div>
                   
                   {submission.successRate <= 45 && (
-                    <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-[13px] text-red-800 dark:text-red-300 space-y-3 leading-relaxed shadow-sm">
-                      <p className="font-bold">Advice: It is recommended not to proceed with the unlock due to the low success probability.</p>
+                    <div className="p-5 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-[13px] text-red-800 dark:text-red-300 space-y-3 leading-relaxed shadow-sm rounded-2xl">
+                      <p className="font-black uppercase tracking-tight text-sm">Advice: Low Success Rate Warning</p>
+                      <p>It is recommended not to proceed with the unlock due to the low success probability.</p>
                       <p>If you choose to proceed, please note that in the event the unlock is unsuccessful, only 70% of the payment will be refunded. The remaining 30% will be retained as a processing service fee.</p>
-                      <p>If you agree to these terms, you may still proceed with the unlock order.</p>
-                      <div className="pt-2 border-t border-red-200 dark:border-red-900/50 space-y-1 text-xs opacity-90">
+                      <div className="pt-3 border-t border-red-200 dark:border-red-900/50 space-y-1.5 text-[11px] opacity-90">
                         <p>• Refunds will be processed using the same payment method used for the original transaction.</p>
                         <p>• If the unlock order is confirmed unsuccessful, the client must submit a support ticket or contact support with their Order ID to request the refund.</p>
                       </div>
@@ -922,34 +950,38 @@ function DeviceCheckContent() {
               )}
 
               {feedbackData.timestamp && (
-                <p className="text-xs text-muted-foreground mt-2 text-right animate-fade-in">Feedback received: {feedbackData.timestamp}</p>
+                <p className="text-[10px] text-muted-foreground/60 mt-4 text-right animate-fade-in font-mono">Report generated: {feedbackData.timestamp}</p>
               )}
+              
               {(submission.status === 'eligible' || submission.status === 'chimaera') && (
-                <div className="mt-4 flex flex-col sm:flex-row items-center sm:justify-end gap-4 animate-fade-in">
-                  <p className="bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-300 font-semibold p-2 px-3 rounded-lg text-sm block w-full sm:w-auto text-center">
-                    ✅ This device is eligible for iCloud Unlock
-                  </p>
+                <div className="mt-8 flex flex-col sm:flex-row items-center sm:justify-end gap-4 animate-fade-in">
+                  <div className="bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-300 font-bold p-3 px-5 rounded-xl text-sm block w-full sm:w-auto text-center border border-green-200 dark:border-green-900/50">
+                    ✅ Verified Eligibility
+                  </div>
                   <Button 
                     onClick={openPaymentModal} 
-                    variant="outline" 
-                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:hover:text-white transition-all font-bold shadow-sm w-full sm:w-auto"
+                    className="btn-primary text-white transition-all font-black shadow-xl w-full sm:w-auto h-12 rounded-xl text-base px-8 hover:scale-105 active:scale-95"
                   >
                     Proceed with Unlock
-                    <ChevronRight className="ml-1 h-4 w-4" />
+                    <ChevronRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
               )}
                {submission.status === 'not_supported' && (
-                 <p className="bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-green-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">❌ Unable to proceed with the unlock.</p>
+                 <div className="bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-300 font-bold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm border border-red-200 dark:border-red-900/30">
+                    ❌ This device is currently not supported for unlock processing.
+                 </div>
                )}
                {submission.status === 'find_my_off' && (
-                 <p className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm leading-relaxed">
+                 <div className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm leading-relaxed border border-blue-200 dark:border-blue-900/30">
                     Find My is OFF. If you need help restoring your device, please contact the {' '}
-                    <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-bold">technician</a>.
-                 </p>
+                    <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
+                 </div>
                )}
                {submission.status === 'feedback' && (
-                 <p className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-2 px-3 rounded-lg mt-4 text-center animate-fade-in text-sm">ℹ️ Select the above device model and check again.</p>
+                 <div className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-bold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm border border-blue-200 dark:border-blue-900/30">
+                    ℹ️ Select the above device model and check again.
+                 </div>
                )}
             </div>
         );
@@ -1042,7 +1074,7 @@ function DeviceCheckContent() {
           </div>
         </div>
 
-        <div className={cn("mt-5 rounded-lg border border-border", (shouldShowLoader || verifyingClaimId) ? "bg-card overflow-hidden" : "p-4 bg-muted/30 min-h-[120px] flex items-center justify-center flex-col text-center")}>
+        <div className={cn("mt-5 rounded-2xl border border-border overflow-hidden", (shouldShowLoader || verifyingClaimId) ? "bg-card" : "bg-card/50 min-h-[120px] flex items-center justify-center flex-col text-center")}>
           {renderContent()}
         </div>
       </main>
