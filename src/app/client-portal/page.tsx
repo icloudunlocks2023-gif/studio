@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
@@ -661,7 +662,7 @@ function DeviceCheckContent() {
   const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
 
   const additionalMethods = [
-    { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qzrxlnds0lrx7txvxg0fhyqctjvztfdjw3uf8lr', type: 'crypto', icon: getImage('bitcoin-icon') },
+    { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qzrxlnds0lrx7txvxg0fhyctjvztfdjw3uf8lr', type: 'crypto', icon: getImage('bitcoin-icon') },
     { id: 'usdt-trc20', name: 'USDT (TRC20)', address: 'TCRCzCURBYfZB459umToj54nXftEKU1G9q', type: 'crypto', icon: getImage('usdt-trc20-icon') },
     { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto', icon: getImage('usdc-icon') },
     { id: 'eth', name: 'Ethereum (ETH)', address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto', icon: getImage('eth-icon') },
@@ -812,9 +813,7 @@ function DeviceCheckContent() {
                 .replace(/undefined/gi, '')
                 .replace(/\(undefined\)/gi, '')
                 .replace(/(iPhone)(\d+)/gi, '$1 $2')
-                .trim()
             )
-            .filter(line => line !== '')
             .join('\n');
         
         const shouldAnimate = !isCachedCheck && (submission.status === 'eligible' || submission.status === 'chimaera');

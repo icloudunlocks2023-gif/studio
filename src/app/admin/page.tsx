@@ -265,7 +265,9 @@ function AdminDashboard() {
             return toast({ title: "Input Required", description: "Enter feedback.", variant: "destructive" });
         }
 
-        lines = feedbackText.split('\n').filter(l => l.trim() && !l.startsWith('TIMESTAMP:'));
+        // Removed l.trim() to preserve blank lines/spacing pasted into the editor
+        lines = feedbackText.split('\n').filter(l => !l.startsWith('TIMESTAMP:'));
+        
         if (status === 'eligible') lines.push('FIND_MY_ON_STATUS');
         if (status === 'find_my_off') lines.push('FIND_MY_OFF_STATUS');
         if (status === 'chimaera') {
