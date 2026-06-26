@@ -255,18 +255,27 @@ function AdminDashboard() {
             "Thank you for your understanding."
         ];
     } else {
-        const feedbackText = feedbackTextRaw
+        const baseText = feedbackTextRaw
             .replace(/undefined/gi, '')
             .replace(/\(undefined\)/gi, '')
-            .replace(/(iPhone)(\d+)/gi, '$1 $2')
-            .trim();
+            .replace(/(iPhone)(\d+)/gi, '$1 $2');
 
-        if (feedbackText === '' && status !== 'eligible' && status !== 'find_my_off' && status !== 'feedback' && status !== 'not_supported' && status !== 'chimaera') {
+        if (baseText.trim() === '' && status !== 'eligible' && status !== 'find_my_off' && status !== 'feedback' && status !== 'not_supported' && status !== 'chimaera') {
             return toast({ title: "Input Required", description: "Enter feedback.", variant: "destructive" });
         }
 
-        // Removed l.trim() to preserve blank lines/spacing pasted into the editor
-        lines = feedbackText.split('\n').filter(l => !l.startsWith('TIMESTAMP:'));
+        // Proactively split reports that use symbols or "Key: Value" patterns without newlines
+        // We inject newlines before common report delimiters and potential keys to ensure vertical display
+        const reportSeparators = /[◆●■|·🔒ℹ️⚠️✅❌]/g;
+        const keyPatterns = /([A-Z][a-z]+(\s[A-Z][a-z]+)?:\s)/g;
+
+        const processedText = baseText
+            .replace(reportSeparators, (match) => `\n${match}`)
+            .replace(keyPatterns, (match) => `\n${match}`);
+
+        lines = processedText.split('\n')
+            .map(l => l.trim())
+            .filter(l => l !== '' && !l.startsWith('TIMESTAMP:'));
         
         if (status === 'eligible') lines.push('FIND_MY_ON_STATUS');
         if (status === 'find_my_off') lines.push('FIND_MY_OFF_STATUS');
