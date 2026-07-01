@@ -829,7 +829,7 @@ function DeviceCheckContent() {
                         <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight mb-6">Contact Support to Reset Your Account</h3>
                         <div className="relative inline-block group">
                             <div className="absolute -inset-1 bg-white/30 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                            <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="relative block">
+                            <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="relative block">
                                 <Button className="bg-white text-blue-700 hover:bg-gray-50 font-black px-10 h-16 rounded-xl text-xl shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-3 group animate-bounce">
                                     Reset Support
                                     <ChevronRight className="group-hover:translate-x-1 transition-transform" />
@@ -1126,7 +1126,7 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>
@@ -1225,7 +1225,7 @@ function DeviceCheckContent() {
                     <div className="space-y-3 animate-fade-in">
                         <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5 mt-2">
                             <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                                For other payment options, contact the <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                                For other payment options, contact the <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                             </AlertDescription>
                         </Alert>
                         <div className="space-y-3">

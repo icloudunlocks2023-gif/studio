@@ -286,7 +286,7 @@ export default function ServicesPage() {
         {!isResellerActive && isProfessionalUser && (
           <div className="bg-blue-50 dark:bg-blue-950/20 border-b border-blue-100 dark:border-blue-900/30 py-4 px-4 text-center">
             <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
-              Looking for reseller pricing? Contact <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Support</a> for reseller rates and bulk service discounts.
+              Looking for reseller pricing? Contact <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Support</a> for reseller rates and bulk service discounts.
             </p>
           </div>
         )}
@@ -569,7 +569,7 @@ export default function ServicesPage() {
           <div className="max-w-lg mx-auto">
               <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Get in Touch</h3>
               <div className="grid sm:grid-cols-2 gap-6">
-                 <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors border-border">
+                 <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors border-border">
                   <div className="w-12 h-12 apple-gradient rounded-lg flex items-center justify-center mr-4">
                      {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={28} height={28} />}
                   </div>
@@ -642,7 +642,7 @@ export default function ServicesPage() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>

@@ -61,7 +61,7 @@ export default function ContactPage() {
       icon: whatsappIcon,
       title: 'WhatsApp',
       value: 'Alternative Contact',
-      link: 'https://wa.me/message/P2IXLAG23I23P1'
+      link: 'https://wa.me/message/VAWM7QDYEPBZF1'
     },
     {
       lucideIcon: Mail,
@@ -218,7 +218,7 @@ export default function ContactPage() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/P2IXLAG23I23P1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>
