@@ -77,11 +77,12 @@ function UserManagementDashboard() {
 
   const filteredUsers = useMemo(() => {
     if (!users) return [];
+    const term = searchTerm.toLowerCase();
     return users.filter(u => 
-        u.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        u.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.id.toLowerCase().includes(searchTerm.toLowerCase())
+        (u.email || '').toLowerCase().includes(term) || 
+        (u.displayName || '').toLowerCase().includes(term) ||
+        (u.username || '').toLowerCase().includes(term) ||
+        (u.id || '').toLowerCase().includes(term)
     );
   }, [users, searchTerm]);
 

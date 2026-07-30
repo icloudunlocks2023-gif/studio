@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -40,9 +39,9 @@ export default function AdminNotificationsPage() {
     if (!searchTerm.trim()) return allUsers;
     const term = searchTerm.toLowerCase();
     return allUsers.filter((u: any) => 
-      u.id.toLowerCase().includes(term) || 
-      u.email?.toLowerCase().includes(term) || 
-      u.displayName?.toLowerCase().includes(term)
+      (u.id || '').toLowerCase().includes(term) || 
+      (u.email || '').toLowerCase().includes(term) || 
+      (u.displayName || '').toLowerCase().includes(term)
     );
   }, [allUsers, searchTerm]);
 
