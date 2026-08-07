@@ -439,9 +439,9 @@ function MyAccountContent() {
   const additionalMethods = [
     { id: 'usdt-bep20', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress, type: 'crypto' },
     { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qzrxlnds0lrx7txvxg0fhyqctjvztfdjw3uf8lr', type: 'crypto' },
-    { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TCRCzCURBYfZB459umToj54nXftEKU1G9q', type: 'crypto' },
-    { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
-    { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
+    { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TQEUNZD9xX5SDFKCAMJWa5uLAr6tdM5gd4', type: 'crypto' },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0x822F4E920593F65151A12dC2DbB26e4Cc223FC20', type: 'crypto' },
+    { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0x822F4E920593F65151A12dC2DbB26e4Cc223FC20', type: 'crypto' },
     { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
     { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
     { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
