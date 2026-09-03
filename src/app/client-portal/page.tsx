@@ -975,7 +975,7 @@ function DeviceCheckContent() {
                {submission.status === 'find_my_off' && (
                  <div className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm leading-relaxed border border-blue-200 dark:border-blue-900/30">
                     Find My is OFF. If you need help restoring your device, please contact the {' '}
-                    <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
+                    <a href="https://t.me/Christoper_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
                  </div>
                )}
                {submission.status === 'feedback' && (
@@ -1120,7 +1120,7 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/Christoper_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
