@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -161,6 +162,17 @@ function MyAccountContent() {
   const [newPassword, setNewPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const telegramIcon = getImage('telegram-icon');
+  const whatsappIcon = getImage('whatsapp-icon');
+
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -703,7 +715,7 @@ function MyAccountContent() {
                                     <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-mono text-sm px-3 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
                                         {formatTime(depositTimer)}
                                     </div>
-                                    <Button variant="ghost" size="sm" onClick={() => setDepositStep('methods')} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Cancel</Button>
+                                    <button onClick={() => setDepositStep('methods')} className="h-7 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary">Cancel</button>
                                 </div>
                             </div>
 
@@ -1067,7 +1079,7 @@ function MyAccountContent() {
 
                   <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5">
                     <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                      For other payment options, contact the <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                      For other payment options, contact the <button onClick={handleWhatsAppClick} className="font-semibold underline text-blue-600">admin</button>.
                     </AlertDescription>
                   </Alert>
                   
@@ -1329,10 +1341,10 @@ function MyAccountContent() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <button onClick={handleWhatsAppClick} className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/3Jbr4p5L/icon.png" alt="WhatsApp" width={18} height={18} className="mr-2" />
                                 WhatsApp
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>

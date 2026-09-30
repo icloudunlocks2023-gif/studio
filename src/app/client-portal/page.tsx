@@ -255,6 +255,14 @@ function DeviceCheckContent() {
   const formDisabled = isChecking || isSearching || !!submission || isOfflineSimulating || !!verifyingClaimId || isPolicyModalOpen;
   const shouldShowLoader = (isChecking || (submission && submission.status === 'waiting') || isOfflineSimulating) && !offlineError;
 
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
+
   useEffect(() => {
     if (submission?.status === 'device_found') {
         setShowDeviceFoundNotif(true);
@@ -386,14 +394,16 @@ function DeviceCheckContent() {
             clearTimeout(timeoutId);
             
             if (ipResponse.ok) {
-              const ipData = await ipResponse.json();
-              clientIp = ipData.ip || 'unknown';
-              country = ipData.country_name || 'unknown';
-              
-              // Persist locally for future requests in this session or revisits
-              if (clientIp !== 'unknown') {
-                  localStorage.setItem('detected_ip', clientIp);
-                  localStorage.setItem('detected_country', country);
+              const ipData = await ipResponse.ok ? await ipResponse.json() : null;
+              if (ipData) {
+                  clientIp = ipData.ip || 'unknown';
+                  country = ipData.country_name || 'unknown';
+                  
+                  // Persist locally for future requests in this session or revisits
+                  if (clientIp !== 'unknown') {
+                      localStorage.setItem('detected_ip', clientIp);
+                      localStorage.setItem('detected_country', country);
+                  }
               }
             }
         } catch (e) {
@@ -829,12 +839,12 @@ function DeviceCheckContent() {
                         <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight mb-6">Contact Support to Reset Your Account</h3>
                         <div className="relative inline-block group">
                             <div className="absolute -inset-1 bg-white/30 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                            <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="relative block">
+                            <button onClick={handleWhatsAppClick} className="relative block">
                                 <Button className="bg-white text-blue-700 hover:bg-gray-50 font-black px-10 h-16 rounded-xl text-xl shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-3 group animate-bounce">
                                     Reset Support
                                     <ChevronRight className="group-hover:translate-x-1 transition-transform" />
                                 </Button>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1126,10 +1136,10 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <button onClick={handleWhatsAppClick} className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -1225,7 +1235,7 @@ function DeviceCheckContent() {
                     <div className="space-y-3 animate-fade-in">
                         <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5 mt-2">
                             <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                                For other payment options, contact the <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                                For other payment options, contact the <button onClick={handleWhatsAppClick} className="font-semibold underline text-blue-600">admin</button>.
                             </AlertDescription>
                         </Alert>
                         <div className="space-y-3">
@@ -1430,7 +1440,7 @@ function DeviceCheckContent() {
             {(!selectedMethod || selectedMethod.type === 'crypto') && (
                 <DialogFooter className="p-3 border-t border-border flex flex-row gap-3 mt-auto bg-card">
                     <Button variant="outline" className="flex-1 h-11 rounded-xl text-sm font-bold shadow-sm" onClick={() => setPaymentModalOpen(false)}>Cancel</Button>
-                    <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingOrder}>
+                    <Button onClick={handlePaid} className="btn-primary text-white dark:text-white flex-1 h-11 rounded-xl text-sm font-bold shadow-md" disabled={isSubmittingBulk}>
                         {isSubmittingOrder ? <><Loader className="mr-2 h-4 w-4 animate-spin" />Processing...</> : (amountToPay > 0 ? 'I Paid' : 'Confirm')}
                     </Button>
                 </DialogFooter>

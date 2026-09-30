@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { useToast } from '@/hooks/use-toast';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -27,10 +28,18 @@ const paymentMethods = [
 
 export default function RefundPolicyPage() {
   const { data: user } = useUser();
+  const { toast } = useToast();
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
 
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
 
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen">
@@ -226,10 +235,10 @@ export default function RefundPolicyPage() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <button onClick={handleWhatsAppClick} className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
