@@ -170,13 +170,13 @@ export default function BulkUnlockDiscountPage() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>

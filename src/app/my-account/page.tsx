@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -79,7 +80,7 @@ interface Counters {
 
 const CopyToClipboard = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const { toast } = useToast();
-  const handleCopy = () => {
+  handleCopy = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied to clipboard!",
@@ -438,7 +439,7 @@ function MyAccountContent() {
 
   const additionalMethods = [
     { id: 'usdt-bep20', name: 'USDT (BEP20)', icon: usdtImage, address: usdtAddress, type: 'crypto' },
-    { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qzrxlnds0lrx7txvxg0fhyqctjvztfdjw3uf8lr', type: 'crypto' },
+    { id: 'btc', name: 'Bitcoin (BTC)', icon: bitcoinImage, address: 'bc1qzrxlnds0lrx7txvxg0fhyctjvztfdjw3uf8lr', type: 'crypto' },
     { id: 'usdt-trc20', name: 'USDT (TRC20)', icon: getImage('usdt-trc20-icon'), address: 'TCRCzCURBYfZB459umToj54nXftEKU1G9q', type: 'crypto' },
     { id: 'usdc-erc20', name: 'USDC (ERC20)', icon: usdcImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
     { id: 'eth', name: 'Ethereum (ETH)', icon: ethImage, address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto' },
@@ -1067,7 +1068,7 @@ function MyAccountContent() {
 
                   <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5">
                     <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                      For other payment options, contact the <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                      For other payment options, contact the <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                     </AlertDescription>
                   </Alert>
                   
@@ -1329,7 +1330,7 @@ function MyAccountContent() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/VAWM7QDYEPBZF1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/3Jbr4p5L/icon.png" alt="WhatsApp" width={18} height={18} className="mr-2" />
                                 WhatsApp
                             </a>
