@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
@@ -255,6 +254,14 @@ function DeviceCheckContent() {
   const formDisabled = isChecking || isSearching || !!submission || isOfflineSimulating || !!verifyingClaimId || isPolicyModalOpen;
   const shouldShowLoader = (isChecking || (submission && submission.status === 'waiting') || isOfflineSimulating) && !offlineError;
 
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
+
   useEffect(() => {
     if (submission?.status === 'device_found') {
         setShowDeviceFoundNotif(true);
@@ -386,14 +393,16 @@ function DeviceCheckContent() {
             clearTimeout(timeoutId);
             
             if (ipResponse.ok) {
-              const ipData = await ipResponse.json();
-              clientIp = ipData.ip || 'unknown';
-              country = ipData.country_name || 'unknown';
-              
-              // Persist locally for future requests in this session or revisits
-              if (clientIp !== 'unknown') {
-                  localStorage.setItem('detected_ip', clientIp);
-                  localStorage.setItem('detected_country', country);
+              const ipData = await ipResponse.ok ? await ipResponse.json() : null;
+              if (ipData) {
+                  clientIp = ipData.ip || 'unknown';
+                  country = ipData.country_name || 'unknown';
+                  
+                  // Persist locally for future requests in this session or revisits
+                  if (clientIp !== 'unknown') {
+                      localStorage.setItem('detected_ip', clientIp);
+                      localStorage.setItem('detected_country', country);
+                  }
               }
             }
         } catch (e) {
@@ -700,10 +709,10 @@ function DeviceCheckContent() {
   const amountToPay = activePrice ? Math.max(0, activePrice - currentBalance) : Math.max(0, price - currentBalance);
 
   const additionalMethods = [
-    { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qzrxlnds0lrx7txvxg0fhyctjvztfdjw3uf8lr', type: 'crypto', icon: getImage('bitcoin-icon') },
-    { id: 'usdt-trc20', name: 'USDT (TRC20)', address: 'TCRCzCURBYfZB459umToj54nXftEKU1G9q', type: 'crypto', icon: getImage('usdt-trc20-icon') },
-    { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto', icon: getImage('usdc-icon') },
-    { id: 'eth', name: 'Ethereum (ETH)', address: '0x21A9f32db018aDd719Ea4e9a329058661c552dd9', type: 'crypto', icon: getImage('eth-icon') },
+    { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1q0g2z478af7w885j7mfzsyzc9xxnufh25ajk3d8', type: 'crypto', icon: getImage('bitcoin-icon') },
+    { id: 'usdt-trc20', name: 'USDT (TRC20)', address: 'TQEUNZD9xX5SDFKCAMJWa5uLAr6tdM5gd4', type: 'crypto', icon: getImage('usdt-trc20-icon') },
+    { id: 'usdc-erc20', name: 'USDC (ERC20)', address: '0x822F4E920593F65151A12dC2DbB26e4Cc223FC20', type: 'crypto', icon: getImage('usdc-icon') },
+    { id: 'eth', name: 'Ethereum (ETH)', address: '0x822F4E920593F65151A12dC2DbB26e4Cc223FC20', type: 'crypto', icon: getImage('eth-icon') },
     { id: 'cashapp', name: 'Cash App', icon: getImage('cashapp-icon'), type: 'manual' },
     { id: 'paypal', name: 'PayPal', icon: getImage('paypal-icon'), type: 'manual' },
     { id: 'venmo', name: 'Venmo', icon: getImage('venmo-icon'), type: 'manual' },
@@ -975,7 +984,7 @@ function DeviceCheckContent() {
                {submission.status === 'find_my_off' && (
                  <div className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm leading-relaxed border border-blue-200 dark:border-blue-900/30">
                     Find My is OFF. If you need help restoring your device, please contact the {' '}
-                    <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
+                    <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
                  </div>
                )}
                {submission.status === 'feedback' && (
@@ -1102,7 +1111,7 @@ function DeviceCheckContent() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Telegram Channel
                             </a>
@@ -1120,7 +1129,7 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>

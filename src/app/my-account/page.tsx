@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -80,7 +79,7 @@ interface Counters {
 
 const CopyToClipboard = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const { toast } = useToast();
-  handleCopy = () => {
+  const handleCopy = () => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied to clipboard!",
@@ -162,6 +161,17 @@ function MyAccountContent() {
   const [newPassword, setNewPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const telegramIcon = getImage('telegram-icon');
+  const whatsappIcon = getImage('whatsapp-icon');
+
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -704,7 +714,7 @@ function MyAccountContent() {
                                     <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-mono text-sm px-3 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
                                         {formatTime(depositTimer)}
                                     </div>
-                                    <Button variant="ghost" size="sm" onClick={() => setDepositStep('methods')} className="h-7 text-[10px] uppercase font-bold text-muted-foreground">Cancel</Button>
+                                    <button onClick={() => setDepositStep('methods')} className="h-7 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary">Cancel</button>
                                 </div>
                             </div>
 
@@ -1324,7 +1334,7 @@ function MyAccountContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Technician
                             </a>

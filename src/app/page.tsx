@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -231,6 +230,14 @@ export default function IcloudUnlocksPage() {
     toast({
         title: "Unable to Add Review",
         description: "You must have a completed unlock order with us to leave a review.",
+    });
+  };
+
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
     });
   };
   
@@ -536,7 +543,7 @@ export default function IcloudUnlocksPage() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/Christoper_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>

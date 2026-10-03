@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -12,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { useToast } from '@/hooks/use-toast';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -28,9 +28,18 @@ const paymentMethods = [
 
 export default function ContactPage() {
   const { data: user } = useUser();
+  const { toast } = useToast();
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
+
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
 
   const contactMethods = [
     { 
@@ -38,36 +47,42 @@ export default function ContactPage() {
       title: 'Telegram Channel', 
       value: 'Official Announcements', 
       link: 'https://t.me/iCloudUnlocks2023',
+      type: 'link'
     },
     { 
       icon: telegramIcon, 
       title: 'Support 1', 
       value: 'General Inquiries', 
       link: 'https://t.me/iCloudUnlocks_2023',
+      type: 'link'
     },
     { 
       icon: telegramIcon, 
       title: 'Support 2', 
       value: 'Billing & Payments', 
       link: 'https://t.me/iUnlock_Apple',
+      type: 'link'
     },
     { 
       icon: telegramIcon, 
       title: 'Technician', 
       value: 'Technical Support', 
-      link: 'https://t.me/Chris_Morgan057',
+      link: 'https://t.me/Christoper_Morgan057',
+      type: 'link'
     },
     {
       icon: whatsappIcon,
       title: 'WhatsApp',
       value: 'Alternative Contact',
-      link: 'https://wa.me/message/3P756XIQM4YAI1'
+      link: 'https://wa.me/message/3P756XIQM4YAI1',
+      type: 'link'
     },
     {
       lucideIcon: Mail,
       title: 'Email Support',
       value: 'icloudunlocks2023@gmail.com',
-      link: 'mailto:icloudunlocks2023@gmail.com'
+      link: 'mailto:icloudunlocks2023@gmail.com',
+      type: 'link'
     }
   ];
 
@@ -139,31 +154,34 @@ export default function ContactPage() {
           
           <CardContent className="p-0">
               <div className="space-y-4">
-                {contactMethods.map((method, index) => (
-                  <a 
-                    key={index}
-                    href={method.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="flex items-center p-4 rounded-lg bg-muted/30 hover:bg-muted/50 border border-border transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    {method.icon && (
-                        <Image src={method.icon.imageUrl} alt={`${method.title} icon`} width={40} height={40} className="mr-4" />
-                    )}
-                    {method.lucideIcon && (
-                        <div className="mr-4 p-2 bg-primary/10 rounded-lg text-primary">
-                            <method.lucideIcon size={24} />
-                        </div>
-                    )}
-                    <div>
-                        <p className="font-semibold text-lg text-foreground">{method.title}</p>
-                        <p className="text-muted-foreground">{method.value}</p>
-                    </div>
-                    <div className="ml-auto text-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-up-right"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-                    </div>
-                  </a>
-                ))}
+                {contactMethods.map((method, index) => {
+                  const Component = 'a';
+                  const props = { href: method.link, target: "_blank", rel: "noopener noreferrer" };
+
+                  return (
+                    <Component 
+                      key={index}
+                      {...props as any}
+                      className="flex items-center p-4 rounded-lg bg-muted/30 hover:bg-muted/50 border border-border transition-all duration-300 transform hover:scale-[1.02] w-full text-left"
+                    >
+                      {method.icon && (
+                          <Image src={method.icon.imageUrl} alt={`${method.title} icon`} width={40} height={40} className="mr-4" />
+                      )}
+                      {method.lucideIcon && (
+                          <div className="mr-4 p-2 bg-primary/10 rounded-lg text-primary">
+                              <method.lucideIcon size={24} />
+                          </div>
+                      )}
+                      <div>
+                          <p className="font-semibold text-lg text-foreground">{method.title}</p>
+                          <p className="text-muted-foreground">{method.value}</p>
+                      </div>
+                      <div className="ml-auto text-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-up-right"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                      </div>
+                    </Component>
+                  );
+                })}
               </div>
           </CardContent>
         </Card>
@@ -212,7 +230,7 @@ export default function ContactPage() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/Christoper_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { NotificationDropdown } from '@/components/notification-dropdown';
+import { useToast } from '@/hooks/use-toast';
 
 const paymentMethods = [
     { name: 'USDT', imageUrl: 'https://i.postimg.cc/ZRTpmnTk/download_(4).png' },
@@ -27,10 +28,18 @@ const paymentMethods = [
 
 export default function PrivacyPolicyPage() {
   const { data: user } = useUser();
+  const { toast } = useToast();
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
 
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Support Notification",
+      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
+    });
+  };
 
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen">
@@ -192,7 +201,7 @@ export default function PrivacyPolicyPage() {
                     <h4 className="font-semibold mb-4">Contact Us</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li className='block'>
-                            <a href="https://t.me/iUnlock_Apple1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/iCloudUnlocks2023" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Telegram Channel
                             </a>
@@ -210,16 +219,20 @@ export default function PrivacyPolicyPage() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/Chris_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/Christoper_Morgan057" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
                         </li>
                         <li className='block'>
+<<<<<<< HEAD
                            <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+=======
+                           <button onClick={handleWhatsAppClick} className="inline-flex items-center hover:text-white">
+>>>>>>> 7c29318709e1c9cb534b6a08114b536b180cd3ad
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
