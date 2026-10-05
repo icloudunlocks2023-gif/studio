@@ -33,14 +33,6 @@ export default function ContactPage() {
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
 
-  const handleWhatsAppClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Support Notification",
-      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
-    });
-  };
-
   const contactMethods = [
     { 
       icon: telegramIcon,

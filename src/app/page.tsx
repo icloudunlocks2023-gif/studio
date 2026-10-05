@@ -233,14 +233,6 @@ export default function IcloudUnlocksPage() {
     });
   };
 
-  const handleWhatsAppClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Support Notification",
-      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
-    });
-  };
-  
   return (
     <div className="bg-background flex flex-col min-h-screen">
       {/* Navigation */}

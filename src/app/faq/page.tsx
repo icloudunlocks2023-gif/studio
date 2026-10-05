@@ -170,6 +170,7 @@ export default function FaqPage() {
                 <p>Support available 24/7.</p>
                 <ul className="list-disc list-inside space-y-1 pl-4">
                     <li><span className="font-semibold">Telegram:</span> <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">@iCloudUnlocks_2023</a></li>
+                    <li><span className="font-semibold">WhatsApp:</span> <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Contact Support</a></li>
                 </ul>
               </AccordionContent>
             </AccordionItem>

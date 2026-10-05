@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -32,14 +31,6 @@ export default function PrivacyPolicyPage() {
   const isAdmin = user?.email === 'iunlockapple01@gmail.com';
   const telegramIcon = getImage('telegram-icon');
   const whatsappIcon = getImage('whatsapp-icon');
-
-  const handleWhatsAppClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Support Notification",
-      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
-    });
-  };
 
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen">
@@ -168,6 +159,7 @@ export default function PrivacyPolicyPage() {
               <p>For privacy-related inquiries:</p>
               <ul className="list-disc list-inside space-y-2 pl-4">
                 <li><span className="font-semibold">Telegram:</span> <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@iCloudUnlocks_2023</a></li>
+                <li><span className="font-semibold">WhatsApp:</span> <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Contact Support</a></li>
               </ul>
             </section>
 
@@ -225,14 +217,10 @@ export default function PrivacyPolicyPage() {
                             </a>
                         </li>
                         <li className='block'>
-<<<<<<< HEAD
                            <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
-=======
-                           <button onClick={handleWhatsAppClick} className="inline-flex items-center hover:text-white">
->>>>>>> 7c29318709e1c9cb534b6a08114b536b180cd3ad
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
-                            </button>
+                            </a>
                         </li>
                     </ul>
                 </div>

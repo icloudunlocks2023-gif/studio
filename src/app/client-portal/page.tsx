@@ -254,14 +254,6 @@ function DeviceCheckContent() {
   const formDisabled = isChecking || isSearching || !!submission || isOfflineSimulating || !!verifyingClaimId || isPolicyModalOpen;
   const shouldShowLoader = (isChecking || (submission && submission.status === 'waiting') || isOfflineSimulating) && !offlineError;
 
-  const handleWhatsAppClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Support Notification",
-      description: "WhatsApp Support is temporary unavailable. Please use Telegram.",
-    });
-  };
-
   useEffect(() => {
     if (submission?.status === 'device_found') {
         setShowDeviceFoundNotif(true);
@@ -1129,7 +1121,7 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
@@ -1180,7 +1172,7 @@ function DeviceCheckContent() {
                     <p className="font-semibold text-foreground text-base">To restore access, you can:</p>
                     <ul className="list-disc list-inside space-y-1 pl-2">
                         <li>Deposit the required amount to unlock a device, or</li>
-                        <li>Contact Admin for assistance</li>
+                        <li>Contact <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="underline font-bold">Admin</a> for assistance</li>
                     </ul>
 
                     <p className="font-semibold text-foreground text-base">If you make a deposit and the device is not supported, you may either:</p>
