@@ -159,7 +159,7 @@ export default function PrivacyPolicyPage() {
               <p>For privacy-related inquiries:</p>
               <ul className="list-disc list-inside space-y-2 pl-4">
                 <li><span className="font-semibold">Telegram:</span> <a href="https://t.me/iCloudUnlocks_2023" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@iCloudUnlocks_2023</a></li>
-                <li><span className="font-semibold">WhatsApp:</span> <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Contact Support</a></li>
+                <li><span className="font-semibold">WhatsApp:</span> <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Contact Support</a></li>
               </ul>
             </section>
 
@@ -217,7 +217,7 @@ export default function PrivacyPolicyPage() {
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>

@@ -1078,7 +1078,7 @@ function MyAccountContent() {
 
                   <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5">
                     <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                      For other payment options, contact the <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                      For other payment options, contact the <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                     </AlertDescription>
                   </Alert>
                   
@@ -1334,13 +1334,13 @@ function MyAccountContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://t.me/wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://t.me/wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/0NsBwhhG/Screenshot-2025-11-29-at-11-01-37.png" alt="Telegram" width={18} height={18} className="mr-2" />
                                 Technician
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 <Image src="https://i.postimg.cc/3Jbr4p5L/icon.png" alt="WhatsApp" width={18} height={18} className="mr-2" />
                                 WhatsApp
                             </a>

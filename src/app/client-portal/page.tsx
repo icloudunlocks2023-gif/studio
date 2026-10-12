@@ -830,7 +830,7 @@ function DeviceCheckContent() {
                         <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight mb-6">Contact Support to Reset Your Account</h3>
                         <div className="relative inline-block group">
                             <div className="absolute -inset-1 bg-white/30 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                            <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="relative block">
+                            <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="relative block">
                                 <Button className="bg-white text-blue-700 hover:bg-gray-50 font-black px-10 h-16 rounded-xl text-xl shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-3 group animate-bounce">
                                     Reset Support
                                     <ChevronRight className="group-hover:translate-x-1 transition-transform" />
@@ -976,7 +976,7 @@ function DeviceCheckContent() {
                {submission.status === 'find_my_off' && (
                  <div className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-semibold p-4 px-5 rounded-2xl mt-4 text-center animate-fade-in text-sm leading-relaxed border border-blue-200 dark:border-blue-900/30">
                     Find My is OFF. If you need help restoring your device, please contact the {' '}
-                    <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
+                    <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="underline font-black">technician</a>.
                  </div>
                )}
                {submission.status === 'feedback' && (
@@ -1121,13 +1121,13 @@ function DeviceCheckContent() {
                             </a>
                         </li>
                         <li className='block'>
-                            <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                            <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {telegramIcon && <Image src={telegramIcon.imageUrl} alt="Telegram" width={18} height={18} className="mr-2" />}
                                 Technician
                             </a>
                         </li>
                         <li className='block'>
-                           <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
+                           <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-white">
                                 {whatsappIcon && <Image src={whatsappIcon.imageUrl} alt="WhatsApp" width={18} height={18} className="mr-2" />}
                                 WhatsApp
                             </a>
@@ -1172,7 +1172,7 @@ function DeviceCheckContent() {
                     <p className="font-semibold text-foreground text-base">To restore access, you can:</p>
                     <ul className="list-disc list-inside space-y-1 pl-2">
                         <li>Deposit the required amount to unlock a device, or</li>
-                        <li>Contact <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="underline font-bold">Admin</a> for assistance</li>
+                        <li>Contact <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="underline font-bold">Admin</a> for assistance</li>
                     </ul>
 
                     <p className="font-semibold text-foreground text-base">If you make a deposit and the device is not supported, you may either:</p>
@@ -1226,7 +1226,7 @@ function DeviceCheckContent() {
                     <div className="space-y-3 animate-fade-in">
                         <Alert variant="default" className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30 py-1.5 mt-2">
                             <AlertDescription className="text-[11px] text-center text-blue-800 dark:text-blue-300">
-                                For other payment options, contact the <a href="https://wa.me/message/3P756XIQM4YAI1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
+                                For other payment options, contact the <a href="https://wa.me/message/GYQCKXW6JCK2B1" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-blue-600">admin</a>.
                             </AlertDescription>
                         </Alert>
                         <div className="space-y-3">
